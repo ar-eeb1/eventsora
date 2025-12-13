@@ -1,0 +1,36 @@
+import { connectDB } from "@/lib/databaseConnection";
+import { catchError, response } from "@/lib/helperFunction";
+import { isAuthenticated } from "@/lib/authentication";
+import { zSchema } from "@/lib/zodSchema";
+import CountryModel from "@/models/Country.model";
+
+export async function POST(request) {
+    try {
+        const auth = await isAuthenticated('master')
+        if (!auth.isAuth) {
+            return response(false, 403, 'Unauthorized.')
+        }
+
+        await connectDB()
+        const payload = await request.json()
+        const schema = zSchema.pick({
+            country: true, code: true
+        })
+
+        const validate = schema.safeParse(payload)
+        if (!validate.success) {
+            return response(false, 400, 'Invalid or Missing fields.', validate.error)
+        }
+
+        const { country, code } = validate.data
+        const newCountry = new CountryModel({
+            country, code
+        })
+        await newCountry.save()
+
+
+        return response(true, 200, 'Country added.')
+    } catch (error) {
+        return catchError(error)
+    }
+}
