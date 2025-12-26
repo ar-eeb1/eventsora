@@ -1,3 +1,4 @@
+import { listingStatus } from "@/lib/utils";
 import mongoose from "mongoose";
 
 const listingSchema = new mongoose.Schema({
@@ -18,24 +19,25 @@ const listingSchema = new mongoose.Schema({
         ref: 'Category',
         required: true,
     },
-    subCategory: {
+    subcategory: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'SubCategory',
+        ref: 'Subcategory',
         required: true,
     },
     startingPrice: {
         type: Number,
+        required: true,
     },
-    provider: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: "User",
+        required: true,
+        index: true
     },
     media: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Media',
-            required: true
         }
     ],
     description: {
@@ -43,20 +45,28 @@ const listingSchema = new mongoose.Schema({
         required: true
     },
     country: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Country',
         required: true
     },
     state: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'State',
         required: true
     },
     city: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'City',
         required: true
     },
-    location: {
-        type: String,
+    locality: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Locality',
         required: true
+    },
+    sublocality: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Sublocality',
     },
     address: {
         type: String,
@@ -65,17 +75,42 @@ const listingSchema = new mongoose.Schema({
     capacity: {
         type: Number
     },
-    isActive: {
-        type: Boolean,
-        required: true,
-        enum: ['active', 'inactive'],
+    status: {
+        type: String,
+        enum: listingStatus,
+        default: 'pending'
     },
     deletedAt: {
         type: Date,
         default: null,
         index: true
-    }
+    },
+    approvedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', // ✅ admins are users
+    },
+    approvedAt: {
+        type: Date,
+    },
+    reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', // ✅ admins are users
+    },
+    reviewedAt: {
+        type: Date,
+    },
+    adminNote: {
+        type: String,
+        default: null,
+    },
+
+
 }, { timestamps: true })
 
+listingSchema.index({ category: 1, subcategory: 1 })
+listingSchema.index({ city: 1 })
+listingSchema.index({ state: 1 })
+listingSchema.index({ userId: 1 })
+listingSchema.index({ status: 1 })
 const ListingModel = mongoose.models.Listing || mongoose.model('Listing', listingSchema, 'listings')
 export default ListingModel

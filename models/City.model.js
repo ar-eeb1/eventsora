@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const citySchema = new mongoose.Schema({
     state: {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'State',
         required: true
     },

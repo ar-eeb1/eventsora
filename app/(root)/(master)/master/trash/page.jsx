@@ -3,7 +3,7 @@ import BreadCrumb from '@/components/application/BreadCrumb'
 import DatatableWrapper from '@/components/application/Main/DatatableWrapper'
 import DeleteAction from '@/components/application/Main/deleteAction'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { DT_CATEOGORY_COLUMN, DT_CITY_COLUMN, DT_COUNTRY_COLUMN, DT_LOCALITY_COLUMN, DT_STATE_COLUMN, DT_SUB_CATEOGORY_COLUMN, DT_SUBLOCALITY_COLUMN } from '@/lib/column'
+import { DT_CATEOGORY_COLUMN, DT_CITY_COLUMN, DT_COUNTRY_COLUMN, DT_LOCALITY_COLUMN, DT_STATE_COLUMN, DT_SUB_CATEOGORY_COLUMN, DT_SUBLOCALITY_COLUMN, DT_USERS_COLUMN } from '@/lib/column'
 import { columnConfig } from '@/lib/helperFunction'
 import {  MASTER_DASHBOARD, MASTER_TRASH } from '@/routes/MasterPanelRoute'
 import { useSearchParams } from 'next/navigation'
@@ -22,12 +22,12 @@ const TRASH_CONFIG = {
     exportUrl: '/api/master/category/export',
     deleteUrl: '/api/master/category/delete'
   },
-  subCategory: {
+  subcategory: {
     title: 'Sub Category Trash',
     columns: DT_SUB_CATEOGORY_COLUMN,
-    fetchUrl: '/api/master/sub-category',
-    exportUrl: '/api/master/sub-category/export',
-    deleteUrl: '/api/master/sub-category/delete'
+    fetchUrl: '/api/master/subcategory',
+    exportUrl: '/api/master/subcategory/export',
+    deleteUrl: '/api/master/subcategory/delete'
   },
   country: {
     title: 'Country Trash',
@@ -63,6 +63,13 @@ const TRASH_CONFIG = {
     fetchUrl: '/api/master/location/sublocality',
     exportUrl: '/api/master/location/sublocality/export',
     deleteUrl: '/api/master/location/sublocality/delete'
+  },
+  users: {
+    title: 'Users Trash',
+    columns: DT_USERS_COLUMN,
+    fetchUrl: '/api/master/users',
+    exportUrl: '/api/master/users/export',
+    deleteUrl: '/api/master/users/delete'
   },
 }
 

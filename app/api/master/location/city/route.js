@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
     try {
-        const auth = await isAuthenticated('master')
+        const auth = await isAuthenticated(['master', 'provider', 'admin'])
         if (!auth.isAuth) {
             return response(false, 403, 'Unauthorized.')
         }
@@ -93,6 +93,7 @@ export async function GET(request) {
         const totalRowCount = await CityModel.countDocuments(matchQuery)
 
         return NextResponse.json({
+            success: true,
             data: getCity,
             meta: { totalRowCount }
         })

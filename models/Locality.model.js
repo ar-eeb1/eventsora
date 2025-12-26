@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const localitySchema = new mongoose.Schema({
     city: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'State',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'City',
         required: true
     },
     locality: {

@@ -1,5 +1,4 @@
 import { isAuthenticated } from "@/lib/authentication";
-import cloudinary from "@/lib/cloudinary";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import MediaModel from "@/models/Media.model";
@@ -10,13 +9,11 @@ export async function POST(request) {
     const payload = await request.json();
     try {
         const auth = await isAuthenticated("provider");
-
         if (!auth.isAuth) {
             return response(false, 403, "Unauthorized.");
         }
       
         await connectDB();
-
         const mediaWithUserId = payload.map(item => ({
             ...item,
             userId: auth.userId   // this must be a string, not object

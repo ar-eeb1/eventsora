@@ -2,7 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import CategoryModel from "@/models/Category.model";
-import SubCategoryModel from "@/models/SubCategory.model";
+import SubcategoryModel from "@/models/Subcategory.model";
 import { isValidObjectId } from "mongoose";
 
 export async function GET(request) {
@@ -16,12 +16,12 @@ export async function GET(request) {
         const filter = {
             deletedAt: null
         }
-        const getSubCategory = await SubCategoryModel.find(filter).sort({ createdAt: -1 }).lean()
-        if (!getSubCategory) {
+        const getSubcategory = await SubcategoryModel.find(filter).sort({ createdAt: -1 }).lean()
+        if (!getSubcategory) {
             return response(false, 404, 'Empty collection')
         }
 
-        return response(true, 200, 'Data Found', getSubCategory)
+        return response(true, 200, 'Data Found', getSubcategory)
     } catch (error) {
         return catchError(error)
     }

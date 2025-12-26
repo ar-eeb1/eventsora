@@ -7,9 +7,9 @@ export const MASTER_CATEGORY_ADD = '/master/category/add'
 export const MASTER_CATEGORY_EDIT = (id) => id ? `/master/category/edit/${id}` : ''
 
 //sub category
-export const MASTER_SUB_CATEGORY_SHOW = '/master/sub-category'
-export const MASTER_SUB_CATEGORY_ADD = '/master/sub-category/add'
-export const MASTER_SUB_CATEGORY_EDIT = (id) => id ? `/master/sub-category/edit/${id}` : ''
+export const MASTER_SUB_CATEGORY_SHOW = '/master/subcategory'
+export const MASTER_SUB_CATEGORY_ADD = '/master/subcategory/add'
+export const MASTER_SUB_CATEGORY_EDIT = (id) => id ? `/master/subcategory/edit/${id}` : ''
 
 export const MASTER_TRASH = '/master/trash'
 
@@ -37,4 +37,12 @@ export const MASTER_LOCALITY_EDIT = (id) => id ? `/master/location/locality/edit
 export const MASTER_SUBLOCALITY_SHOW = '/master/location/sublocality'
 export const MASTER_SUBLOCALITY_ADD = '/master/location/sublocality/add'
 export const MASTER_SUBLOCALITY_EDIT = (id) => id ? `/master/location/sublocality/edit/${id}` : ''
+
+//USER SHOW routes
+export const MASTER_USER_SHOW = '/master/users'
+export const MASTER_USER_EDIT = (id) => id ? `/master/users/edit/${id}` : ''
+
+
+//Reviews show routes
+export const MASTER_REVIEW_SHOW = '/master/review'
 

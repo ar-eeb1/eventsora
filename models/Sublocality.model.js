@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 
 const sublocalitySchema = new mongoose.Schema({
     locality: {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Locality',
         required: true
     },
     sublocality: {
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        default: null
     },
     deletedAt: {
         type: Date,
@@ -18,5 +18,5 @@ const sublocalitySchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const SublocalityModel = mongoose.models.Sublocality || mongoose.model('Sublocality', sublocalitySchema, 'sublocalities')
+const SublocalityModel = mongoose.models?.Sublocality || mongoose.model('Sublocality', sublocalitySchema, 'sublocalities')
 export default SublocalityModel
