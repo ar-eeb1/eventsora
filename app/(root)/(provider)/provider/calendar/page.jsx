@@ -664,7 +664,7 @@ const ListingCalendar = () => {
                                             )} 
                                         />
                                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                            Leave as 0 to use listing's default price
+                                            Leave as 0 to use listing's default starting Price
                                         </p>
                                     </div>
 

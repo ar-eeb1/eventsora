@@ -67,8 +67,6 @@ userSchema.methods = {
     }
 }
 
-
-
 const UserModel = mongoose.models.User || mongoose.model('User', userSchema, 'users')
 export default UserModel
 

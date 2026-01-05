@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from '@mui/material'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import { MaterialReactTable, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFiltersButton, MRT_ToggleFullScreenButton, MRT_ToggleGlobalFilterButton, useMaterialReactTable } from 'material-react-table'
+import { MaterialReactTable, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, MRT_ToggleGlobalFilterButton, useMaterialReactTable } from 'material-react-table'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import RecyclingIcon from '@mui/icons-material/Recycling';
@@ -10,10 +10,8 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import useDeleteMutation from '@/hooks/useDeleteMutation'
 import ButtonLoading from '../ButtonLoading'
-import { fa } from 'zod/v4/locales'
 import { showToast } from '@/lib/showToast'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { object } from 'zod'
 
 const Datatable = ({
     queryKey,
@@ -213,6 +211,7 @@ const Datatable = ({
                     text='Export'
                     loading={exportLoading}
                     onClick={() => handleExport(table.getSelectedRowModel().rows)}
+                    className='cursor-pointer'
                 />
             </Tooltip>
         )
@@ -220,7 +219,7 @@ const Datatable = ({
     })
 
     return (
-        <MaterialReactTable table={table} />
+        <MaterialReactTable id={Date.now} table={table} />
     )
 }
 

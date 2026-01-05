@@ -12,14 +12,10 @@ import { ProviderSidebar } from '@/lib/providerSidebarMenu'
 const AppSidebar = () => {
     const { toggleSidebar } = useSidebar()
     return (
-        // <Sidebar className='p-0 m-0 border-none lg:w-[20%] '>
         <Sidebar className='z-50 border-none '>
-            {/* <SidebarHeader className='m-0 p-0'> */}
             <SidebarHeader className=' h-14 p-0 bg-pink-100 dark:bg-card'>
-                {/* <div className='px-6 py-4 flex flex-row justify-between items-center'> */}
                 <div className="px-6 flex justify-between items-center ">
                     <Image className='w-auto h-20 object-contain' src={logo.src} alt='EventSora Logo' width={200} height={200} priority />
-                    {/* <Button onClick={toggleSidebar} type='button' size='icon' variant='ghost' className='w-9 h-9 rounded-full hover:bg-pink-100 hover:text-pink-600 transition-all duration-200 lg:hidden'> */}
                     <Button onClick={toggleSidebar} type='button' size='icon' className='md:hidden w-7 h-7 rounded-full -mr-2 bg-pink-300' >
                         <X className='w-4 h-4' />
                     </Button>

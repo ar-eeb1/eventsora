@@ -36,41 +36,41 @@ const statusConfig = {
 const Calendar = ({
     // Data Props
     calendarData = {},
-    
+
     // Mode Props
     mode = 'view',
     onDateSelect,
     selectedDates = [],
-    
+
     // Calendar Props
     currentDate: externalCurrentDate,
     onMonthChange,
-    
+
     // UI Props
     showLegend = true,
     showPrice = true,
     showStatus = true,
     selectable = true,
     showHeader = true,
-    
+
     // State Props
     isLoading = false,
     disabledDates = [],
-    
+
     // Styling Props
     className,
     compact = false,
     highlightToday = true,
-    
+
     // Callbacks
     onDateClick,
-    
+
     // Rest props
     ...props
 }) => {
     const [internalCurrentDate, setInternalCurrentDate] = useState(externalCurrentDate || new Date())
     const currentDate = externalCurrentDate || internalCurrentDate
-    
+
     const setCurrentDate = (date) => {
         if (onMonthChange) {
             onMonthChange(date)
@@ -78,7 +78,7 @@ const Calendar = ({
             setInternalCurrentDate(date)
         }
     }
-    
+
     // Calendar helper functions
     const getDaysInMonth = (date) => {
         const year = date.getFullYear()
@@ -105,14 +105,14 @@ const Calendar = ({
 
     const handleDateClick = (dateKey, day) => {
         if (!selectable) return
-        
+
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
-        
+
         if (clickedDate < today) return
         if (disabledDates.includes(dateKey)) return
-        
+
         if (mode === 'select' && onDateSelect) {
             if (selectedDates.includes(dateKey)) {
                 onDateSelect(selectedDates.filter(d => d !== dateKey))
@@ -120,7 +120,7 @@ const Calendar = ({
                 onDateSelect([...selectedDates, dateKey])
             }
         }
-        
+
         if (onDateClick) {
             onDateClick(dateKey, calendarData[dateKey])
         }
@@ -147,7 +147,7 @@ const Calendar = ({
     // Loading skeleton
     if (isLoading) {
         return (
-            <div className={cn("border border-gray-200 dark:border-gray-700 rounded-xl p-4", className)}>
+            <div className={cn("border border-pink-200  dark:border-pink-700 rounded-xl p-4", className)}>
                 <div className="flex justify-between items-center mb-4">
                     <Skeleton className="h-8 w-32" />
                     <div className="flex gap-2">
@@ -170,31 +170,31 @@ const Calendar = ({
     }
 
     return (
-        <div className={cn("border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white dark:bg-gray-900", className)} {...props}>
+        <div className={cn("my-6 border-2 border-[#CE416F] dark:border-pink-700 rounded-xl overflow-hidden bg-white dark:bg-pink-900", className)} {...props}>
             {showHeader && (
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
+                <div className="p-4 border-b border-pink-200 dark:border-pink-700 bg-[#e75888] dark:bg-pink-800/50">
+                    <div className="flex items-center justify-center ">
+                        <div className="flex items-center gap-4 ">
+                            <div className="flex items-center gap-2 ">
                                 <button
                                     type="button"
                                     onClick={handlePrevMonth}
-                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-gray-100 hover:text-black rounded-lg transition-colors"
                                 >
-                                    <ChevronLeft className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                                    <ChevronLeft className="w-4 h-4 text-white hover:text-black dark:text-gray-300" />
                                 </button>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                <h3 className="text-3xl font-semibold text-white dark:text-white">
                                     {monthNames[month]} {year}
                                 </h3>
                                 <button
                                     type="button"
                                     onClick={handleNextMonth}
-                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-gray-100 hover:text-black rounded-lg transition-colors"
                                 >
-                                    <ChevronRight className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                                    <ChevronRight className="w-4 h-4 text-white hover:text-black dark:text-gray-300" />
                                 </button>
                             </div>
-                            
+
                             {mode === 'select' && selectedDates.length > 0 && (
                                 <Badge className="bg-blue-600 text-white">
                                     {selectedDates.length} selected
@@ -202,12 +202,12 @@ const Calendar = ({
                             )}
                         </div>
                     </div>
-                    
+
                     {/* Day Names Header */}
                     <div className="grid grid-cols-7 gap-2 mt-4">
                         {fullDayNames.map((day, index) => (
                             <div key={day} className="text-center">
-                                <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                                <div className="text-sm font-semibold text-white underline underline-offset-5 dark:text-white ">
                                     {compact ? dayNames[index] : day}
                                 </div>
                             </div>
@@ -232,7 +232,7 @@ const Calendar = ({
                         const isSelected = selectedDates.includes(dateKey)
                         const currentDateObj = new Date(year, month, day)
                         const isPast = currentDateObj < today
-                        const todayClass = highlightToday && isToday(day) ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
+                        const todayClass = highlightToday && isToday(day) ? 'ring-2 ring-pink-500 dark:ring-pink-400' : ''
                         const isDisabled = disabledDates.includes(dateKey)
                         const config = dateData ? statusConfig[dateData.status] : null
 
@@ -241,18 +241,18 @@ const Calendar = ({
                             'border',
                             todayClass,
                             isPast || isDisabled
-                                ? 'bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 cursor-not-allowed opacity-60'
+                                ? 'bg-pink-50 dark:bg-pink-900/50 border-pink-100 dark:border-pink-800 cursor-not-allowed opacity-60'
                                 : isSelected && mode === 'select'
-                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600 shadow-md cursor-pointer'
-                                : dateData
-                                ? cn(
-                                    config?.bgColor,
-                                    config?.borderColor,
-                                    selectable && 'hover:shadow-md cursor-pointer hover:opacity-90'
-                                )
-                                : selectable 
-                                ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm cursor-pointer'
-                                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                                    ? 'bg-blue-50 dark:bg-pink-900/20 border-pink-300 dark:border-pink-600 shadow-md cursor-pointer'
+                                    : dateData
+                                        ? cn(
+                                            config?.bgColor,
+                                            config?.borderColor,
+                                            selectable && 'hover:shadow-md cursor-pointer hover:opacity-90'
+                                        )
+                                        : selectable
+                                            ? 'bg-white dark:bg-pink-800 border-pink-200 dark:border-pink-700 hover:border-pink-300 dark:hover:border-pink-600 hover:shadow-sm cursor-pointer'
+                                            : 'bg-white dark:bg-pink-800 border-pink-200 dark:border-pink-700'
                         )
 
                         return (
@@ -266,13 +266,13 @@ const Calendar = ({
                                     <div className={cn(
                                         'font-semibold',
                                         isToday(day) ? 'text-blue-600 dark:text-blue-400' :
-                                        isPast || isDisabled ? 'text-gray-400 dark:text-gray-600' :
-                                        isSelected ? 'text-blue-700 dark:text-blue-300' :
-                                        dateData ? config?.textColor : 'text-gray-900 dark:text-gray-200'
+                                            isPast || isDisabled ? 'text-gray-400 dark:text-gray-600' :
+                                                isSelected ? 'text-blue-700 dark:text-blue-300' :
+                                                    dateData ? config?.textColor : 'text-gray-900 dark:text-gray-200'
                                     )}>
                                         {day}
                                     </div>
-                                    
+
                                     {/* Status Icon */}
                                     {showStatus && dateData && (
                                         <div className={cn(
@@ -288,7 +288,7 @@ const Calendar = ({
                                 <div className="mt-1 space-y-0.5">
                                     {showStatus && dateData && !compact && (
                                         <div className={cn(
-                                            'text-xs font-medium truncate',
+                                            'text-lg font-medium truncate',
                                             config?.textColor
                                         )}>
                                             {config?.label}
@@ -296,12 +296,12 @@ const Calendar = ({
                                     )}
                                     {showPrice && dateData?.price > 0 && !compact && (
                                         <div className="flex items-center gap-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
-                                            <DollarSign className="w-2.5 h-2.5" />
-                                            {dateData.price}
+
+                                            {dateData.price.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
                                         </div>
                                     )}
                                 </div>
-                                
+
                                 {/* Selection Indicator */}
                                 {isSelected && mode === 'select' && (
                                     <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
@@ -314,19 +314,19 @@ const Calendar = ({
 
             {/* Legend */}
             {showLegend && (
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Legend</h4>
+                <div className="p-4 border-t border-pink-200 dark:border-pink-700 bg-pink-50 dark:bg-pink-800/50">
+                    <h4 className="text-sm font-semibold text-pink-900 dark:text-white mb-2">Legend</h4>
                     <div className="flex flex-wrap gap-2">
                         {Object.entries(statusConfig).map(([status, config]) => (
-                            <div key={status} className="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                            <div key={status} className="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-pink-800 rounded border border-pink-200 dark:border-pink-700">
                                 <div className={cn('w-2 h-2 rounded-full', config.bgColor, config.borderColor, 'border')}></div>
-                                <span className="text-xs text-gray-700 dark:text-gray-300">{config.label}</span>
+                                <span className="text-xs text-pink-700 dark:text-pink-300">{config.label}</span>
                             </div>
                         ))}
                         {mode === 'select' && (
-                            <div className="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-pink-800 rounded border border-pink-200 dark:border-pink-700">
                                 <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                <span className="text-xs text-gray-700 dark:text-gray-300">Selected</span>
+                                <span className="text-xs text-pink-700 dark:text-pink-300">Selected</span>
                             </div>
                         )}
                     </div>

@@ -33,7 +33,6 @@ const AddListing = () => {
   const [selectedMedia, setSelectedMedia] = useState([])
 
   const [loading, setLoading] = useState(false)
-  const [fields, setFields] = useState(false)
 
   const formSchema = zSchema.pick({
     name: true,
@@ -41,7 +40,6 @@ const AddListing = () => {
     category: true,
     subcategory: true,
     startingPrice: true,
-    // media: true,
     description: true,
     country: true,
     state: true,
@@ -60,7 +58,6 @@ const AddListing = () => {
       category: '',
       subcategory: '',
       startingPrice: '',
-      // media: [],
       description: '',
       country: '',
       state: '',
@@ -88,7 +85,7 @@ const AddListing = () => {
   }, [getCategory])
 
   // Check if selected category is "Venue"
-  const isVenueCategory = categoryOptions.find(cat => cat.value === selectedCategory)?.label?.toLowerCase() === 'venue'
+  const isVenueCategory = categoryOptions.find(cat => cat.value === selectedCategory)?.label?.toLowerCase() === 'venues'
 
   // FETCH SUBCATEGORIES
   const [subcategoryOptions, setSubcategoryOptions] = useState([])
