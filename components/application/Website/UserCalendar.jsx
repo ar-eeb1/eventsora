@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import Calendar from '../Calendar'
 import { showToast } from '@/lib/showToast'
 
-const UserCalendar = ({ listingId, onDateSelect, selectedDates = [], disabledDates = [], maxSelectable = 1 }) => {
+const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates = [], disabledDates = [], maxSelectable = 1 }) => {
     const [calendarData, setCalendarData] = useState({})
     const [isLoading, setIsLoading] = useState(true)
     const [selected, setSelected] = useState(selectedDates)
@@ -12,7 +12,11 @@ const UserCalendar = ({ listingId, onDateSelect, selectedDates = [], disabledDat
     const fetchCalendarData = useCallback(async () => {
         try {
             setIsLoading(true)
-            const response = await fetch(`/api/website/calendar?listingId=${listingId}`)
+            let url = `/api/website/calendar?listingId=${listingId}`
+            if (variantId) {
+                url += `&variantId=${variantId}`
+            }
+            const response = await fetch(url)
             const result = await response.json()
 
             if (result.success) {
@@ -41,13 +45,13 @@ const UserCalendar = ({ listingId, onDateSelect, selectedDates = [], disabledDat
         } finally {
             setIsLoading(false)
         }
-    }, [listingId])
+    }, [listingId, variantId])
 
     useEffect(() => {
         if (listingId) {
             fetchCalendarData()
         }
-    }, [listingId, fetchCalendarData])
+    }, [listingId, variantId, fetchCalendarData])
 
     useEffect(() => {
         setSelected(selectedDates)

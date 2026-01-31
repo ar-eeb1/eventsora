@@ -36,6 +36,7 @@ export async function GET(req) {
 
 
     const listings = await ListingModel.find(filter) // ✅ USE FILTER
+      .sort({ createdAt: -1 })
       .populate('media', '_id secure_url')
       .populate('category', '_id category slug')
       .populate('city', '_id city')

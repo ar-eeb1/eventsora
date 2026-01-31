@@ -1,5 +1,5 @@
-const { default: axios } = require("axios");
-const { useState, useMemo, useEffect } = require("react");
+import axios from "axios";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 const useFetch = (url, method = "GET", options = {}) => {
     const [data, setData] = useState(null)
@@ -16,30 +16,56 @@ const useFetch = (url, method = "GET", options = {}) => {
         return opts
     }, [method, optionString])
 
+    // Use a ref to track if component is mounted
+    const isMounted = useRef(true)
+
     useEffect(() => {
-        const apiCall = async () => {
-            setLoading(true)
-            setError(null)
-            try {
-                const { data: response } = await axios({
-                    url,
-                    method,
-                    ...(requestOption)
-                })
-
-                if (!response.success) {
-                    throw new Error(response.message)
-                }
-
-                setData(response)
-            } catch (error) {
-                setError(error.message)
-            } finally {
-                setLoading(false)
-            }
+        isMounted.current = true
+        return () => {
+            isMounted.current = false
         }
+    }, [])
 
-        apiCall()
+    useEffect(() => {
+        const controller = new AbortController(); // Create controller
+
+        const timeoutId = setTimeout(() => {
+            const apiCall = async () => {
+                setLoading(true)
+                setError(null)
+                try {
+                    console.log('Fetching:', url) // DEBUG LOG
+                    const { data: response } = await axios({
+                        url,
+                        method,
+                        ...requestOption,
+                        signal: controller.signal // Pass signal
+                    })
+
+                    if (isMounted.current) {
+                        if (!response.success) {
+                            throw new Error(response.message)
+                        }
+                        setData(response)
+                    }
+                } catch (error) {
+                    if (axios.isCancel(error)) {
+                    } else if (isMounted.current) {
+                        setError(error.message)
+                    }
+                } finally {
+                    if (isMounted.current) {
+                        setLoading(false)
+                    }
+                }
+            }
+            apiCall()
+        }, 100) // Debounce delay 100ms
+
+        return () => {
+            clearTimeout(timeoutId) // Clear timeout on cleanup (prevents request if unmounted quickly)
+            controller.abort() // Cancel request on cleanup
+        }
 
     }, [requestOption, url, refreshIndex])
 

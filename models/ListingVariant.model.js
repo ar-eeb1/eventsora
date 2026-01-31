@@ -2,7 +2,7 @@ import { listingStatus, pricingType } from "@/lib/utils";
 import mongoose from "mongoose";
 
 const listingVariantSchema = new mongoose.Schema({
-    listing: {
+    listingId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Listing',
         required: true
@@ -21,6 +21,7 @@ const listingVariantSchema = new mongoose.Schema({
         enum: pricingType,
         default: 'fixed'
     },
+    points: [String],
     serviceCode: {
         type: String,
         required: true,

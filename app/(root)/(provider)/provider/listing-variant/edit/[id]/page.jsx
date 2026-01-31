@@ -3,7 +3,6 @@ import BreadCrumb from '@/components/application/BreadCrumb'
 import ButtonLoading from '@/components/application/ButtonLoading'
 import Select from '@/components/application/Main/Select'
 import Editor from '@/components/application/Provider/Editor'
-import MediaModal from '@/components/application/Provider/MediaModal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -30,61 +29,73 @@ const EditListing = ({ params }) => {
   const { id } = use(params)
   const { data: getListingVariant, loading: getListingVariantLoading } = useFetch(`/api/provider/listing-variant/get/${id}`)
 
-
-  //MEDIA MODAL STATES
-
-  const [open, setOpen] = useState(false)
-  const [selectedMedia, setSelectedMedia] = useState([])
   const [loading, setLoading] = useState(false)
 
   const formSchema = zSchema.pick({
     _id: true,
-    listing: true,
+    listingId: true,
     title: true,
     serviceCode: true,
     startingPrice: true,
     pricingType: true,
+    points: true,
   })
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       _id: id,
-      listing: '',
+      listingId: '',
       title: '',
       serviceCode: '',
       startingPrice: '',
       pricingType: '',
+      points: [],
     }
   })
+
+  // POINTS HANDLER
+  const [pointInput, setPointInput] = useState('')
+  const handleAddPoint = (e) => {
+    e.preventDefault()
+    if (!pointInput.trim()) return
+
+    const currentPoints = form.getValues('points') || []
+    form.setValue('points', [...currentPoints, pointInput.trim()])
+    setPointInput('')
+  }
+
+  const handleRemovePoint = (index) => {
+    const currentPoints = form.getValues('points') || []
+    const newPoints = currentPoints.filter((_, i) => i !== index)
+    form.setValue('points', newPoints)
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleAddPoint(e)
+    }
+  }
 
   useEffect(() => {
     if (getListingVariant && getListingVariant.success) {
       const listing = getListingVariant.data
       form.reset({
         _id: listing?._id,
-        listing: listing?.listing?._id ?? listing?.listing,
+        listingId: listing?.listingId ?? listing?.listing?._id ?? listing?.listing, // Robust check
         title: listing?.title,
         serviceCode: listing?.serviceCode,
         startingPrice: listing?.startingPrice,
         pricingType: listing?.pricingType,
+        points: listing?.points || [],
       })
 
-      if (listing.media) {
-        const media = listing.media.map((media) => ({ _id: media._id, url: media.secure_url }))
-        setSelectedMedia(media)
-      }
     }
   }, [getListingVariant])
 
   // SUBMIT
   const onSubmit = async (values) => {
-    if (selectedMedia.length <= 0) {
-      return showToast('error', 'Please Select Media')
-    }
-    const mediaIds = selectedMedia.map(media => media._id)
-    values.media = mediaIds
-
     setLoading(true)
     try {
       const { data: response } = await axios.put('/api/provider/listing-variant/update', values)
@@ -108,7 +119,6 @@ const EditListing = ({ params }) => {
       setListingOptions(options)
     }
   }, [getListings])
-  console.log(listingOptions);
 
   // PRICE TYPE
   const [pricingOptions, setPricingOptions] = useState([])
@@ -142,7 +152,7 @@ const EditListing = ({ params }) => {
 
                   <div className='grid md:grid-cols-2 grid-cols-1 gap-6'>
                     {/* LISTING */}
-                    <FormField control={form.control} name="listing" render={({ field }) => (
+                    <FormField control={form.control} name="listingId" render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-sm font-medium">Listing<span className='text-red-500 ml-1'>*</span></FormLabel>
                         <FormControl>
@@ -152,6 +162,7 @@ const EditListing = ({ params }) => {
                             setSelected={field.onChange}
                             isMulti={false}
                             placeholder='Select Listing'
+                            disabled={true}
                           />
                         </FormControl>
                         <FormMessage />
@@ -233,55 +244,61 @@ const EditListing = ({ params }) => {
                 </div>
 
 
-                {/* Media Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 pb-2 border-b-2 border-primary/20">
-                    <div className="h-2 w-2 bg-primary rounded-full"></div>
-                    <h5 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Media Gallery</h5>
+                {/* POINTS */}
+                <div className="md:col-span-2 space-y-4">
+                  <FormLabel className="text-sm font-medium">Points (Offerings)</FormLabel>
+                  <div className="flex gap-2">
+                    <Input
+                      value={pointInput}
+                      onChange={(e) => setPointInput(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      placeholder="Add a point (e.g. 1 Day Shoot)"
+                      className="h-11 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddPoint}
+                      className="h-11 px-6"
+                    >
+                      Add
+                    </Button>
                   </div>
 
-                  <div className='rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 p-8 text-center bg-linear-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 transition-all duration-200 hover:border-primary/50'>
-                    <MediaModal
-                      open={open}
-                      setOpen={setOpen}
-                      selectedMedia={selectedMedia}
-                      setSelectedMedia={setSelectedMedia}
-                      isMultiple={true}
-                    />
-                    {selectedMedia.length > 0 && (
-                      <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6'>
-                        {selectedMedia.map((media, index) => (
-                          <div
-                            key={media._id}
-                            className='relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 group'
-                          >
-                            <Image
-                              src={media.url}
-                              alt={media.alt || `Media ${index + 1}`}
-                              fill
-                              className='object-cover'
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                              <span className="text-white text-xs font-medium">#{index + 1}</span>
-                            </div>
-                          </div>
-                        ))}
+                  {/* Points List */}
+                  <div className="space-y-2">
+                    {form.watch('points')?.map((point, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 group hover:border-primary/20 transition-all duration-200">
+                        <div className="flex items-center gap-3">
+                          <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-medium">
+                            {index + 1}
+                          </span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                            {point}
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemovePoint(index)}
+                          className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                          </svg>
+                        </Button>
                       </div>
-                    )}
-                    <Button
-                      type='button'
-                      onClick={() => setOpen(true)}
-                      className='h-12 px-8 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105'
-                    >
-                      {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
-                    </Button>
-                    {selectedMedia.length > 0 && (
-                      <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                        {selectedMedia.length} {selectedMedia.length === 1 ? 'image' : 'images'} selected
-                      </p>
+                    ))}
+                    {(!form.watch('points') || form.watch('points').length === 0) && (
+                      <div className="text-center py-8 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg text-gray-500 text-sm">
+                        No points added yet. Add points to describe what this package includes.
+                      </div>
                     )}
                   </div>
                 </div>
+
 
                 {/* Submit Button */}
                 <div className='pt-6 border-t flex justify-end gap-4'>

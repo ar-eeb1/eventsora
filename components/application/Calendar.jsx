@@ -221,7 +221,7 @@ const Calendar = ({
                 <div className="grid grid-cols-7 gap-2">
                     {/* Empty cells before month starts */}
                     {Array.from({ length: startingDayOfWeek }).map((_, index) => (
-                        <div key={`empty-${index}`} className="aspect-square"></div>
+                        <div key={`empty-${index}`} className=""></div>
                     ))}
 
                     {/* Calendar Days */}
@@ -237,7 +237,8 @@ const Calendar = ({
                         const config = dateData ? statusConfig[dateData.status] : null
 
                         let cellClass = cn(
-                            'aspect-square rounded-lg p-2 flex flex-col transition-all duration-200',
+                            // 'aspect-square rounded-lg p-2 flex flex-col transition-all duration-200',
+                            'min-h-[134px] max-w-[134px] rounded-lg p-1 flex flex-col ',
                             'border',
                             todayClass,
                             isPast || isDisabled
@@ -262,7 +263,7 @@ const Calendar = ({
                                 className={cellClass}
                             >
                                 {/* Day Number */}
-                                <div className="flex justify-between items-start">
+                                <div className="flex justify-between items-center">
                                     <div className={cn(
                                         'font-semibold',
                                         isToday(day) ? 'text-blue-600 dark:text-blue-400' :

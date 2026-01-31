@@ -34,11 +34,16 @@ const CalendarSchema = new mongoose.Schema(
             default: null,
             index: true,
         },
+        variantId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ListingVariant",
+            default: null
+        }
     },
     { timestamps: true }
 );
 
-CalendarSchema.index({ listingId: 1, date: 1 }, { unique: true });
+CalendarSchema.index({ listingId: 1, variantId: 1, date: 1 }, { unique: true });
 
 const CalendarModel = mongoose.models.Calendar || mongoose.model("Calendar", CalendarSchema, "calendar");
 

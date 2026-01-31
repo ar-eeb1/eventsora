@@ -17,11 +17,12 @@ export async function PUT(request) {
         const schema = zSchema
             .pick({
                 _id: true,
-                listing: true,
+                listingId: true,
                 title: true,
                 serviceCode: true,
                 startingPrice: true,
                 pricingType: true,
+                points: true,
             })
 
         const validate = schema.safeParse(payload)
@@ -36,11 +37,12 @@ export async function PUT(request) {
             return response(false, 404, 'Listing Variant not found')
         }
 
-        getListingVariant.listing = validatedData.listing
+        getListingVariant.listingId = validatedData.listingId
         getListingVariant.title = validatedData.title
         getListingVariant.serviceCode = validatedData.serviceCode
         getListingVariant.startingPrice = validatedData.startingPrice
         getListingVariant.pricingType = validatedData.pricingType
+        getListingVariant.points = validatedData.points
 
         await getListingVariant.save()
 

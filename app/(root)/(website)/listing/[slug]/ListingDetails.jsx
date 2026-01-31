@@ -11,9 +11,15 @@ import Link from 'next/link'
 import BreadCrumb from '@/components/application/BreadCrumb'
 import ButtonLoading from '@/components/application/ButtonLoading'
 import AvailabilityCalendar from '@/components/application/Website/AvailabilityCalendar'
+import { useSearchParams } from 'next/navigation'
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
-    console.log('variant', variants.title);
+    const searchParams = useSearchParams()
+    const serviceCode = searchParams.get('serviceCode')
+
+    // Find active variant based on serviceCode
+    const activeVariant = variants.find(v => v.serviceCode === serviceCode)
+
     const [isloading, setIsLoading] = useState(false)
     const breadCrumbData = [
         { href: WEBSITE_HOME, label: 'Home' },
@@ -27,7 +33,6 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     }, [listing])
 
     const handleDateSelect = (selectedDates) => {
-        console.log('Selected dates:', selectedDates)
         // Handle booking logic here
     }
 
@@ -73,20 +78,41 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                     <div className='flex items-center gap-2 mb-3 text-3xl'>
                         <h2 className='font-bold'>Starting Price :</h2>
                         <span>{listing?.startingPrice.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</span>
-                        {/* <span>{variant?.startingPrice.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</span> */}
                     </div>
 
                     <div className='line-clamp-3' dangerouslySetInnerHTML={{ __html: decode(listing?.description) }}>
                     </div>
-
-                    <div className='flex items-center pt-3 gap-2 font-semibold'><BsFillPeopleFill size={20} className='text-pink-700' aria-hidden="true" />{listing?.capacity} Guests</div>
+                    {
+                        listing?.capacity?.length > 0 &&
+                        <div className='flex items-center pt-3 gap-2 font-semibold'><BsFillPeopleFill size={20} className='text-pink-700' aria-hidden="true" />{listing?.capacity} Guests</div>
+                    }
                     {variants.length > 0 &&
-                        <div className='flex gap-5 mt-5'>
+                        <div className='flex gap-5 mt-5 flex-wrap'>
                             {variants.map((v) => (
-                                <Link key={v._id} className={`uppercase bg-white py-1 px-3 rounded-full text-sm cursor-pointer hover:bg-primary hover:text-white ${v.title === v.title ? 'bg-primary' : ''}`} href={`${WEBSITE_LISTING_DETAILS(listing.slug)}?serviceCode=${v.serviceCode}`}>{v.title}</Link>
+                                <Link key={v._id} className={`uppercase py-1 px-3 rounded-full text-sm cursor-pointer hover:bg-primary hover:text-white ${v.serviceCode === serviceCode ? 'bg-primary text-white' : 'bg-white'}`} href={`${WEBSITE_LISTING_DETAILS(listing.slug)}?serviceCode=${v.serviceCode}`}>{v.title}</Link>
                             ))}
                         </div>
                     }
+
+                    {/* Points Display */}
+                    {activeVariant && activeVariant.points && activeVariant.points.length > 0 && (
+                        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
+                            <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                                <span className="w-1 h-6 bg-primary rounded-full"></span>
+                                What&apos;s Included
+                            </h3>
+                            <ul className="grid sm:grid-cols-2 gap-2">
+                                {activeVariant.points.map((point, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
+                                        <svg className="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span className="capitalize text-sm">{point}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     <div className='gap-3 flex mt-10'>
                         <ButtonLoading type='button' text='Book Now' className={'w-1/2 rounded-full py-6 text-md text-white'} />
@@ -95,12 +121,16 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 </div>
             </div>
 
-            <div>
-                <div className='text-center'>
-                    <h1>Select date for booking</h1>
+            <div className='mb-5'>
+                <div className="text-center my-6">
+                    <h1 className=" inline-block px-6 py-3 text-4xl font-semibold text-pink-700 bg-white dark:bg-gray-800 rounded-full shadow-md border border-primary/20 underline underline-offset-4 transition-transform hover:scale-105 hover:shadow-lg">
+                        &quot;{listing.name}&quot;
+                    </h1>
                 </div>
+
                 <AvailabilityCalendar
                     listingId={listing._id}
+                    variantId={activeVariant?._id}
                     onDateSelect={handleDateSelect}
                 />
             </div>

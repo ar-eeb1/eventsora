@@ -8,29 +8,34 @@ import { Slider } from '@/components/ui/slider'
 import ButtonLoading from '../ButtonLoading'
 import { useRouter } from 'next/navigation'
 import { WEBSITE_CATEGORY } from '@/routes/WebsiteRoute'
-import { Separator } from '@radix-ui/react-dropdown-menu'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 const Filter = () => {
-  const [priceFilter, setPriceFilter] = useState({ minPrice: 0, maxPrice: 1000000 })
   const [capacityFilter, setCapacityFilter] = useState({ minCapacity: 0, maxCapacity: 3000 })
-
+  const [priceFilter, setPriceFilter] = useState({ minPrice: 0, maxPrice: 1000000 })
 
   const params = useParams()
+  const router = useRouter()
   const searchParams = useSearchParams()
-  const [selectedSubcategory, setSelectedSubcategory] = useState([])
 
+  const [selectedSubcategory, setSelectedSubcategory] = useState([])
+  const [city, setCity] = useState([])
+  const [locality, setLocality] = useState([])
 
   const category = params.category
   const [subcategoryList, setSubcategoryList] = useState([])
   const { data: subcategoryData } = useFetch(`/api/website/subcategory?type=${category}`);
 
+  const { data: cityData } = useFetch(`/api/website/location/city`)
+  const { data: localityData } = useFetch(`/api/website/location/locality?city=${city.join(',')}`)
+
   const urlSearchParams = new URLSearchParams(searchParams.toString())
-  const router = useRouter()
 
   useEffect(() => {
     searchParams.get('subcategory') ? setSelectedSubcategory(searchParams.get('subcategory').split(',')) : setSelectedSubcategory([])
+    searchParams.get('city') ? setCity(searchParams.get('city').split(',')) : setCity([])
+    searchParams.get('locality') ? setLocality(searchParams.get('locality').split(',')) : setLocality([])
   }, [searchParams])
 
 
@@ -61,6 +66,35 @@ const Filter = () => {
     router.push(`${WEBSITE_CATEGORY(`${category}`)}?${urlSearchParams}`)
   }
 
+  const handleCityFilter = (cityId) => {
+    let newSelectedCity = [...city]
+    if (newSelectedCity.includes(cityId)) {
+      newSelectedCity = newSelectedCity.filter(c => c !== cityId)
+    } else {
+      newSelectedCity.push(cityId)
+    }
+    setCity(newSelectedCity)
+    newSelectedCity.length > 0 ? urlSearchParams.set('city', newSelectedCity.join(',')) : urlSearchParams.delete('city')
+
+    // Clear locality when city changes
+    setLocality([])
+    urlSearchParams.delete('locality')
+
+    router.push(`${WEBSITE_CATEGORY(`${category}`)}?${urlSearchParams}`)
+  }
+
+  const handleLocalityFilter = (localityId) => {
+    let newSelectedLocality = [...locality]
+    if (newSelectedLocality.includes(localityId)) {
+      newSelectedLocality = newSelectedLocality.filter(l => l !== localityId)
+    } else {
+      newSelectedLocality.push(localityId)
+    }
+    setLocality(newSelectedLocality)
+    newSelectedLocality.length > 0 ? urlSearchParams.set('locality', newSelectedLocality.join(',')) : urlSearchParams.delete('locality')
+    router.push(`${WEBSITE_CATEGORY(`${category}`)}?${urlSearchParams}`)
+  }
+
   const handlePriceFilter = () => {
     urlSearchParams.set('minPrice', priceFilter.minPrice)
     urlSearchParams.set('maxPrice', priceFilter.maxPrice)
@@ -83,7 +117,7 @@ const Filter = () => {
           </Link>
         </Button>}
 
-      <Accordion type="multiple" defaultValue={['1', '2', '3', '4']}>
+      <Accordion type="multiple" defaultValue={['1', '2', '3', '4', '5']}>
         <AccordionItem value="1">
           <AccordionTrigger className='uppercase font-semibold hover:no-underline'>
             Find in {category}
@@ -109,6 +143,58 @@ const Filter = () => {
 
         <AccordionItem value="2">
           <AccordionTrigger className='uppercase font-semibold hover:no-underline'>
+            City
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className='max-h-48 overflow-auto'>
+              <ul>
+                {cityData && cityData.success && cityData.data.map((c) => (
+                  <li key={c._id} className='mb-3'>
+                    <label className='flex items-center space-x-3 cursor-pointer'>
+                      <Checkbox
+                        onCheckedChange={() => handleCityFilter(c._id)}
+                        checked={city.includes(c._id)}
+                      />
+                      <span>{c.city}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {city.length > 0 && (
+          <AccordionItem value="5">
+            <AccordionTrigger className='uppercase font-semibold hover:no-underline'>
+              Locality
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className='max-h-48 overflow-auto'>
+                <ul>
+                  {localityData && localityData.success && localityData.data.length > 0 ? (
+                    localityData.data.map((l) => (
+                      <li key={l._id} className='mb-3'>
+                        <label className='flex items-center space-x-3 cursor-pointer'>
+                          <Checkbox
+                            onCheckedChange={() => handleLocalityFilter(l._id)}
+                            checked={locality.includes(l._id)}
+                          />
+                          <span>{l.locality}</span>
+                        </label>
+                      </li>
+                    ))
+                  ) : (
+                    <li>No localities found</li>
+                  )}
+                </ul>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        <AccordionItem value="3">
+          <AccordionTrigger className='uppercase font-semibold hover:no-underline'>
             PRICE
           </AccordionTrigger>
           <AccordionContent className=''>
@@ -124,7 +210,7 @@ const Filter = () => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="3">
+        <AccordionItem value="4">
           <AccordionTrigger className='uppercase font-semibold hover:no-underline'>
             CAPACITY
           </AccordionTrigger>

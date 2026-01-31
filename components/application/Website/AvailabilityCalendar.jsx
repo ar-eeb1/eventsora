@@ -3,14 +3,15 @@ import React from 'react'
 import UserCalendar from './UserCalendar'
 import { Skeleton } from '@/components/ui/skeleton'
 
-export const AvailabilityCalendar = ({ 
-    listingId, 
-    onDateSelect, 
+export const AvailabilityCalendar = ({
+    listingId,
+    variantId = null,
+    onDateSelect,
     selectedDates = [],
     disabledDates = [],
     maxSelectable = 1,
     isLoading: externalLoading = false,
-    ...props 
+    ...props
 }) => {
     if (!listingId) {
         return (
@@ -38,6 +39,7 @@ export const AvailabilityCalendar = ({
     return (
         <UserCalendar
             listingId={listingId}
+            variantId={variantId}
             onDateSelect={onDateSelect}
             selectedDates={selectedDates}
             disabledDates={disabledDates}

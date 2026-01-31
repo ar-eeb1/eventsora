@@ -94,7 +94,7 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <Search isShow={showSearch} />
+            <Search isShow={showSearch} onClose={() => setShowSearch(false)} />
         </div>
     )
 }

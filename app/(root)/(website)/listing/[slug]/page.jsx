@@ -13,7 +13,6 @@ const ListingPage = async ({ params, searchParams }) => {
         url += `?startingPrice=${startingPrice}&capacity=${capacity}`
     }
     const { data: getListing } = await axios.get(url)
-    console.log(getListing);
     
 
     if (!getListing.success) {

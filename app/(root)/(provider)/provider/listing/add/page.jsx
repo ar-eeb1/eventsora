@@ -1,6 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/application/BreadCrumb'
 import ButtonLoading from '@/components/application/ButtonLoading'
+import { numberToIndianWords } from '@/lib/numberToWords'
 import Select from '@/components/application/Main/Select'
 import Editor from '@/components/application/Provider/Editor'
 import MediaModal from '@/components/application/Provider/MediaModal'
@@ -267,7 +268,6 @@ const AddListing = () => {
 
   // SUBMIT
   const onSubmit = async (values) => {
-    console.log(values);
     if (selectedMedia.length <= 0) {
       return showToast('error', 'Please Select Media')
     }
@@ -389,6 +389,11 @@ const AddListing = () => {
                               className="h-11  transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                               {...field}
                             />
+                            {field.value && (
+                              <p className="text-xs text-muted-foreground mt-1 font-medium capitalize">
+                                {numberToIndianWords(field.value)}
+                              </p>
+                            )}
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -885,7 +890,6 @@ export default AddListing
 
 //   // SUBMIT
 //   const onSubmit = async (values) => {
-//     console.log(values);
 //     if (selectedMedia.length <= 0) {
 //       return showToast('error', 'Please Select Media')
 //     }

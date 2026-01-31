@@ -14,10 +14,11 @@ import { showToast } from '@/lib/showToast'
 import { dateStatus } from '@/lib/utils'
 import axios from 'axios'
 import { z } from 'zod'
-import { ChevronLeft, ChevronRight, DollarSign, X, Calendar as CalendarIcon, Check, Clock, Ban, Tag } from 'lucide-react'
+import { ChevronLeft, ChevronRight, X, Calendar as CalendarIcon, Check, Clock, Ban, Tag, Package, Download } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { Money } from '@mui/icons-material'
+import { toPng } from 'html-to-image'
 
 const breadcrumbData = [
     { href: PROVIDER_DASHBOARD, label: 'Home' },
@@ -27,6 +28,7 @@ const breadcrumbData = [
 // Zod schema for form validation
 const calendarFormSchema = z.object({
     listingId: z.string().min(1, 'Please select a listing'),
+    variantId: z.string().optional(),
     dates: z.array(z.string()).min(1, 'Please select at least one date'),
     dateStatus: z.enum(dateStatus),
     price: z.number().min(0, 'Price cannot be negative').default(0),
@@ -39,12 +41,14 @@ const ListingCalendar = () => {
     const [calendarData, setCalendarData] = useState({})
     const [showModal, setShowModal] = useState(false)
     const [isLoadingCalendar, setIsLoadingCalendar] = useState(false)
+    const [isDownloading, setIsDownloading] = useState(false)
 
     // Initialize form
     const form = useForm({
         resolver: zodResolver(calendarFormSchema),
         defaultValues: {
             listingId: '',
+            variantId: '',
             dates: [],
             dateStatus: 'available',
             price: 0
@@ -53,6 +57,7 @@ const ListingCalendar = () => {
 
     // Get listings using useFetch
     const { data: getListing } = useFetch('/api/provider/listing?deleteType=SD')
+
     const [listingOptions, setListingOptions] = useState([])
 
     useEffect(() => {
@@ -65,6 +70,38 @@ const ListingCalendar = () => {
             )
         }
     }, [getListing])
+
+    // Update your useFetch for variants to conditionally fetch based on listing
+    const { data: getListingVariant } = useFetch(
+        form.watch('listingId')
+            ? `/api/provider/variants-by-listing?listingId=${form.watch('listingId')}`
+            : null // Don't fetch if no listing is selected
+    )
+
+    const [listingVariantOptions, setListingVariantOptions] = useState([])
+    const [hasVariants, setHasVariants] = useState(false)
+
+    useEffect(() => {
+        if (getListingVariant?.success && getListingVariant.data) {
+            // Check if the listing has any variants
+            if (Array.isArray(getListingVariant.data) && getListingVariant.data.length > 0) {
+                setHasVariants(true)
+                setListingVariantOptions(
+                    getListingVariant.data.map(variant => ({
+                        label: variant.title,
+                        value: variant._id,
+                        listingId: variant.listingId
+                    }))
+                )
+            } else {
+                setHasVariants(false)
+                setListingVariantOptions([])
+            }
+        } else {
+            setHasVariants(false)
+            setListingVariantOptions([])
+        }
+    }, [getListingVariant])
 
     // Status options from dateStatus
     const statusOptions = dateStatus.map(status => ({
@@ -84,6 +121,12 @@ const ListingCalendar = () => {
         return { daysInMonth, startingDayOfWeek, year, month }
     }
 
+    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentDate)
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December']
+    const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+    const fullDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
     const formatDateKey = (year, month, day) => {
         return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
     }
@@ -100,7 +143,7 @@ const ListingCalendar = () => {
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
-        
+
         if (clickedDate < today) return // Disable past dates
 
         if (selectedDates.includes(dateKey)) {
@@ -119,44 +162,58 @@ const ListingCalendar = () => {
             showToast('error', 'Please select at least one date')
             return
         }
-        
+
         if (!form.getValues('listingId')) {
             showToast('error', 'Please select a listing')
             return
         }
-        
+
+        // If listing has variants but no variant is selected, show error
+        if (hasVariants && !form.getValues('variantId')) {
+            showToast('error', 'Please select a variant or choose "Main Listing"')
+            return
+        }
+
         setShowModal(true)
     }
 
     const onSubmit = async (values) => {
-        console.log('Form submitted with values:', values)
-        
         // Validate the form
         const isValid = await form.trigger()
         if (!isValid) {
             console.log('Form validation failed:', form.formState.errors)
             return
         }
-        
+
         setLoading(true)
         try {
+            // Prepare payload
+            const payload = {
+                listingId: values.listingId,
+                dateStatus: values.dateStatus,
+                price: values.price
+            }
+
+            // Add variantId if it exists
+            if (values.variantId) {
+                payload.variantId = values.variantId
+            }
+
             // Submit each selected date to the API
             const promises = values.dates.map(dateKey => {
-                const payload = {
-                    listingId: values.listingId,
-                    date: new Date(dateKey).toISOString(),
-                    dateStatus: values.dateStatus,
-                    price: values.price
+                const datePayload = {
+                    ...payload,
+                    date: new Date(dateKey).toISOString()
                 }
-                
-                return axios.post('/api/provider/calendar', payload)
+
+                return axios.post('/api/provider/calendar', datePayload)
             })
 
             const results = await Promise.all(promises)
-            
+
             // Check if all requests were successful
             const allSuccess = results.every(result => result.data.success)
-            
+
             if (!allSuccess) {
                 throw new Error('Some dates failed to save')
             }
@@ -166,16 +223,18 @@ const ListingCalendar = () => {
             values.dates.forEach(dateKey => {
                 updatedCalendarData[dateKey] = {
                     status: values.dateStatus,
-                    price: values.price
+                    price: values.price,
+                    variantId: values.variantId
                 }
             })
             setCalendarData(updatedCalendarData)
 
             showToast('success', 'Dates saved successfully')
-            
-            // Reset form and selections
+
+            // Reset form and selections (keep listing and variant if selected)
             form.reset({
-                listingId: values.listingId, // Keep listing selected
+                listingId: values.listingId,
+                variantId: values.variantId || '',
                 dates: [],
                 dateStatus: 'available',
                 price: 0
@@ -190,12 +249,21 @@ const ListingCalendar = () => {
         }
     }
 
-    // Fetch existing calendar data when listing is selected
+    // Fetch existing calendar data when listing OR variant is selected
     useEffect(() => {
         const listingId = form.watch('listingId')
+        const variantId = form.watch('variantId')
+
         if (listingId) {
             setIsLoadingCalendar(true)
-            axios.get(`/api/provider/calendar?listingId=${listingId}`)
+            let url = `/api/provider/calendar?listingId=${listingId}`
+
+            // Add variantId to query if it exists
+            if (variantId) {
+                url += `&variantId=${variantId}`
+            }
+
+            axios.get(url)
                 .then(({ data }) => {
                     if (data.success) {
                         // Transform API data to calendar format
@@ -223,13 +291,31 @@ const ListingCalendar = () => {
             setCalendarData({})
             setIsLoadingCalendar(false)
         }
-    }, [form.watch('listingId')])
+    }, [form.watch('listingId'), form.watch('variantId')])
 
-    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentDate)
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December']
-    const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-    const fullDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+
+    const downloadCalendar = async () => {
+        const element = document.getElementById('calendar-to-capture');
+        if (!element) return;
+
+        setIsDownloading(true);
+        try {
+            const dataUrl = await toPng(element, { cacheBust: true, backgroundColor: '#ffffff' });
+
+            const link = document.createElement('a');
+            link.download = `calendar-${monthNames[month]}-${year}.png`;
+            link.href = dataUrl;
+            link.click();
+
+            showToast('success', 'Calendar downloaded successfully');
+        } catch (error) {
+            console.error('Error downloading calendar:', error);
+            showToast('error', `Failed: ${error.message || 'Unknown error'}`);
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -292,7 +378,7 @@ const ListingCalendar = () => {
                 <CardContent>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                            {/* Listing Selection Card */}
+                            {/* Selection Card */}
                             <div className="bg-linear-to-r from-pink-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl border border-pink-100 dark:border-gray-700">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="p-2 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
@@ -300,33 +386,87 @@ const ListingCalendar = () => {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-gray-900 dark:text-white">Select Listing</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Choose which listing you want to manage dates for</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {hasVariants ? 'Choose a listing and its variant' : 'Choose which listing you want to manage dates for'}
+                                        </p>
                                     </div>
                                 </div>
-                                <FormField 
-                                    control={form.control} 
-                                    name="listingId" 
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="sr-only">Listing</FormLabel>
-                                            <FormControl>
-                                                <Select
-                                                    options={listingOptions}
-                                                    selected={field.value}
-                                                    setSelected={field.onChange}
-                                                    isMulti={false}
-                                                    placeholder="Select a listing..."
-                                                    className="bg-white dark:bg-gray-800 border-pink-200 dark:border-gray-700"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )} 
-                                />
+
+                                {/* Listing Selection */}
+                                <div className="mb-4">
+                                    <FormLabel className="text-gray-900 dark:text-white font-medium mb-2 block">Listing</FormLabel>
+                                    <FormField
+                                        control={form.control}
+                                        name="listingId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Select
+                                                        options={listingOptions}
+                                                        selected={field.value}
+                                                        setSelected={(value) => {
+                                                            field.onChange(value)
+                                                            // Reset variant when listing changes
+                                                            form.setValue('variantId', '')
+                                                        }}
+                                                        isMulti={false}
+                                                        placeholder="Select a listing..."
+                                                        className="bg-white dark:bg-gray-800 border-pink-200 dark:border-gray-700"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                {/* Variant Selection - Only show if listing has variants */}
+                                {hasVariants && (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Package className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            <FormLabel className="text-gray-900 dark:text-white font-medium">Select Variant (Optional)</FormLabel>
+                                        </div>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                            This listing has variants. Select a variant to manage specific calendar, or leave empty to manage the main listing.
+                                        </p>
+                                        <FormField
+                                            control={form.control}
+                                            name="variantId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Select
+                                                            options={[
+                                                                { label: 'Main Listing (No Variant)', value: '' },
+                                                                ...listingVariantOptions
+                                                            ]}
+                                                            selected={field.value || ''}
+                                                            setSelected={field.onChange}
+                                                            isMulti={false}
+                                                            placeholder="Select a variant or use main listing..."
+                                                            className="bg-white dark:bg-gray-800 border-pink-200 dark:border-gray-700"
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Show message if no variants */}
+                                {form.watch('listingId') && !hasVariants && listingVariantOptions.length === 0 && (
+                                    <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                        <p className="text-sm text-blue-700 dark:text-blue-300">
+                                            This listing has no variants. Managing calendar for main listing.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Calendar Card */}
-                            <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-900">
+                            <div id="calendar-to-capture" className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-900">
                                 <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
@@ -349,22 +489,38 @@ const ListingCalendar = () => {
                                                     <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                                                 </button>
                                             </div>
-                                            
+
                                             {isLoadingCalendar && (
                                                 <Badge variant="outline" className="animate-pulse">
                                                     Loading...
                                                 </Badge>
                                             )}
                                         </div>
-                                        
-                                        {/* Selected Dates Count */}
-                                        {selectedDates.length > 0 && (
-                                            <Badge className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2">
-                                                {selectedDates.length} date{selectedDates.length !== 1 ? 's' : ''} selected
-                                            </Badge>
-                                        )}
+
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={downloadCalendar}
+                                                disabled={isDownloading}
+                                                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 shadow-sm"
+                                            >
+                                                {isDownloading ? (
+                                                    <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                                                ) : (
+                                                    <Download className="w-4 h-4" />
+                                                )}
+                                                Save as PNG
+                                            </button>
+                                        </div>
                                     </div>
-                                    
+
+                                    {/* Selected Dates Count */}
+                                    {selectedDates.length > 0 && (
+                                        <Badge className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 mt-2 md:mt-0">
+                                            {selectedDates.length} date{selectedDates.length !== 1 ? 's' : ''} selected
+                                        </Badge>
+                                    )}
+
                                     {/* Day Names Header */}
                                     <div className="grid grid-cols-7 gap-2 mt-6">
                                         {fullDayNames.map((day, index) => (
@@ -403,17 +559,17 @@ const ListingCalendar = () => {
                                                 'aspect-square rounded-lg p-3 flex flex-col transition-all duration-200',
                                                 'border-2',
                                                 todayClass,
-                                                isPast 
+                                                isPast
                                                     ? 'bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 cursor-not-allowed opacity-60'
                                                     : isSelected
-                                                    ? 'bg-pink-50 dark:bg-pink-900/20 border-pink-300 dark:border-pink-600 shadow-md cursor-pointer'
-                                                    : dateData
-                                                    ? cn(
-                                                        config?.bgColor,
-                                                        config?.borderColor,
-                                                        'hover:shadow-md cursor-pointer hover:opacity-90'
-                                                    )
-                                                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 hover:shadow-sm cursor-pointer'
+                                                        ? 'bg-pink-50 dark:bg-pink-900/20 border-pink-300 dark:border-pink-600 shadow-md cursor-pointer'
+                                                        : dateData
+                                                            ? cn(
+                                                                config?.bgColor,
+                                                                config?.borderColor,
+                                                                'hover:shadow-md cursor-pointer hover:opacity-90'
+                                                            )
+                                                            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 hover:shadow-sm cursor-pointer'
                                             )
 
                                             return (
@@ -427,13 +583,13 @@ const ListingCalendar = () => {
                                                         <div className={cn(
                                                             'text-lg font-semibold',
                                                             isToday(day) ? 'text-pink-600 dark:text-pink-400' :
-                                                            isPast ? 'text-gray-400 dark:text-gray-600' :
-                                                            isSelected ? 'text-pink-700 dark:text-pink-300' :
-                                                            dateData ? config?.textColor : 'text-gray-900 dark:text-gray-200'
+                                                                isPast ? 'text-gray-400 dark:text-gray-600' :
+                                                                    isSelected ? 'text-pink-700 dark:text-pink-300' :
+                                                                        dateData ? config?.textColor : 'text-gray-900 dark:text-gray-200'
                                                         )}>
                                                             {day}
                                                         </div>
-                                                        
+
                                                         {/* Status Icon */}
                                                         {dateData && (
                                                             <div className={cn(
@@ -467,7 +623,7 @@ const ListingCalendar = () => {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    
+
                                                     {/* Selection Indicator */}
                                                     {isSelected && (
                                                         <div className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></div>
@@ -524,14 +680,19 @@ const ListingCalendar = () => {
                                                     {selectedDates.length} date{selectedDates.length !== 1 ? 's' : ''} selected
                                                 </div>
                                                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                                                    {selectedDates.map(date => new Date(date).toLocaleDateString('en-US', { 
-                                                        month: 'short', 
-                                                        day: 'numeric' 
+                                                    {selectedDates.map(date => new Date(date).toLocaleDateString('en-US', {
+                                                        month: 'short',
+                                                        day: 'numeric'
                                                     })).join(', ')}
                                                 </div>
+                                                {form.watch('listingId') && (
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                        {form.watch('variantId') ? 'Managing variant calendar' : 'Managing main listing calendar'}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex gap-3">
                                             <button
                                                 type="button"
@@ -539,14 +700,14 @@ const ListingCalendar = () => {
                                                     setSelectedDates([])
                                                     form.setValue('dates', [])
                                                 }}
-                                                className=" cursor-pointer px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                                className="cursor-pointer px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                             >
                                                 Clear All
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={openModal}
-                                                disabled={!form.getValues('listingId')}
+                                                disabled={!form.getValues('listingId') || (hasVariants && !form.getValues('variantId'))}
                                                 className="cursor-pointer px-6 py-2.5 bg-linear-to-r from-pink-600 to-purple-600 text-white rounded-lg font-medium hover:from-pink-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
                                             >
                                                 Configure Dates
@@ -557,9 +718,9 @@ const ListingCalendar = () => {
                             )}
 
                             {/* Hidden form field */}
-                            <FormField 
-                                control={form.control} 
-                                name="dates" 
+                            <FormField
+                                control={form.control}
+                                name="dates"
                                 render={({ field }) => (
                                     <FormItem className="hidden">
                                         <FormControl>
@@ -567,7 +728,7 @@ const ListingCalendar = () => {
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
-                                )} 
+                                )}
                             />
                         </form>
                     </Form>
@@ -590,6 +751,11 @@ const ListingCalendar = () => {
                                         <p className="text-sm text-gray-600 dark:text-gray-400">
                                             {selectedDates.length} date{selectedDates.length !== 1 ? 's' : ''} selected
                                         </p>
+                                        {form.watch('variantId') && (
+                                            <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">
+                                                For variant: {listingVariantOptions.find(v => v.value === form.watch('variantId'))?.label}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                                 <button
@@ -612,9 +778,9 @@ const ListingCalendar = () => {
                                             <Tag className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                             <FormLabel className="text-gray-900 dark:text-white font-medium ">Date Status</FormLabel>
                                         </div>
-                                        <FormField 
-                                            control={form.control} 
-                                            name="dateStatus" 
+                                        <FormField
+                                            control={form.control}
+                                            name="dateStatus"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
@@ -628,7 +794,7 @@ const ListingCalendar = () => {
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
-                                            )} 
+                                            )}
                                         />
                                     </div>
 
@@ -638,9 +804,9 @@ const ListingCalendar = () => {
                                             <Money className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                             <FormLabel className="text-gray-900 dark:text-white font-medium">Offering Price (Optional)</FormLabel>
                                         </div>
-                                        <FormField 
-                                            control={form.control} 
-                                            name="price" 
+                                        <FormField
+                                            control={form.control}
+                                            name="price"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
@@ -648,7 +814,7 @@ const ListingCalendar = () => {
                                                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
                                                                 Rs
                                                             </div>
-                                                            <Input 
+                                                            <Input
                                                                 type="number"
                                                                 placeholder="0.00"
                                                                 value={field.value}
@@ -661,57 +827,30 @@ const ListingCalendar = () => {
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
-                                            )} 
+                                            )}
                                         />
                                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                                             Leave as 0 to use listing's default starting Price
                                         </p>
                                     </div>
 
-                                    {/* Preview */}
-                                    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">Preview</h4>
-                                        <div className="space-y-2">
-                                            {selectedDates.slice(0, 3).map(date => (
-                                                <div key={date} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
-                                                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                                                        {new Date(date).toLocaleDateString('en-US', { 
-                                                            weekday: 'short',
-                                                            month: 'short', 
-                                                            day: 'numeric',
-                                                            year: 'numeric'
-                                                        })}
-                                                    </span>
-                                                    <Badge className={statusConfig[form.watch('dateStatus')]?.badgeBg}>
-                                                        {statusConfig[form.watch('dateStatus')]?.label}
-                                                    </Badge>
-                                                </div>
-                                            ))}
-                                            {selectedDates.length > 3 && (
-                                                <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-                                                    + {selectedDates.length - 3} more dates
-                                                </div>
-                                            )}
-                                        </div>
+                                    {/* Modal Actions */}
+                                    <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowModal(false)}
+                                            disabled={loading}
+                                            className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <ButtonLoading
+                                            loading={loading}
+                                            onClick={form.handleSubmit(onSubmit)}
+                                            text="Save Changes"
+                                            className="flex-1 px-4 py-3 bg-linear-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
+                                        />
                                     </div>
-                                </div>
-
-                                {/* Modal Actions */}
-                                <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowModal(false)}
-                                        disabled={loading}
-                                        className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <ButtonLoading
-                                        loading={loading}
-                                        onClick={form.handleSubmit(onSubmit)}
-                                        text="Save Changes"
-                                        className="flex-1 px-4 py-3 bg-linear-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
-                                    />
                                 </div>
                             </Form>
                         </div>
@@ -723,258 +862,3 @@ const ListingCalendar = () => {
 }
 
 export default ListingCalendar
-
-// import BreadCrumb from '@/components/application/BreadCrumb'
-// import ButtonLoadingcalendar from '@/components/application/ButtonLoading'
-// import Select from '@/components/application/Main/Select'
-// import { Card, CardContent, CardHeader } from '@/components/ui/card'
-// import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-// import useFetch from '@/hooks/useFetch'
-// import { zSchema } from '@/lib/zodSchema'
-// import { PROVIDER_DASHBOARD, PROVIDER_LISTING_CALENDAR } from '@/routes/ProviderPanelRoute'
-// import { zodResolver } from '@hookform/resolvers/zod'
-// import React, { useEffect, useState } from 'react'
-// import { useForm } from 'react-hook-form'
-// import Calendar from 'react-calendar'
-// import 'react-calendar/dist/Calendar.css'
-// import { Input } from '@/components/ui/input'
-// import { showToast } from '@/lib/showToast'
-// import { dateStatus } from '@/lib/utils'
-// import axios from 'axios'
-// import { z } from 'zod' // Import Zod
-
-// const breadcrumbData = [
-//     { href: PROVIDER_DASHBOARD, label: 'Home' },
-//     { href: PROVIDER_LISTING_CALENDAR, label: 'Calendar' },
-// ]
-
-// // ✅ Create a custom schema for your form
-// const calendarFormSchema = z.object({
-//     listingId: z.string().min(1, 'Please select a listing'),
-//     date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-//         message: 'Invalid date format',
-//     }),
-//     dateStatus: z.enum(dateStatus),
-//     price: z.number().min(0, 'Price cannot be negative').default(0),
-// })
-
-// const ListingCalendar = () => {
-//     const [loading, setLoading] = useState(false)
-//     const [selectedDate, setSelectedDate] = useState(null)
-
-//     useEffect(() => {
-//         console.log('Selected date changed:', selectedDate)
-//     }, [selectedDate])
-
-//     const form = useForm({
-//         resolver: zodResolver(calendarFormSchema), // Use custom schema
-//         defaultValues: {
-//             listingId: '',
-//             dateStatus: 'available',
-//             price: 0
-//         },
-//     })
-
-//     // ✅ Reset the form date field when selectedDate changes
-//     useEffect(() => {
-//         if (selectedDate) {
-//             let dateToSet;
-//             if (selectedDate instanceof Date) {
-//                 dateToSet = selectedDate;
-//             } else if (Array.isArray(selectedDate)) {
-//                 dateToSet = selectedDate[0];
-//             } else {
-//                 dateToSet = new Date(selectedDate);
-//             }
-            
-//             // Set the date field in the form as ISO string
-//             form.setValue('date', dateToSet.toISOString(), { 
-//                 shouldValidate: true 
-//             });
-//         }
-//     }, [selectedDate, form])
-
-//     // get listings
-//     const { data: getListing } = useFetch('/api/provider/listing?deleteType=SD')
-//     const [listingOptions, setListingOptions] = useState([])
-
-//     useEffect(() => {
-//         if (getListing?.success) {
-//             setListingOptions(
-//                 getListing.data.map(list => ({
-//                     label: list.name,
-//                     value: list._id,
-//                 }))
-//             )
-//         }
-//     }, [getListing])
-
-//     const statusOptions = dateStatus.map(status => ({
-//         label: status.charAt(0).toUpperCase() + status.slice(1),
-//         value: status,
-//     }))
-
-//     const onSubmit = async (values) => {
-//         console.log('Form submitted with values:', values)
-        
-//         if (!selectedDate) {
-//             showToast('Please select a date', 'error')
-//             return
-//         }
-        
-//         // Validate the form
-//         const isValid = await form.trigger()
-//         if (!isValid) {
-//             console.log('Form validation failed:', form.formState.errors)
-//             return
-//         }
-        
-//         // Prepare payload - date is already in ISO string format from the form
-//         const payload = {
-//             listingId: values.listingId,
-//             date: values.date, // Already ISO string from form
-//             dateStatus: values.dateStatus,
-//             price: values.price
-//         }
-        
-//         console.log('Final payload:', payload)
-        
-//         setLoading(true)
-//         try {
-//             const { data } = await axios.post('/api/provider/calendar', payload)
-//             console.log('API response:', data)
-            
-//             if (!data.success) {
-//                 throw new Error(data.message || 'API call failed')
-//             }
-
-//             showToast('success', data.message || 'Date saved successfully')
-//             form.reset({
-//                 listingId: '',
-//                 dateStatus: 'available',
-//                 price: 0
-//             })
-//             setSelectedDate(null)
-//         } catch (error) {
-//             console.error('API error:', error)
-//             showToast('error', error.response?.data?.message || error.message || 'Something went wrong')
-//         } finally {
-//             setLoading(false)
-//         }
-//     }
-
-//     // Monitor form errors
-//     useEffect(() => {
-//         if (Object.keys(form.formState.errors).length > 0) {
-//             console.log('Form errors:', form.formState.errors)
-//         }
-//     }, [form.formState.errors])
-
-//     return (
-//         <div>
-//             <BreadCrumb breadCrumbData={breadcrumbData} />
-
-//             <Card className="py-0 rounded shadow-sm">
-//                 <CardHeader className="pt-3 px-3 border-b">
-//                     <h4 className="text-xl font-semibold">Manage Dates</h4>
-//                 </CardHeader>
-
-//                 <CardContent>
-//                     <Form {...form}>
-//                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-//                             {/* Listing */}
-//                             <FormField control={form.control} name="listingId" render={({ field }) => (
-//                                 <FormItem>
-//                                     <FormLabel>Listing</FormLabel>
-//                                     <FormControl>
-//                                         <Select
-//                                             options={listingOptions}
-//                                             selected={field.value}
-//                                             setSelected={field.onChange}
-//                                             isMulti={false}
-//                                             placeholder="Select Listing"
-//                                         />
-//                                     </FormControl>
-//                                     <FormMessage />
-//                                 </FormItem>
-//                             )} />
-
-//                             {/* Calendar - Now this updates the form's date field */}
-//                             <div className="border rounded p-3">
-//                                 <Calendar 
-//                                     onChange={setSelectedDate} 
-//                                     value={selectedDate} 
-//                                 />
-//                             </div>
-
-//                             {/* Hidden date field for form validation */}
-//                             <FormField control={form.control} name="date" render={({ field }) => (
-//                                 <FormItem className="hidden">
-//                                     <FormControl>
-//                                         <Input type="hidden" {...field} />
-//                                     </FormControl>
-//                                     <FormMessage />
-//                                 </FormItem>
-//                             )} />
-
-//                             {selectedDate && (
-//                                 <p className="text-sm text-muted-foreground">
-//                                     Selected Date: <b>
-//                                         {selectedDate instanceof Date 
-//                                             ? selectedDate.toDateString() 
-//                                             : new Date(selectedDate).toDateString()
-//                                         }
-//                                     </b>
-//                                 </p>
-//                             )}
-
-//                             {/* Status */}
-//                             <FormField control={form.control} name="dateStatus" render={({ field }) => (
-//                                 <FormItem>
-//                                     <FormLabel>Status</FormLabel>
-//                                     <FormControl>
-//                                         <Select
-//                                             options={statusOptions}
-//                                             selected={field.value}
-//                                             setSelected={field.onChange}
-//                                             isMulti={false}
-//                                         />
-//                                     </FormControl>
-//                                     <FormMessage />
-//                                 </FormItem>
-//                             )} />
-
-//                             {/* Price */}
-//                             <FormField control={form.control} name="price" render={({ field }) => (
-//                                 <FormItem>
-//                                     <FormLabel>Booking Price (optional)</FormLabel>
-//                                     <FormControl>
-//                                         <Input 
-//                                             type="number" 
-//                                             placeholder="Enter price" 
-//                                             value={field.value}
-//                                             onChange={(e) => field.onChange(Number(e.target.value))}
-//                                         />
-//                                     </FormControl>
-//                                     <FormMessage />
-//                                 </FormItem>
-//                             )} />
-
-//                             {/* Submit */}
-//                             <div className="pt-6 border-t flex justify-end">
-//                                 <ButtonLoading
-//                                     loading={loading}
-//                                     type="submit"
-//                                     text="Save Date"
-//                                     disabled={loading || !selectedDate}
-//                                 />
-//                             </div>
-//                         </form>
-//                     </Form>
-//                 </CardContent>
-//             </Card>
-//         </div>
-//     )
-// }
-
-// export default ListingCalendar

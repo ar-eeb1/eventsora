@@ -6,14 +6,14 @@ import { MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
 
-const ListingBox = ({ listing }) => {
+const ListingBox = ({ listing }) => {    
     const imageUrl = listing?.media?.[0]?.secure_url || img.src
     const imageAlt = listing?.name || 'listing'
     const capacity = listing?.capacity
     const startingPrice = listing?.startingPrice?.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' }) || '0'
     const location = [listing?.city?.city, listing?.locality?.locality]
         .filter(Boolean)
-        .join(', ')
+        .join(' , ')
 
     return (
         <Link href={WEBSITE_LISTING_DETAILS(listing.slug)} className='bg-white rounded-md shadow-sm hover:shadow-lg transition-shadow duration-200 overflow-hidden '>
@@ -29,7 +29,7 @@ const ListingBox = ({ listing }) => {
             </div>
 
             {/* Content */}
-            <div className='p-4 space-y-3'>
+            <div className='px-4 pt-4 pb-3 space-y-3'>
                 {/* Title */}
                 <h2 className='font-semibold text-lg text-gray-900 line-clamp-2 max-h-14'>
                     {listing?.name || 'Untitled Listing'}
@@ -60,7 +60,7 @@ const ListingBox = ({ listing }) => {
                             <MapPin size={14} className='text-gray-400 shrink-0' aria-hidden="true" />
                             <p className='text-sm truncate'>{location}</p>
                         </div>
-                        <div className='underline underline-offset-4 text-sm text-blue-800'>
+                        <div className=' text-sm text-pink-800 bg-pink-200 px-2 rounded-full'>
                             Book Now
                         </div>
                     </div>

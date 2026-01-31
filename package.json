@@ -44,6 +44,7 @@
     "entities": "^7.0.0",
     "export-to-csv": "^1.4.0",
     "fuse.js": "^7.1.0",
+    "html-to-image": "^1.11.13",
     "input-otp": "^1.4.2",
     "jose": "^6.1.2",
     "lucide-react": "^0.554.0",

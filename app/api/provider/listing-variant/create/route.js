@@ -16,12 +16,13 @@ export async function POST(request) {
 
         const schema = zSchema
             .pick({
-                listing: true,
+                listingId: true,
                 title: true,
-                media: true,
+                // media: true,
                 serviceCode: true,
                 startingPrice: true,
                 pricingType: true,
+                points: true,
             })
 
         const validate = schema.safeParse(payload)

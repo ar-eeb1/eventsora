@@ -3,6 +3,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import CategoryModel from "@/models/Category.model";
 import ListingModel from "@/models/Listing.model";
 import SubcategoryModel from "@/models/Subcategory.model";
+import mongoose from "mongoose";
 
 export async function GET(request) {
     try {
@@ -17,8 +18,6 @@ export async function GET(request) {
         const minCapacity = parseInt(searchParams.get('minCapacity')) || 0
         const maxCapacity = parseInt(searchParams.get('maxCapacity')) || 3000
         const search = searchParams.get('q')
-
-        console.log(minCapacity, maxCapacity);
 
 
         // PAGINATION
@@ -59,6 +58,18 @@ export async function GET(request) {
 
         if (search) {
             matchStage.name = { $regex: search, $options: 'i' }
+        }
+
+        const city = searchParams.get('city')
+        if (city) {
+            const cityIds = city.split(',').map(id => new mongoose.Types.ObjectId(id))
+            matchStage.city = { $in: cityIds }
+        }
+
+        const locality = searchParams.get('locality')
+        if (locality) {
+            const localityIds = locality.split(',').map(id => new mongoose.Types.ObjectId(id))
+            matchStage.locality = { $in: localityIds }
         }
 
 
@@ -134,6 +145,28 @@ export async function GET(request) {
                 }
             },
 
+            // City Lookup
+            {
+                $lookup: {
+                    from: 'cities',
+                    localField: 'city',
+                    foreignField: '_id',
+                    as: 'city'
+                }
+            },
+            { $unwind: '$city' },
+
+            // Locality Lookup
+            {
+                $lookup: {
+                    from: 'localities',
+                    localField: 'locality',
+                    foreignField: '_id',
+                    as: 'locality'
+                }
+            },
+            { $unwind: '$locality' },
+
             // Projection
             {
                 $project: {
@@ -150,7 +183,9 @@ export async function GET(request) {
                     variants: {
                         startingPrice: 1,
                         capacity: 1
-                    }
+                    },
+                    city: { city: 1 },
+                    locality: { locality: 1 }
                 }
             }
         ])

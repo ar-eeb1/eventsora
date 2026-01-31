@@ -32,7 +32,7 @@ export async function GET(request, { params }) {
 
         // GET LISTING VARIANT
         const variantFilter = {
-            listing: getListing._id,
+            listingId: getListing._id,
             deletedAt: null,
             // status: 'approved'
         }
@@ -51,8 +51,8 @@ export async function GET(request, { params }) {
         //     return response(false, 404, 'Variant Not Found')
         // }
 
-        const getPrice = await ListingVariantModel.distinct('startingPrice', { listing: getListing._id })
-        const getCapacity = await ListingVariantModel.distinct('capacity', { listing: getListing._id })
+        const getPrice = await ListingVariantModel.distinct('startingPrice', { listingId: getListing._id })
+        const getCapacity = await ListingVariantModel.distinct('capacity', { listingId: getListing._id })
 
         // REVIEW 
         const review = await reviewModel.countDocuments({ listing: getListing._id })
