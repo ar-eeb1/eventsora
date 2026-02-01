@@ -11,7 +11,10 @@ import Link from 'next/link'
 import BreadCrumb from '@/components/application/BreadCrumb'
 import ButtonLoading from '@/components/application/ButtonLoading'
 import AvailabilityCalendar from '@/components/application/Website/AvailabilityCalendar'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import axios from 'axios'
+import { showToast } from '@/lib/showToast'
+
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
     const searchParams = useSearchParams()
@@ -32,8 +35,35 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
         setActiveThumb(listing?.media[0]?.secure_url)
     }, [listing])
 
+    const router = useRouter()
+    useEffect(() => {
+        if (variants && variants.length > 0 && !activeVariant) {
+            const firstVariant = variants[0]
+            router.replace(`${WEBSITE_LISTING_DETAILS(listing.slug)}?serviceCode=${firstVariant.serviceCode}`)
+        }
+    }, [activeVariant, variants, listing.slug, router])
+
     const handleDateSelect = (selectedDates) => {
         // Handle booking logic here
+    }
+
+    const handleMessageProvider = async () => {
+
+        setIsLoading(true)
+        try {
+            const receiverId = listing.userId?._id
+            const { data } = await axios.post('/api/message/conversation/create', {
+                receiverId: receiverId,
+                listingId: listing._id
+            })
+            if (data.success) {
+                router.push(`/user/messages/${data.data._id}`)
+            }
+        } catch (error) {
+            showToast('error', error.response?.data?.message || 'Failed to start chat')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
 
@@ -116,16 +146,26 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
 
                     <div className='gap-3 flex mt-10'>
                         <ButtonLoading type='button' text='Book Now' className={'w-1/2 rounded-full py-6 text-md text-white'} />
-                        <button type='button' className='w-1/2 rounded-full text-md text-black bg-white cursor-pointer'>Message Provider</button>
+                        <ButtonLoading
+                            type='button'
+                            onClick={handleMessageProvider}
+                            loading={isloading} // Check state name casing (isloading vs isLoading)
+                            text='Message Provider'
+                            className='w-1/2 rounded-full text-md text-black bg-white cursor-pointer'
+                        />
                     </div>
                 </div>
             </div>
 
             <div className='mb-5'>
-                <div className="text-center my-6">
-                    <h1 className=" inline-block px-6 py-3 text-4xl font-semibold text-pink-700 bg-white dark:bg-gray-800 rounded-full shadow-md border border-primary/20 underline underline-offset-4 transition-transform hover:scale-105 hover:shadow-lg">
-                        &quot;{listing.name}&quot;
-                    </h1>
+                <div className="flex flex-col items-center justify-center my-10 space-y-2">
+                    <div className="h-1 w-20 bg-primary rounded-full mb-5"></div>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white text-center">
+                        Availability for <span className="text-primary">&quot;{listing.name}&quot;</span>
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 text-center max-w-lg">
+                        Check availability and pricing for your desired dates below.
+                    </p>
                 </div>
 
                 <AvailabilityCalendar

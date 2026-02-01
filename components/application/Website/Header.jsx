@@ -8,12 +8,12 @@ import Categories from './Categories'
 import { CircleUserRound, SearchIcon, X } from 'lucide-react'
 import Booking from './Booking'
 import { useSelector } from 'react-redux'
-import { USER_DASHBOARD, WEBSITE_CATEGORY } from '@/routes/WebsiteRoute'
+import { USER_DASHBOARD, WEBSITE_CATEGORY, WEBSITE_MESSAGES } from '@/routes/WebsiteRoute'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import profileIcon from '@/public/assets/user.png'
 import { CiMenuFries } from "react-icons/ci";
 import Search from './Search'
-
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 const Header = () => {
     const auth = useSelector(store => store.authStore.auth)
     const [isMobileMenu, setIsMobileMenu] = useState(false)
@@ -70,8 +70,9 @@ const Header = () => {
                         <button type='button' onClick={() => setShowSearch(!showSearch)}>
                             <SearchIcon className='hover:text-pink-100 cursor-pointer text-white' />
                         </button>
-
-                        <Booking />
+                        <Link href={WEBSITE_MESSAGES}>
+                            <ChatBubbleOutlineIcon className='text-white' />
+                        </Link>
                         {!auth
                             ?
                             <Link href={WEBSITE_LOGIN} className=' text-white'>

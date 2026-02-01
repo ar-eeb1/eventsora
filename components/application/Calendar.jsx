@@ -170,44 +170,44 @@ const Calendar = ({
     }
 
     return (
-        <div className={cn("my-6 border-2 border-[#CE416F] dark:border-pink-700 rounded-xl overflow-hidden bg-white dark:bg-pink-900", className)} {...props}>
+        <div className={cn("my-6 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden bg-white dark:bg-gray-950 shadow-xs", className)} {...props}>
             {showHeader && (
-                <div className="p-4 border-b border-pink-200 dark:border-pink-700 bg-[#e75888] dark:bg-pink-800/50">
-                    <div className="flex items-center justify-center ">
-                        <div className="flex items-center gap-4 ">
-                            <div className="flex items-center gap-2 ">
-                                <button
-                                    type="button"
-                                    onClick={handlePrevMonth}
-                                    className="p-2 hover:bg-gray-100 hover:text-black rounded-lg transition-colors"
-                                >
-                                    <ChevronLeft className="w-4 h-4 text-white hover:text-black dark:text-gray-300" />
-                                </button>
-                                <h3 className="text-3xl font-semibold text-white dark:text-white">
-                                    {monthNames[month]} {year}
-                                </h3>
-                                <button
-                                    type="button"
-                                    onClick={handleNextMonth}
-                                    className="p-2 hover:bg-gray-100 hover:text-black rounded-lg transition-colors"
-                                >
-                                    <ChevronRight className="w-4 h-4 text-white hover:text-black dark:text-gray-300" />
-                                </button>
-                            </div>
-
-                            {mode === 'select' && selectedDates.length > 0 && (
-                                <Badge className="bg-blue-600 text-white">
-                                    {selectedDates.length} selected
-                                </Badge>
-                            )}
+                <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 pl-2">
+                            {monthNames[month]} {year}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={handlePrevMonth}
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full transition-colors flex items-center justify-center border border-gray-200 dark:border-gray-800"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNextMonth}
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full transition-colors flex items-center justify-center border border-gray-200 dark:border-gray-800"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
                         </div>
                     </div>
 
+                    {mode === 'select' && selectedDates.length > 0 && (
+                        <div className="mt-2 pl-2">
+                            <Badge className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                {selectedDates.length} selected
+                            </Badge>
+                        </div>
+                    )}
+
                     {/* Day Names Header */}
-                    <div className="grid grid-cols-7 gap-2 mt-4">
+                    <div className="grid grid-cols-7 gap-2 mt-6">
                         {fullDayNames.map((day, index) => (
                             <div key={day} className="text-center">
-                                <div className="text-sm font-semibold text-white underline underline-offset-5 dark:text-white ">
+                                <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                     {compact ? dayNames[index] : day}
                                 </div>
                             </div>
@@ -232,29 +232,35 @@ const Calendar = ({
                         const isSelected = selectedDates.includes(dateKey)
                         const currentDateObj = new Date(year, month, day)
                         const isPast = currentDateObj < today
-                        const todayClass = highlightToday && isToday(day) ? 'ring-2 ring-pink-500 dark:ring-pink-400' : ''
+                        const todayClass = highlightToday && isToday(day) ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-gray-950' : ''
                         const isDisabled = disabledDates.includes(dateKey)
                         const config = dateData ? statusConfig[dateData.status] : null
 
                         let cellClass = cn(
-                            // 'aspect-square rounded-lg p-2 flex flex-col transition-all duration-200',
-                            'min-h-[134px] max-w-[134px] rounded-lg p-1 flex flex-col ',
+                            'min-h-[120px] rounded-lg p-3 flex flex-col transition-all duration-200 relative group',
                             'border',
                             todayClass,
                             isPast || isDisabled
-                                ? 'bg-pink-50 dark:bg-pink-900/50 border-pink-100 dark:border-pink-800 cursor-not-allowed opacity-60'
+                                ? 'bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800 cursor-not-allowed opacity-50'
                                 : isSelected && mode === 'select'
-                                    ? 'bg-blue-50 dark:bg-pink-900/20 border-pink-300 dark:border-pink-600 shadow-md cursor-pointer'
+                                    ? 'bg-primary/5 border-primary dark:border-primary/50 shadow-md cursor-pointer'
                                     : dateData
                                         ? cn(
-                                            config?.bgColor,
+                                            // Keep custom status background but make it more subtle
+                                            config?.bgColor === 'bg-green-50 dark:bg-green-900/20' ? 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-primary/50' : config?.bgColor,
                                             config?.borderColor,
-                                            selectable && 'hover:shadow-md cursor-pointer hover:opacity-90'
+                                            selectable && 'hover:shadow-md cursor-pointer hover:-translate-y-0.5'
                                         )
                                         : selectable
-                                            ? 'bg-white dark:bg-pink-800 border-pink-200 dark:border-pink-700 hover:border-pink-300 dark:hover:border-pink-600 hover:shadow-sm cursor-pointer'
-                                            : 'bg-white dark:bg-pink-800 border-pink-200 dark:border-pink-700'
+                                            ? 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-primary/50 hover:shadow-sm cursor-pointer hover:-translate-y-0.5'
+                                            : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800'
                         )
+
+                        // Override for simplified Available look
+                        if (dateData?.status === 'available' && !isSelected && !isPast && !isDisabled) {
+                            cellClass = cn(cellClass, 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800')
+                        }
+
 
                         return (
                             <div
@@ -262,51 +268,49 @@ const Calendar = ({
                                 onClick={() => handleDateClick(dateKey, day)}
                                 className={cellClass}
                             >
+                                {/* Selection Indicator */}
+                                {isSelected && mode === 'select' && (
+                                    <div className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-white dark:ring-gray-900"></div>
+                                )}
+
                                 {/* Day Number */}
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-start">
                                     <div className={cn(
-                                        'font-semibold',
-                                        isToday(day) ? 'text-blue-600 dark:text-blue-400' :
+                                        'text-lg font-medium',
+                                        isToday(day) ? 'text-primary' :
                                             isPast || isDisabled ? 'text-gray-400 dark:text-gray-600' :
-                                                isSelected ? 'text-blue-700 dark:text-blue-300' :
-                                                    dateData ? config?.textColor : 'text-gray-900 dark:text-gray-200'
+                                                isSelected ? 'text-primary' :
+                                                    'text-gray-700 dark:text-gray-200'
                                     )}>
                                         {day}
                                     </div>
-
-                                    {/* Status Icon */}
-                                    {showStatus && dateData && (
-                                        <div className={cn(
-                                            'p-1 rounded-full',
-                                            config?.bgColor
-                                        )}>
-                                            {getStatusIcon(dateData.status)}
-                                        </div>
-                                    )}
                                 </div>
 
-                                {/* Status and Price */}
-                                <div className="mt-1 space-y-0.5">
-                                    {showStatus && dateData && !compact && (
+                                {/* Status and Price Content */}
+                                <div className="mt-auto space-y-1">
+                                    {showStatus && dateData && !compact && dateData.status !== 'available' && (
                                         <div className={cn(
-                                            'text-lg font-medium truncate',
-                                            config?.textColor
+                                            'text-xs font-medium px-2 py-1 rounded-md w-fit',
+                                            dateData.status === 'booked' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                                                dateData.status === 'blocked' ? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' : ''
                                         )}>
                                             {config?.label}
                                         </div>
                                     )}
-                                    {showPrice && dateData?.price > 0 && !compact && (
-                                        <div className="flex items-center gap-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
 
-                                            {dateData.price.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                    {/* Simple "Available" text only if pricing is hidden or for clarity */}
+                                    {showStatus && dateData && !compact && dateData.status === 'available' && (
+                                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                            Available
+                                        </div>
+                                    )}
+
+                                    {showPrice && dateData?.price > 0 && !compact && (
+                                        <div className="font-semibold text-sm text-gray-900 dark:text-white">
+                                            {dateData.price.toLocaleString('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 })}
                                         </div>
                                     )}
                                 </div>
-
-                                {/* Selection Indicator */}
-                                {isSelected && mode === 'select' && (
-                                    <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                                )}
                             </div>
                         )
                     })}
@@ -315,19 +319,24 @@ const Calendar = ({
 
             {/* Legend */}
             {showLegend && (
-                <div className="p-4 border-t border-pink-200 dark:border-pink-700 bg-pink-50 dark:bg-pink-800/50">
-                    <h4 className="text-sm font-semibold text-pink-900 dark:text-white mb-2">Legend</h4>
-                    <div className="flex flex-wrap gap-2">
-                        {Object.entries(statusConfig).map(([status, config]) => (
-                            <div key={status} className="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-pink-800 rounded border border-pink-200 dark:border-pink-700">
-                                <div className={cn('w-2 h-2 rounded-full', config.bgColor, config.borderColor, 'border')}></div>
-                                <span className="text-xs text-pink-700 dark:text-pink-300">{config.label}</span>
-                            </div>
-                        ))}
+                <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
+                    <div className="flex flex-wrap items-center gap-6 justify-center">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full border border-gray-300 bg-white"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Available</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-red-100 border border-red-200"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Booked</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-gray-200 border border-gray-300"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Blocked</span>
+                        </div>
                         {mode === 'select' && (
-                            <div className="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-pink-800 rounded border border-pink-200 dark:border-pink-700">
-                                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                <span className="text-xs text-pink-700 dark:text-pink-300">Selected</span>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-primary/20 border border-primary"></div>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Selected</span>
                             </div>
                         )}
                     </div>

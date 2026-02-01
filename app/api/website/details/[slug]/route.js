@@ -4,6 +4,7 @@ import ListingModel from "@/models/Listing.model";
 import ListingVariantModel from "@/models/ListingVariant.model";
 import { MediaModel } from "@/models/Media.model";
 import reviewModel from "@/models/Review.model";
+import UserModel from "@/models/user.Model.js";
 
 export async function GET(request, { params }) {
     try {
@@ -25,7 +26,10 @@ export async function GET(request, { params }) {
         filter.slug = slug
 
         // GET LISTING
-        const getListing = await ListingModel.findOne(filter).populate('media', 'secure_url').lean()
+        const getListing = await ListingModel.findOne(filter)
+            .populate('media', 'secure_url')
+            .populate('userId', 'name email profileImage')
+            .lean()
         if (!getListing) {
             return response(false, 404, 'Listing Not Found')
         }

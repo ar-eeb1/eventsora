@@ -60,7 +60,10 @@ export async function GET(request) {
             if (filter.id === 'startingPrice') {
                 matchQuery[filter.id] = Number(filter.value)
             } else {
-                matchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
+                // Prevent overwritting userId
+                if (filter.id !== 'userId') {
+                    matchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
+                }
             }
         });
 
@@ -69,6 +72,9 @@ export async function GET(request) {
         sorting.forEach(sort => {
             sortQuery[sort.id] = sort.desc ? -1 : 1
         })
+
+        // SECURITY: Force userId match to prevent any bypass
+        matchQuery.userId = userObjectId;
 
         //agggreggate pipeline
         const aggregatePipeline = [

@@ -16,5 +16,8 @@ export const PROVIDER_LISTING_VARIANT_EDIT = (id) => id ? `/provider/listing-var
 //calendar
 export const PROVIDER_LISTING_CALENDAR = '/provider/calendar'
 
+//messages
+export const PROVIDER_MESSAGES = '/provider/messages'
+
 
 export const PROVIDER_TRASH = '/provider/trash'

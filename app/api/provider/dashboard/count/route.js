@@ -13,10 +13,10 @@ export async function GET(request) {
         await connectDB();
 
         const [listing] = await Promise.all([
-            ListingModel.countDocuments({ deletedAt: null })
+            ListingModel.countDocuments({ deletedAt: null, userId: auth.userId })
         ])
 
-        return response(true, 200, 'Dashboard Count', {listing})
+        return response(true, 200, 'Dashboard Count', { listing })
     } catch (error) {
         return catchError(error);
     }

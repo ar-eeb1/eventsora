@@ -32,12 +32,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <Script src="https://cdn.lordicon.com/lordicon.js"></Script>
-      <Script
-        src="https://animatedicons.co/scripts/animatedicons.min.js"
-        strategy="afterInteractive"
-      />
 
       <body className={`${geistSans.variable} ${geistMono.variable} ${poppins.className} antialiased`}>
         <ThemeProvider
