@@ -51,7 +51,9 @@ export async function GET(request) {
         }
 
         // MATCH STAGE
-        let matchStage = {}
+        let matchStage = {
+            status: 'approved'
+        }
         if (categoryId.length > 0) matchStage.category = { $in: categoryId } // filter by category
         if (subcategoryId.length > 0) matchStage.subcategory = { $in: subcategoryId } // filter by subcategory
 

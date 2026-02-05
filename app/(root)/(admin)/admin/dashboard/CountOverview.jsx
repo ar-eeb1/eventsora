@@ -3,19 +3,19 @@ import Link from 'next/link'
 import { Banknote, Calendar, CalendarCheck, List } from 'lucide-react';
 import React from 'react'
 import useFetch from '@/hooks/useFetch';
-import { PROVIDER_LISTING_SHOW } from '@/routes/ProviderPanelRoute';
+import { ADMIN_LISTING_SHOW } from '@/routes/AdminPanelRoute';
 
 
 const CountOverview = () => {
 
-    const { data: countData } = useFetch('/api/provider/dashboard/count')
+    const { data: countData } = useFetch('/api/admin/dashboard/count')
 
     return (
         <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 sm:gap-10 gap-5 mt-4 lg:gap-5">
-            <Link href={PROVIDER_LISTING_SHOW}>
+            <Link href={ADMIN_LISTING_SHOW}>
                 <div className='flex items-center justify-between p-3 rounded-lg border shadow border-l-4 border-l-pink-400 bg-white dark:bg-card dark:border-gray-800 dark:border-l-pink-800'>
                     <div>
-                        <h4 className='font-medium text-gray-500'>My Listings</h4>
+                        <h4 className='font-medium text-gray-500'>All Listings</h4>
                         <span className='text-xl font-bold'>{countData?.data?.listing || 0}</span>
                     </div>
                     <div>
@@ -26,7 +26,7 @@ const CountOverview = () => {
             <Link href={''}>
                 <div className='flex items-center justify-between p-3 rounded-lg border shadow border-l-4 border-l-rose-400 bg-white dark:bg-card dark:border-gray-800 dark:border-l-rose-800'>
                     <div>
-                        <h4 className='font-medium text-gray-500'>Bookings</h4>
+                        <h4 className='font-medium text-gray-500'>All Bookings</h4>
                         <span className='text-xl font-bold'>10</span>
                     </div>
                     <div>
@@ -45,7 +45,7 @@ const CountOverview = () => {
                     </div>
                 </div>
             </Link>
-            <Link href={''}>
+            {/* <Link href={''}>
                 <div className='flex items-center justify-between p-3 rounded-lg border shadow border-l-4 border-l-purple-400 bg-white dark:bg-card dark:border-gray-800 dark:border-l-purple-800'>
                     <div>
                         <h4 className='font-medium text-gray-500'>Earnings</h4>
@@ -55,7 +55,7 @@ const CountOverview = () => {
                         <span className='w-12 h-12 border flex justify-center items-center rounded-full bg-purple-500 dark:bg-purple-800 text-white'><Banknote size={20} /></span>
                     </div>
                 </div>
-            </Link>
+            </Link> */}
         </div>
     )
 }

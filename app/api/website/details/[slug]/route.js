@@ -17,7 +17,8 @@ export async function GET(request, { params }) {
 
 
         const filter = {
-            deletedAt: null
+            deletedAt: null,
+            status: 'approved'
         }
 
         if (!slug) {

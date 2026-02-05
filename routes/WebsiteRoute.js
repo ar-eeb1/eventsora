@@ -7,3 +7,4 @@ export const WEBSITE_CATEGORY = (slug) => slug ? `/${slug}` : ''
 export const WEBSITE_LISTING_DETAILS = (slug) => slug ? `/listing/${slug}` : '/listing'
 
 export const WEBSITE_MESSAGES = '/user/messages'
+export const WEBSITE_BOOKINGS = '/booking'

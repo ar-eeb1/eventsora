@@ -9,7 +9,7 @@ export const AvailabilityCalendar = ({
     onDateSelect,
     selectedDates = [],
     disabledDates = [],
-    maxSelectable = 1,
+    maxSelectable = null,
     isLoading: externalLoading = false,
     ...props
 }) => {

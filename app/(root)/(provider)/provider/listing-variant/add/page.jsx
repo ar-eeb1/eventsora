@@ -62,9 +62,8 @@ const AddListingVariant = () => {
     title: true,
     serviceCode: true,
     startingPrice: true,
-    serviceCode: true,
-    startingPrice: true,
     pricingType: true,
+    minPersons: true,
     points: true,
   })
 
@@ -76,6 +75,7 @@ const AddListingVariant = () => {
       serviceCode: '',
       startingPrice: Number(0),
       pricingType: '',
+      minPersons: 1,
     }
   })
 
@@ -234,7 +234,25 @@ const AddListingVariant = () => {
                       </FormItem>
                     )} />
 
-
+                    {/* MINIMUM PERSONS */}
+                    {form.watch('pricingType') === 'per_person' && (
+                      <FormField control={form.control} name="minPersons" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">Minimum Persons<span className='text-red-500 ml-1'>*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              type='number'
+                              placeholder='Enter minimum persons required'
+                              className="h-11 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                              min='1'
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    )}
 
                   </div>
                 </div>

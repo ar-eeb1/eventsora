@@ -17,6 +17,7 @@ export async function GET(req) {
 
     let filter = {
       deletedAt: null,
+      status: 'approved',
     };
 
     // GET CATEGORY

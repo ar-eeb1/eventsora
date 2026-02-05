@@ -23,6 +23,7 @@ export async function POST(request) {
                 startingPrice: true,
                 pricingType: true,
                 points: true,
+                minPersons: true,
             })
 
         const validate = schema.safeParse(payload)

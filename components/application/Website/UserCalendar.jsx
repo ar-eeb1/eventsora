@@ -6,7 +6,7 @@ import { showToast } from '@/lib/showToast'
 const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates = [], disabledDates = [], maxSelectable = 1 }) => {
     const [calendarData, setCalendarData] = useState({})
     const [isLoading, setIsLoading] = useState(true)
-    const [selected, setSelected] = useState(selectedDates)
+    const [selected, setSelected] = useState(selectedDates || [])
 
     // Fetch calendar data
     const fetchCalendarData = useCallback(async () => {
@@ -54,11 +54,17 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
     }, [listingId, variantId, fetchCalendarData])
 
     useEffect(() => {
-        setSelected(selectedDates)
+        setSelected(selectedDates || [])
     }, [selectedDates])
 
     // Handle date selection
     const handleDateSelect = (dates) => {
+        // Check if at least one date is selected
+        if (!dates || dates.length === 0) {
+            showToast("error", "Please select any date")
+            return
+        }
+
         // Prevent selecting more than maxSelectable dates
         if (dates.length > maxSelectable && maxSelectable > 0) {
             showToast("error", `You can only select up to ${maxSelectable} date(s)`)
@@ -155,12 +161,10 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
                 showHeader={true}
                 compact={false}
                 highlightToday={true}
-                // Add a custom function to handle missing dates
-                getDateStatus={getDateStatus}
             />
 
             {/* Selected dates summary */}
-            {selected.length > 0 && (
+            {selected && selected.length > 0 && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                     <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">
                         Selected Date{selected.length > 1 ? 's' : ''}

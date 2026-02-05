@@ -21,6 +21,11 @@ const listingVariantSchema = new mongoose.Schema({
         enum: pricingType,
         default: 'fixed'
     },
+    minPersons: {
+        type: Number,
+        default: 1,
+        min: 1
+    },
     points: [String],
     serviceCode: {
         type: String,

@@ -6,10 +6,10 @@ import logo from '@/public/assets/eventsoraWhite.png'
 import Image from 'next/image'
 import Categories from './Categories'
 import { CircleUserRound, SearchIcon, X } from 'lucide-react'
-import Booking from './Booking'
 import { useSelector } from 'react-redux'
 import { USER_DASHBOARD, WEBSITE_CATEGORY, WEBSITE_MESSAGES } from '@/routes/WebsiteRoute'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import Booking from './Booking'
 import profileIcon from '@/public/assets/user.png'
 import { CiMenuFries } from "react-icons/ci";
 import Search from './Search'
@@ -73,6 +73,8 @@ const Header = () => {
                         <Link href={WEBSITE_MESSAGES}>
                             <ChatBubbleOutlineIcon className='text-white' />
                         </Link>
+                        <Booking />
+
                         {!auth
                             ?
                             <Link href={WEBSITE_LOGIN} className=' text-white'>

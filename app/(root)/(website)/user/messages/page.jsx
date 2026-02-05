@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import img from '@/public/assets/profile.png' // Default image
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const MessagesPage = () => {
     const { auth: user } = useSelector(state => state.authStore)
