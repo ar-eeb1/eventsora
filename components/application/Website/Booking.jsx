@@ -17,6 +17,8 @@ import Image from 'next/image'
 
 const Booking = () => {
     const booking = useSelector(store => store.bookingStore)
+    console.log(booking);
+
     return (
         <Sheet>
             <SheetTrigger className='relative'>
@@ -39,7 +41,10 @@ const Booking = () => {
                         {booking.listings?.map(listing => (
                             <div className='flex justify-between items-center gap-5 mb-4 border-b pb-4'>
                                 <div className='flex gap-5 items-center'>
-                                    <Image src={listing?.media || imgPlaceholder.src} width={50} height={50} alt='Image' />
+                                    <Image src={listing?.thumbnail?.secure_url || imgPlaceholder.src} width={100} height={100} alt='Image' />
+                                </div>
+                                <div>
+                                    <h4 className='text-lg font-semibold'>{listing?.listingName}</h4>
                                 </div>
                             </div>
                         ))

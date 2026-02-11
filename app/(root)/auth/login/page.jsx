@@ -20,7 +20,7 @@ import z from 'zod'
 import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import Link from 'next/link'
-import { WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from '@/routes/AdminPanelRoute'
+import { ADMIN_DASHBOARD, WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from '@/routes/AdminPanelRoute'
 import axios from 'axios'
 import { showToast } from '@/lib/showToast'
 import OtpVerification from '@/components/application/OtpVerification'
@@ -29,6 +29,7 @@ import { login } from '@/store/reducer/authReducer'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { USER_DASHBOARD } from '@/routes/WebsiteRoute'
 import { PROVIDER_DASHBOARD } from '@/routes/ProviderPanelRoute'
+import { MASTER_DASHBOARD } from '@/routes/MasterPanelRoute'
 
 
 
@@ -91,8 +92,8 @@ const LoginPage = () => {
                 const roleRoutes = {
                     user: USER_DASHBOARD,
                     provider: PROVIDER_DASHBOARD,
-                    admin: '',
-                    master: '',
+                    admin: ADMIN_DASHBOARD,
+                    master: MASTER_DASHBOARD,
                     suspended: ''
                 }
                 const userRole = otpResponse.data.role;

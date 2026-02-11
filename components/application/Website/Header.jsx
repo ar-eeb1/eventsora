@@ -14,6 +14,7 @@ import profileIcon from '@/public/assets/user.png'
 import { CiMenuFries } from "react-icons/ci";
 import Search from './Search'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import ThemeSwitch from './ThemeSwitch'
 const Header = () => {
     const auth = useSelector(store => store.authStore.auth)
     const [isMobileMenu, setIsMobileMenu] = useState(false)
@@ -93,6 +94,7 @@ const Header = () => {
                         <button type='button' className='cursor-pointer lg:hidden block' onClick={() => setIsMobileMenu(!isMobileMenu)}>
                             <CiMenuFries className='text-white ' size={25} />
                         </button>
+                        {/* <ThemeSwitch /> */}
 
                     </div>
                 </div>

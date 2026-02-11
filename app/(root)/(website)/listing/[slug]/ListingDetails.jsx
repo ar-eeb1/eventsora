@@ -6,7 +6,7 @@ import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import img from '@/public/assets/img-placeholder.png'
 import { IoStar, IoClose, IoAdd, IoRemove } from 'react-icons/io5'
-import { decode } from 'entities'
+import { decode, encode } from 'entities'
 import { BsFillPeopleFill } from 'react-icons/bs'
 import Link from 'next/link'
 import BreadCrumb from '@/components/application/BreadCrumb'
@@ -20,11 +20,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addIntoBooking } from '@/store/reducer/bookingReducer'
 import { set } from 'mongoose'
 import { Button } from '@/components/ui/button'
+import { is } from 'zod/v4/locales'
+import Loading from '@/components/application/Loading'
+import ListingReview from '@/components/application/Website/ListingReview'
+import { Card, CardHeader } from '@/components/ui/card'
 
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
     // DISPATCH 
     const dispatch = useDispatch()
+    const [isListingLoading, setIsListingLoading] = useState(false)
 
 
     const searchParams = useSearchParams()
@@ -94,6 +99,8 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
         })
 
         setIsAddedIntoBooking(existingListing > -1)
+
+        setIsListingLoading(false)
     }, [bookingStore, listing, activeVariant, selectedDates])
 
     const handleDateSelect = (dates) => {
@@ -194,6 +201,13 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
 
     return (
         <div className='lg:px-32 px-4 mt-10'>
+            {
+                isListingLoading && <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+                    {/* <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div> */}
+                    <Loading />
+                </div>
+            }
+
             {/* Modal Overlay */}
             {showModal && (
                 <div
@@ -289,6 +303,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         <div className='flex gap-5 mt-5 flex-wrap'>
                             {variants.map((v) => (
                                 <Link
+                                    onClick={() => setIsListingLoading(true)}
                                     key={v._id}
                                     replace
                                     className={`uppercase py-1 px-3 rounded-full text-sm cursor-pointer hover:bg-primary hover:text-white ${v.serviceCode?.trim() === serviceCode?.trim() ? 'bg-primary text-white' : 'bg-white'}`}
@@ -400,6 +415,17 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                     selectedDates={selectedDates}
                 />
             </div>
+
+
+            {/* LISTING DETAILS */}
+            <Card className={'mb-10 p-4'}>
+                <CardHeader className={'font-semibold text-2xl border-b border-pink-400 p-0 m-0 [.border-b]:pb-0'}>
+                    <h2>Description</h2>
+                </CardHeader>
+                <div dangerouslySetInnerHTML={{ __html: encode(listing.description) }}></div>
+            </Card>
+
+            <ListingReview listingId={listing._id} />
         </div >
     )
 }

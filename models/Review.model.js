@@ -23,12 +23,16 @@ const reviewScehma = new mongoose.Schema({
         type: String,
         required: true
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
     deletedAt: {
         type: Date,
         default: null,
         index: true
     }
-})
+}, { timestamps: true })
 
 const reviewModel = mongoose.models.Review || mongoose.model('Review', reviewScehma, "reviews")
 export default reviewModel

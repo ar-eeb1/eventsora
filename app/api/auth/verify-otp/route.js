@@ -40,7 +40,7 @@ export async function POST(request) {
             role: getUser.role               // 🔹 must include role
         })
             .setIssuedAt()
-            .setExpirationTime("24h")
+            .setExpirationTime("3h")
             .setProtectedHeader({ alg: "HS256" })
             .sign(secret);
 
@@ -51,7 +51,8 @@ export async function POST(request) {
             httpOnly: process.env.NODE_ENV === 'production',
             path: '/',
             secure: process.env.NODE_ENV === 'production',
-            safeSite: 'lax',
+            sameSite: 'lax',
+            maxAge: 3 * 60 * 60, // 3 hours in seconds
         })
 
         await getOtpData.deleteOne()
