@@ -24,6 +24,7 @@ import { is } from 'zod/v4/locales'
 import Loading from '@/components/application/Loading'
 import ListingReview from '@/components/application/Website/ListingReview'
 import { Card, CardHeader } from '@/components/ui/card'
+import { url } from 'zod'
 
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
@@ -112,18 +113,20 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
             // relations
             listingId: listing._id,
             variantId: activeVariant?._id || null,
+            url: listing.slug,
 
             // snapshot info
             listingName: listing.name,
             variantTitle: activeVariant?.title || null,
+            variantPrice: activeVariant?.startingPrice || null,
             slug: listing.slug,
 
             // pricing snapshot
+            startingPrice: listing?.startingPrice || null,
             price: activeVariant?.startingPrice || null,
             pricingType: activeVariant?.pricingType || null,
             minPersons: activeVariant?.minPersons || null,
             quantity: qty || activeVariant?.minPersons || 1,
-
             // media
             thumbnail: listing.media?.[0],
             // booking meta
@@ -178,8 +181,6 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
 
     // Initialize quantity based on active variant's minimum persons
     const [qty, setQty] = useState(activeVariant?.minPersons || 1)
-
-
     const increment = () => {
         setQty(prev => prev + 10)
     }

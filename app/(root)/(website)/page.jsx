@@ -1,8 +1,5 @@
 import AddHomeListing from '@/components/application/Website/AddHomeListing'
-import FeaturedListing from '@/components/application/Website/AddHomeListing'
 import React from 'react'
-import hall from '@/public/svg/hall.svg'
-import Image from 'next/image'
 import Link from 'next/link'
 
 const Home = () => {
