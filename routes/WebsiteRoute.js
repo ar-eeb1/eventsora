@@ -9,3 +9,5 @@ export const WEBSITE_LISTING_DETAILS = (slug) => slug ? `/listing/${slug}` : '/l
 export const WEBSITE_MESSAGES = '/user/messages'
 export const WEBSITE_BOOKINGS = '/booking'
 export const WEBSITE_CHECKOUT = '/checkout'
+export const WEBSITE_BOOKING_DETAILS = (booking_id) => `/booking-details/${booking_id}`
+

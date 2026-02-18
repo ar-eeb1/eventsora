@@ -252,6 +252,8 @@ const BookingSummary = ({ listings }) => {
 
 const BookingPage = () => {
   const booking = useSelector((store) => store.bookingStore)
+  console.log(booking);
+  
   const dispatch = useDispatch()
 
   const [itemToRemove, setItemToRemove] = useState(null)

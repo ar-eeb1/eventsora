@@ -4,7 +4,6 @@ import ListingDetails from './ListingDetails'
 
 const ListingPage = async ({ params, searchParams }) => {
     const { slug } = await params
-
     const { capacity, startingPrice } = await searchParams
 
     let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/website/details/${slug}`
@@ -34,11 +33,6 @@ const ListingPage = async ({ params, searchParams }) => {
             />
         )
     }
-    return (
-        <div>
-            ListingPage
-        </div>
-    )
 }
 
 export default ListingPage

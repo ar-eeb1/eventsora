@@ -1,5 +1,5 @@
-export const orderNotification = (data) => {
-    const html = `
+export const bookingNotification = (data) => {
+	const html = `
         <!DOCTYPE html>
   <html lang="en-US" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
@@ -248,8 +248,8 @@ export const orderNotification = (data) => {
 																<h1
 																	style="margin: 0; color: #000000; direction: ltr; font-family: TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif; font-size: 40px; font-weight: 400; letter-spacing: -2px; line-height: 1.2; text-align: center; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 48px;">
 																	<span class="tinyMce-placeholder"
-																		style="word-break: break-word;">YOUR ORDER WILL
-																		BE SHIPPED SOON!</span>
+																		style="word-break: break-word;">YOUR BOOKING WILL
+																		BE VERIFIED SOON!</span>
 																</h1>
 															</td>
 														</tr>
@@ -444,8 +444,8 @@ export const orderNotification = (data) => {
 																<h3
 																	style="margin: 0; color: #4400ff; direction: ltr; font-family: TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif; font-size: 24px; font-weight: 700; letter-spacing: normal; line-height: 1.2; text-align: center; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 29px;">
 																	<span class="tinyMce-placeholder"
-																		style="word-break: break-word;">Order Id:
-																		${data.order_id} </span>
+																		style="word-break: break-word;">Booking Id:
+																		${data.booking_id} </span>
 																</h3>
 															</td>
 														</tr>
@@ -457,13 +457,13 @@ export const orderNotification = (data) => {
 														<tr>
 															<td class="pad" style="text-align:center;">
 																<div align="center" class="alignment"><a
-																		href="${data.orderDetailsUrl}"
+																		href="${data.bookingUrl}"
 																		style="color:#ffffff;text-decoration:none;"
 																		target="_blank"> <span class="button"
 																			style="background-color: #9502f5; border-bottom: 0px solid #f65c03; border-left: 0px solid #f65c03; border-radius: 30px; border-right: 0px solid #f65c03; border-top: 0px solid #f65c03; color: #ffffff; display: inline-block; font-family: TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif; font-size: 16px; font-weight: 700; mso-border-alt: none; padding-bottom: 5px; padding-top: 5px; padding-left: 30px; padding-right: 30px; text-align: center; width: auto; word-break: keep-all; letter-spacing: 1px;"><span
-																				style="word-break: break-word; line-height: 32px;">VIEW
-																				MY
-																				ORDER</span></span> </a>
+																				style="word-break: break-word; line-height: 32px;">
+																				VIEW MY BOOKING
+																				</span></span> </a>
 																</div>
 															</td>
 														</tr>
@@ -756,5 +756,5 @@ export const orderNotification = (data) => {
 </html>
 `;
 
-    return html;
+	return html;
 };

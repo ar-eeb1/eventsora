@@ -5,7 +5,7 @@ import { BiMinus, BiPlus } from 'react-icons/bi'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import img from '@/public/assets/img-placeholder.png'
-import { IoStar, IoClose, IoAdd, IoRemove } from 'react-icons/io5'
+import { IoStar, IoClose, IoAdd, IoRemove, IoLocationOutline } from 'react-icons/io5'
 import { decode, encode } from 'entities'
 import { BsFillPeopleFill } from 'react-icons/bs'
 import Link from 'next/link'
@@ -287,6 +287,11 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                             <IoStar className='text-yellow-500' key={i} />
                         ))}
                         <span>({reviewCount} Reviews)</span>
+                    </div>
+
+                    <div className='flex items-center gap-1 mb-5 text-gray-600 font-medium capitalize'>
+                        <IoLocationOutline className='text-pink-600' size={20} />
+                        <span>{listing?.city?.city}, {listing?.locality?.locality}</span>
                     </div>
                     <div className='flex items-center gap-2 mb-3 text-3xl'>
                         <h2 className='font-bold'>Starting Price :</h2>

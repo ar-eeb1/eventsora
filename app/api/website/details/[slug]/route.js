@@ -5,6 +5,8 @@ import ListingVariantModel from "@/models/ListingVariant.model";
 import { MediaModel } from "@/models/Media.model";
 import reviewModel from "@/models/Review.model";
 import UserModel from "@/models/user.Model.js";
+import CityModel from "@/models/City.model";
+import LocalityModel from "@/models/Locality.model";
 
 export async function GET(request, { params }) {
     try {
@@ -30,6 +32,8 @@ export async function GET(request, { params }) {
         const getListing = await ListingModel.findOne(filter)
             .populate('media', 'secure_url')
             .populate('userId', 'name email profileImage')
+            .populate('city', 'city')
+            .populate('locality', 'locality')
             .lean()
         if (!getListing) {
             return response(false, 404, 'Listing Not Found')

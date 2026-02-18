@@ -9,9 +9,9 @@ import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits'
 import useFetch from '@/hooks/useFetch'
-import { addIntoBooking, clearBooking, syncVerifiedBookings } from '@/store/reducer/bookingReducer'
+import { clearBooking, syncVerifiedBookings } from '@/store/reducer/bookingReducer'
 import Image from 'next/image'
-import { WEBSITE_BOOKINGS, WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
+import { WEBSITE_BOOKING_DETAILS, WEBSITE_BOOKINGS, WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
 import { zSchema } from '@/lib/zodSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -20,8 +20,9 @@ import { useForm } from 'react-hook-form'
 import { Textarea } from '@/components/ui/textarea'
 import ButtonLoading from '@/components/application/ButtonLoading'
 import { showToast } from '@/lib/showToast'
-import { success } from 'zod'
 import axios from 'axios'
+import Loading from '@/components/application/Loading'
+
 
 const breadCrumbData = [
   { href: WEBSITE_HOME, label: 'Home' },
@@ -33,11 +34,13 @@ const CheckoutPage = () => {
   const booking = useSelector((store) => store.bookingStore)
   const router = useRouter()
   const { data: getVerifiedBookingData } = useFetch('/api/website/booking-verficiation', 'POST', { data: booking.listings })
+
   const dispatch = useDispatch()
 
   const [isSynced, setIsSynced] = useState(false);
   const [serverTotalAmount, setServerTotalAmount] = useState(0);
   const [placingBooking, setPlacingBooking] = useState(false)
+  const [savingBooking, setSavingBooking] = useState(false)
 
   useEffect(() => {
     if (getVerifiedBookingData && getVerifiedBookingData.success && !isSynced) {
@@ -82,19 +85,37 @@ const CheckoutPage = () => {
     }
   }
 
+
   const placeBooking = async (formData) => {
     setPlacingBooking(true)
-    console.log(formData);
+    setSavingBooking(true)
     try {
-      const generatedBookingId = await getBookingId(serverTotalAmount)
+      const payload = {
+        ...formData,
+        listings: booking.listings.map(item => ({
+          listingId: item.listingId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+          bookingDate: item.bookingDate
+        }))
+      }
 
-      if (generatedBookingId.success) {
-        router.push(`/payment?booking_id=${generatedBookingId.booking_id}&amount=${serverTotalAmount}`)
+      const { data: orderResponse } = await axios.post('/api/website/payment/save-booking', payload)
+
+      if (orderResponse.success) {
+        showToast('success', orderResponse.message)
+        dispatch(clearBooking())
+        bookingForm.reset()
+        router.push(WEBSITE_BOOKING_DETAILS(orderResponse.data._id))
+      } else {
+        showToast('error', orderResponse.message)
       }
     } catch (error) {
-      showToast('error', error.message)
+      console.error(error);
+      showToast('error', error.response?.data?.message || error.message || 'Something went wrong')
     } finally {
       setPlacingBooking(false)
+      setSavingBooking(false)
     }
   }
 
@@ -120,6 +141,20 @@ const CheckoutPage = () => {
 
   return (
     <div className='lg:px-32 px-4 mt-10 mb-20'>
+      {savingBooking &&
+        <div className='h-screen w-screen fixed top-0 left-0 z-50 bg-black/40'>
+          <div className='h-screen flex justify-center items-center flex-row'>
+            {/* <Image src={Loading.src} alt='loading' width={80} height={80} /> */}
+            <Loading />
+            <div className="mt-50 flex gap-1 text-3xl text-pink-400 kapakana-regular italic font-bold">
+              Booking
+              <span className="inline-block animate-bounce [animation-delay:0ms]">.</span>
+              <span className="inline-block animate-bounce [animation-delay:150ms]">.</span>
+              <span className="inline-block animate-bounce [animation-delay:300ms]">.</span>
+            </div>
+          </div>
+        </div>
+      }
       <BreadCrumb breadCrumbData={breadCrumbData} />
 
       {booking.count === 0 ? (
