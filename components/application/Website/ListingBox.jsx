@@ -60,7 +60,7 @@ const ListingBox = ({ listing }) => {
                             <MapPin size={14} className='text-gray-400 shrink-0' aria-hidden="true" />
                             <p className='text-sm truncate'>{location}</p>
                         </div>
-                        <div className=' text-sm text-pink-800 bg-pink-200 px-2 rounded-full'>
+                        <div className=' text-xs text-pink-800 bg-pink-200 px-3 py-0.5 uppercase rounded-full'>
                             Book Now
                         </div>
                     </div>

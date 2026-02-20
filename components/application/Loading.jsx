@@ -8,7 +8,7 @@ const Loading = () => {
                 trigger="loop"
                 delay="700"
                 colors="primary:#ee66aa"
-                style={{ width: 150, height: 150 }}>
+                style={{ width: 'clamp(100px, 15vw, 150px)', height: 'clamp(100px, 15vw, 150px)' }}>
             </lord-icon>
         </div>
     )

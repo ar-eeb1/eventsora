@@ -38,7 +38,7 @@
 //     return (
 //         <CldUploadWidget
 //             signatureEndpoint="/api/cloudinary-signature"
-//             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPDATE_PRESET}
+//             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
 //             onError={handleOnError}
 //             onQueuesEnd={handleOnQueueEnd}
 //             config={{
@@ -142,7 +142,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
                             <div className="grid grid-cols-1 gap-4">
                                 <CldUploadWidget
                                     signatureEndpoint="/api/cloudinary-signature"
-                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPDATE_PRESET}
+                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
                                     onError={handleOnError}
                                     onQueuesEnd={handleOnQueueEnd}
                                     config={{
@@ -174,7 +174,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
 
                                 <CldUploadWidget
                                     signatureEndpoint="/api/cloudinary-signature"
-                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPDATE_PRESET}
+                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
                                     onError={handleOnError}
                                     onQueuesEnd={handleOnQueueEnd}
                                     config={{
@@ -206,7 +206,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
 
                                 <CldUploadWidget
                                     signatureEndpoint="/api/cloudinary-signature"
-                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPDATE_PRESET}
+                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
                                     onError={handleOnError}
                                     onQueuesEnd={handleOnQueueEnd}
                                     config={{

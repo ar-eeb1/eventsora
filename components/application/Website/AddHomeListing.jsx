@@ -22,7 +22,7 @@ const AddHomeListing = async () => {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     {!listingData.success && (
                         <div className=''>
                             <span className='text-lg font-semibold text-gray-700'>No Listing Found</span>
@@ -43,7 +43,7 @@ const AddHomeListing = async () => {
                         <ArrowRight size={20} />
                     </Link>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     {!carData.success &&
                         <div className=''>
                             <span className='text-lg font-semibold text-gray-700'>No Listing Found</span>

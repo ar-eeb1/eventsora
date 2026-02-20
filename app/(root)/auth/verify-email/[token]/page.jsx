@@ -32,7 +32,7 @@ const EmailVerification = ({ params }) => {
               triger="loop"
               delay='1000'
               colors="primary:#17171c,secondary:#fad3d1,tertiary:#e8308c"
-              style={{ width: 150, height: 150 }}
+              style={{ width: 'clamp(100px, 15vw, 150px)', height: 'clamp(100px, 15vw, 150px)' }}
             >
             </lord-icon>
             <h1 className='text-2xl font-bold my-5 '>Email verification success!</h1>
