@@ -7,7 +7,7 @@ export async function GET() {
     try {
         await connectDB()
 
-        const auth = await isAuthenticated('user')
+        const auth = await isAuthenticated(['user', 'provider'])
         if (!auth.isAuth) {
             return response(false, 401, 'unauthorized')
         }
@@ -19,7 +19,7 @@ export async function GET() {
             return response(false, 404, 'user not found')
         }
         return response(true, 200, 'User data', user)
-    } catch (error) {       
+    } catch (error) {
         return catchError(error)
     }
 

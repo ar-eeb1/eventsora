@@ -1,6 +1,8 @@
 export const PROVIDER_DASHBOARD = '/provider/dashboard'
-export const PROVIDER_MEDIA_SHOW = '/provider/media'
+export const PROVIDER_PROFILE = '/provider/profile'
+export const PROVIDER_BUSINESS_PROFILE = '/provider/business-profile'
 // export const PROVIDER_MEDIA_EDIT = (id) => id ? `/provider/media/edit/${id}` : ''
+export const PROVIDER_MEDIA_SHOW = '/provider/media'
 
 
 // listing routes

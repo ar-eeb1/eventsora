@@ -7,7 +7,8 @@ export async function POST(request) {
     try {
         await connectDB()
 
-        const auth = await isAuthenticated('user')
+        const auth = await isAuthenticated(['user', 'provider'])
+
         if (!auth.isAuth) {
             return response(false, 401, 'unauthorized')
         }
