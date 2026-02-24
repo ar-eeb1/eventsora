@@ -1,4 +1,4 @@
-import { bookingStatus } from "@/lib/utils";
+import { bookingStatus, paymentStatus } from "@/lib/utils";
 import mongoose from "mongoose"
 
 const bookingSchema = new mongoose.Schema({
@@ -27,9 +27,9 @@ const bookingSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    status: {
+    paymentStatus: {
         type: String,
-        enum: bookingStatus,
+        enum: paymentStatus,
         default: 'pending'
     },
     listings: [
@@ -53,6 +53,12 @@ const bookingSchema = new mongoose.Schema({
     booking_id: {
         type: String,
         required: true
+    },
+    providerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        index: true
     }
 
 

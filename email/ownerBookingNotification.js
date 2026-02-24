@@ -33,23 +33,48 @@ export const ownerBookingNotification = (data) => {
             
             <div class="booking-id">Booking ID: ${data.booking_id}</div>
             
-            <table class="details-table">
-                <tr>
-                    <th>Listing:</th>
-                    <td>${data.listingName}</td>
-                </tr>
-                ${data.variantTitle ? `<tr><th>Variant:</th><td>${data.variantTitle}</td></tr>` : ''}
-                <tr>
-                    <th>Quantity:</th>
-                    <td>${data.quantity}</td>
-                </tr>
-                <tr>
-                    <th>Date(s):</th>
-                    <td>${data.bookingDates}</td>
-                </tr>
-            </table>
+            <p><strong>Booking Details:</strong></p>
+            ${data.listings ?
+            data.listings.map(item => `
+                    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #9502f5;">
+                        <table class="details-table" style="margin: 0;">
+                            <tr>
+                                <th>Listing:</th>
+                                <td>${item.listingName}</td>
+                            </tr>
+                            ${item.variantTitle ? `<tr><th>Variant:</th><td>${item.variantTitle}</td></tr>` : ''}
+                            <tr>
+                                <th>Quantity:</th>
+                                <td>${item.quantity}</td>
+                            </tr>
+                            <tr>
+                                <th>Date(s):</th>
+                                <td>${item.bookingDates}</td>
+                            </tr>
+                        </table>
+                    </div>
+                `).join('')
+            :
+            `
+                <table class="details-table">
+                    <tr>
+                        <th>Listing:</th>
+                        <td>${data.listingName}</td>
+                    </tr>
+                    ${data.variantTitle ? `<tr><th>Variant:</th><td>${data.variantTitle}</td></tr>` : ''}
+                    <tr>
+                        <th>Quantity:</th>
+                        <td>${data.quantity}</td>
+                    </tr>
+                    <tr>
+                        <th>Date(s):</th>
+                        <td>${data.bookingDates}</td>
+                    </tr>
+                </table>
+                `
+        }
 
-            <p>Customer Information:</p>
+            <p style="margin-top: 25px;"><strong>Customer Information:</strong></p>
             <table class="details-table">
                 <tr>
                     <th>Name:</th>

@@ -3,7 +3,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { MaterialReactTable, MRT_ShowHideColumnsButton, MRT_ToggleDensePaddingButton, MRT_ToggleFullScreenButton, MRT_ToggleGlobalFilterButton, useMaterialReactTable } from 'material-react-table'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 import RecyclingIcon from '@mui/icons-material/Recycling';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
@@ -36,6 +36,7 @@ const Datatable = ({
         pageIndex: 0,
         pageSize: initialPageSize
     })
+    const tableId = useId()
 
     // data fetching logics
     const {
@@ -92,10 +93,29 @@ const Datatable = ({
                 filename: 'Eventsora'
             })
 
+            // Helper to flatten objects for CSV
+            const sanitizeRow = (row) => {
+                const sanitized = {}
+                Object.entries(row).forEach(([key, value]) => {
+                    if (value && typeof value === 'object') {
+                        if (Array.isArray(value)) {
+                            sanitized[key] = value.map(v => typeof v === 'object' ? JSON.stringify(v) : v).join(', ')
+                        } else if (value instanceof Date) {
+                            sanitized[key] = value.toLocaleString()
+                        } else {
+                            sanitized[key] = value.toString()
+                        }
+                    } else {
+                        sanitized[key] = value
+                    }
+                })
+                return sanitized
+            }
+
             let csv
             if (Object.keys(rowSelection).length > 0) {
                 // export only selected row
-                const rowData = selectedRows.map((row) => row.original)
+                const rowData = selectedRows.map((row) => sanitizeRow(row.original))
                 csv = generateCsv(csvConfig)(rowData)
             } else {
                 // export all data
@@ -103,7 +123,7 @@ const Datatable = ({
                 if (!response.success) {
                     throw new Error(response.message)
                 }
-                const rowData = response.data
+                const rowData = response.data.map(row => sanitizeRow(row))
                 csv = generateCsv(csvConfig)(rowData)
             }
 
@@ -165,7 +185,7 @@ const Datatable = ({
 
 
 
-                {deleteType !== 'PD' &&
+                {trashView &&
                     <Tooltip title='Recycle Bin'>
                         <Link href={trashView}>
                             <IconButton>
@@ -175,7 +195,7 @@ const Datatable = ({
                     </Tooltip>
                 }
                 {
-                    deleteType === 'SD' &&
+                    (deleteEndpoint && deleteType === 'SD') &&
                     <Tooltip title='Delete All'>
                         <IconButton onClick={() => handleDelete(Object.keys(rowSelection), deleteType)} disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}>
                             <DeleteIcon />
@@ -183,7 +203,7 @@ const Datatable = ({
                     </Tooltip>
                 }
                 {
-                    deleteType === 'PD' &&
+                    (deleteEndpoint && deleteType === 'PD') &&
                     <>
                         <Tooltip title='Restore Data'>
                             <IconButton onClick={() => handleDelete(Object.keys(rowSelection), 'RSD')} disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}>
@@ -205,7 +225,7 @@ const Datatable = ({
         renderRowActionMenuItems: ({ row }) => createAction(row, deleteType, handleDelete),
 
         renderTopToolbarCustomActions: ({ table }) => (
-            <Tooltip>
+            <div className="flex items-center gap-4">
                 <ButtonLoading
                     type='button'
                     text='Export'
@@ -213,13 +233,21 @@ const Datatable = ({
                     onClick={() => handleExport(table.getSelectedRowModel().rows)}
                     className='cursor-pointer'
                 />
-            </Tooltip>
+                {meta?.totalRowCount !== undefined && (
+                    <div className="flex items-center gap-4 px-2 text-sm font-medium text-muted-foreground border-l pl-4">
+                        <span>Total Records: <span className="text-foreground">{meta.totalRowCount}</span></span>
+                        <span>Page Amount: <span className="text-foreground">
+                            {data.reduce((acc, row) => acc + (row.subtotal || row.totalAmount || 0), 0).toLocaleString()}
+                        </span></span>
+                    </div>
+                )}
+            </div>
         )
 
     })
 
     return (
-        <MaterialReactTable id={Date.now} table={table} />
+        <MaterialReactTable id={tableId} table={table} />
     )
 }
 

@@ -12,13 +12,20 @@ export async function GET(request) {
         }
 
         await connectDB();
-
-        const [listing, bookings] = await Promise.all([
-            ListingModel.countDocuments({ deletedAt: null }),
-            bookingModel.countDocuments({ deletedAt: null })
+        const bookingsStatus = await bookingModel.aggregate([
+            {
+                $group: {
+                    _id: '$bookingStatus',
+                    count: { $sum: 1 },
+                }
+            },
+            {
+                $sort: { count: 1 }
+            }
         ])
 
-        return response(true, 200, 'Dashboard Count', { listing, bookings })
+
+        return response(true, 200, 'Bookings Count', bookingsStatus)
     } catch (error) {
         return catchError(error);
     }

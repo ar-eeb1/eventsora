@@ -106,7 +106,13 @@ const CheckoutPage = () => {
         showToast('success', orderResponse.message)
         dispatch(clearBooking())
         bookingForm.reset()
-        router.push(WEBSITE_BOOKING_DETAILS(orderResponse.data._id))
+
+        if (Array.isArray(orderResponse.data) && orderResponse.data.length > 0) {
+          const ids = orderResponse.data.map(b => b.booking_id).join(',')
+          router.push(`/checkout/success?ids=${ids}`)
+        } else {
+          router.push(WEBSITE_BOOKING_DETAILS(orderResponse.data._id))
+        }
       } else {
         showToast('error', orderResponse.message)
       }

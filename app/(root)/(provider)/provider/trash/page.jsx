@@ -3,7 +3,7 @@ import BreadCrumb from '@/components/application/BreadCrumb'
 import DatatableWrapper from '@/components/application/Main/DatatableWrapper'
 import DeleteAction from '@/components/application/Main/deleteAction'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { DT_LISTING_COLUMN } from '@/lib/column'
+import { DT_BOOKING_COLUMN, DT_LISTING_COLUMN } from '@/lib/column'
 import { columnConfig } from '@/lib/helperFunction'
 import { PROVIDER_DASHBOARD, PROVIDER_TRASH } from '@/routes/ProviderPanelRoute'
 import { useSearchParams } from 'next/navigation'
@@ -21,6 +21,13 @@ const TRASH_CONFIG = {
     fetchUrl: '/api/provider/listing',
     exportUrl: '/api/provider/listing/export',
     deleteUrl: '/api/provider/listing/delete'
+  },
+  bookings: {
+    title: 'Booking Trash',
+    columns: DT_BOOKING_COLUMN,
+    fetchUrl: '/api/provider/bookings',
+    exportUrl: '/api/provider/bookings/export',
+    deleteUrl: '/api/provider/bookings/delete'
   },
 }
 

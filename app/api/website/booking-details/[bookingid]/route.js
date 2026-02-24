@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import BookingModel from "@/models/Booking.model";
 import ListingModel from "@/models/Listing.model";
+import mongoose from "mongoose";
 
 
 export async function GET(request, { params }) {
@@ -13,7 +14,14 @@ export async function GET(request, { params }) {
             return response(false, 400, "Booking ID is required");
         }
 
-        const booking = await BookingModel.findById(bookingid).populate('listings.listingId', 'slug').lean();
+        let query = {};
+        if (mongoose.Types.ObjectId.isValid(bookingid)) {
+            query = { _id: bookingid };
+        } else {
+            query = { booking_id: bookingid };
+        }
+
+        const booking = await BookingModel.findOne(query).populate('listings.listingId', 'slug').lean();
 
         if (!booking) {
             return response(false, 404, "Booking not found");

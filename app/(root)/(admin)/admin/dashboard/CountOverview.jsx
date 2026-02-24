@@ -27,7 +27,7 @@ const CountOverview = () => {
                 <div className='flex items-center justify-between p-3 rounded-lg border shadow border-l-4 border-l-rose-400 bg-white dark:bg-card dark:border-gray-800 dark:border-l-rose-800'>
                     <div>
                         <h4 className='font-medium text-gray-500'>All Bookings</h4>
-                        <span className='text-xl font-bold'>10</span>
+                        <span className='text-xl font-bold'>{countData?.data?.bookings || 0}</span>
                     </div>
                     <div>
                         <span className='w-12 h-12 border flex justify-center items-center rounded-full bg-rose-500 dark:bg-rose-800 text-white'><Calendar size={20} /></span>

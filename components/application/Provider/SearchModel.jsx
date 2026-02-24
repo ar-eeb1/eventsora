@@ -10,7 +10,7 @@ import {
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import Fuse from 'fuse.js'
-import searchProviderData from '@/lib/search'
+import { searchProviderData } from '@/lib/search'
 
 const options = {
     keys: ['label', 'description', 'keywords'],

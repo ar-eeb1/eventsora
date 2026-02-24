@@ -60,10 +60,10 @@ const ProviderBusinessProfile = () => {
         name: true,
         phone: true,
     }).extend({
-        bankName: z.string().min(1, "Bank name is required"),
+        bankName: z.string().min(1, "Select Bank"),
         accountHolderName: z.string().min(1, "Account holder name is required"),
         accountNumber: z.string().min(1, "Account number is required"),
-        iban: z.string().min(1, "IBAN is required"),
+        iban: z.string().min(1, "IBAN is required").max(24, "IBAN must be at most 24 charecter"),
     })
 
     const form = useForm({

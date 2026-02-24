@@ -7,10 +7,10 @@ const layout = ({ children }) => {
     return (
         <SidebarProvider>
             <div className="flex w-full">
-                
+
                 <AppSidebar />
 
-                <main className="flex-1">
+                <main className="flex-1 md:w-[calc(100vw-16rem)] w-full">
                     <Topbar />
                     <div className="pt-16 p-5">
                         {children}

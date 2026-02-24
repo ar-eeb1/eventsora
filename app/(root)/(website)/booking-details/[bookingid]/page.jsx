@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import Link from 'next/link'
 import { WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
+import StatusBadge from '@/components/application/StatusBadge'
+
 
 const breadCrumbData = [
   { href: WEBSITE_HOME, label: 'Home' },
@@ -23,22 +25,7 @@ const BookingDetails = () => {
   const [booking, setBooking] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const getStatusBadge = (status) => {
-    switch (status?.toUpperCase()) {
-      case 'approved':
-      case 'confirmed':
-        return <Badge variant="default" className="bg-green-500 hover:bg-green-600 text-white capitalize">{status}</Badge>
-      case 'pending':
-        return <Badge variant="secondary" className="bg-yellow-400 hover:bg-yellow-500 text-black capitalize">{status}</Badge>
-      case 'cancelled':
-      case 'rejected':
-        return <Badge variant="destructive" className="capitalize">{status}</Badge>
-      case 'unverified':
-        return <Badge variant="outline" className="border-orange-500 text-orange-500 capitalize">{status}</Badge>
-      default:
-        return <Badge variant="outline" className="capitalize">{status}</Badge>
-    }
-  }
+
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -101,8 +88,15 @@ const BookingDetails = () => {
       <div className="lg:max-w-8xl mx-auto mt-10">
         <div className="text-center mb-10">
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking Placed Successfully!</h1>
-          <p className="text-gray-600 italic">Please complete your payment to confirm your booking.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {booking.status === 'paid' ? 'Payment Received!' : 'Booking Placed Successfully!'}
+          </h1>
+          <p className="text-gray-600 italic">
+            {booking.status === 'paid'
+              ? 'Thank you for your payment. Your booking is being processed.'
+              : 'Please complete your payment to confirm your booking.'}
+          </p>
+
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -115,7 +109,17 @@ const BookingDetails = () => {
                     <ShoppingBag className="w-6 h-6" />
                     Booking Summary
                   </div>
-                  {getStatusBadge(booking.bookingStatus || booking.status)}
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-2 text-sm font-normal text-gray-500">
+                      Payment: <StatusBadge status={booking.status} type="payment" />
+                    </div>
+                    {booking.bookingStatus && (
+                      <div className="flex items-center gap-2 text-sm font-normal text-gray-500">
+                        Booking: <StatusBadge status={booking.bookingStatus} type="booking" />
+                      </div>
+                    )}
+                  </div>
+
                 </CardTitle>
                 <CardDescription>Booking ID: <span className="font-bold text-gray-900">{booking.booking_id || booking._id}</span></CardDescription>
               </CardHeader>
