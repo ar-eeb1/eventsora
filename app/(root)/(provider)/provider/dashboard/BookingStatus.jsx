@@ -2,16 +2,10 @@
 import { Label, Pie, PieChart } from "recharts"
 import { CardContent } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import React from "react"
-export const description = "A chart"
+import React, { useEffect, useState } from "react"
+import useFetch from "@/hooks/useFetch"
 
-const chartData = [
-    { status: "pending", count: 10, fill: "var(--color-pending)" },
-    { status: "confirmed", count: 29, fill: "var(--color-confirmed)" },
-    { status: "rejected", count: 1, fill: "var(--color-rejected)" },
-    { status: "cancelled", count: 2, fill: "var(--color-cancelled)" },
-    { status: "completed", count: 80, fill: "var(--color-completed)" },
-]
+export const description = "A chart"
 
 const chartConfig = {
     status: {
@@ -19,31 +13,58 @@ const chartConfig = {
     },
     pending: {
         label: "Pending",
-        color: "#f59e0b",
+        color: "#fbbf24",
     },
     confirmed: {
         label: "Confirmed",
         color: "#22c55e",
     },
-    rejected: {
-        label: "Rejected",
-        color: "#ef4444",
-    },
-    cancelled: {
-        label: "Cancelled",
-        color: "#6b7280",
+    "awaiting-payment": {
+        label: "Awaiting Payment",
+        color: "#f97316",
     },
     completed: {
         label: "Completed",
-        color: "#3b82f6",
+        color: "#2563eb",
     },
-
-}
+    cancelled: {
+        label: "Cancelled",
+        color: "#9ca3af",
+    },
+    unverified: {
+        label: "Unverified",
+        color: "#8b5cf6",
+    },
+};
 
 export function BookingStatus() {
+    const [chartData, setChartData] = useState([])
+    const [totalCount, setTotalCount] = useState(0)
+
+    const { data: bookingsStatus, loading } = useFetch('/api/provider/dashboard/bookings-status')
+
+    useEffect(() => {
+        if (bookingsStatus && bookingsStatus.success) {
+            const requiredStatuses = ['pending', 'confirmed', 'awaiting-payment', 'completed', 'cancelled', 'unverified'];
+
+            const newBookingStatus = requiredStatuses.map((status) => {
+                const found = bookingsStatus.data.find((o) => o._id === status);
+                return {
+                    status: status,
+                    count: found ? found.count : 0,
+                    fill: `var(--color-${status.replace(/-/g, '')})`
+                };
+            });
+
+            setChartData(newBookingStatus)
+            const total = newBookingStatus.reduce((acc, curr) => acc + curr.count, 0)
+            setTotalCount(total)
+        }
+    }, [bookingsStatus])
+
     const totalVisitors = React.useMemo(() => {
-        return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-    }, [])
+        return chartData.reduce((acc, curr) => acc + curr.count, 0)
+    }, [chartData])
     return (
         <div>
             <CardContent className="flex-1 pb-0">
@@ -77,7 +98,7 @@ export function BookingStatus() {
                                                     y={viewBox.cy}
                                                     className="fill-foreground text-3xl font-bold"
                                                 >
-                                                    100
+                                                    {totalCount}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
@@ -97,26 +118,17 @@ export function BookingStatus() {
             </CardContent>
             <div>
                 <ul>
-                    <li className="flex justify-between items-center mb-3 text-sm">
-                        <span>Pending</span>
-                        <span className="rounded-full text-sm text-white p-1 px-2 bg-[#f59e0b]">0</span>
-                    </li>
-                    <li className="flex justify-between items-center mb-3 text-sm">
-                        <span>Confirmed</span>
-                        <span className="rounded-full text-sm text-white p-1 px-2 bg-[#22c55e]">0</span>
-                    </li>
-                    <li className="flex justify-between items-center mb-3 text-sm">
-                        <span>Rejected</span>
-                        <span className="rounded-full text-sm text-white p-1 px-2 bg-[#ef4444]">0</span>
-                    </li>
-                    <li className="flex justify-between items-center mb-3 text-sm">
-                        <span>Cancelled</span>
-                        <span className="rounded-full text-sm text-white p-1 px-2 bg-[#6b7280]">0</span>
-                    </li>
-                    <li className="flex justify-between items-center mb-3 text-sm">
-                        <span>Completed</span>
-                        <span className="rounded-full text-sm text-white p-1 px-2 bg-[#3b82f6]">0</span>
-                    </li>
+                    {chartData.map((item) => (
+                        <li key={item.status} className="flex justify-between items-center mb-3 text-sm">
+                            <span className="capitalize">{item.status.replace(/-/g, ' ')}</span>
+                            <span
+                                className="rounded-full text-xs text-white p-1 px-2"
+                                style={{ backgroundColor: chartConfig[item.status]?.color || '#6b7280' }}
+                            >
+                                {item.count}
+                            </span>
+                        </li>
+                    ))}
                 </ul>
             </div>
         </div>

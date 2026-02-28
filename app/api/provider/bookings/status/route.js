@@ -3,6 +3,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { bookingStatus } from "@/lib/utils";
 import BookingModel from "@/models/Booking.model";
+import CalendarModel from "@/models/Calendar.model";
 
 export async function PUT(request) {
     try {
@@ -32,12 +33,49 @@ export async function PUT(request) {
             return response(false, 400, 'Cannot confirm booking until payment is paid.');
         }
 
-
         booking.bookingStatus = newBookingStatus;
         await booking.save();
+
+        // When confirmed, mark all booked dates in the Calendar as 'booked'
+        if (newBookingStatus === 'confirmed') {
+            const calendarUpserts = [];
+
+            for (const item of booking.listings) {
+                for (const rawDate of (item.bookingDate || [])) {
+                    // Normalize to midnight UTC
+                    const date = new Date(rawDate);
+                    date.setUTCHours(0, 0, 0, 0);
+
+                    const filter = {
+                        listingId: item.listingId,
+                        variantId: item.variantId || null,
+                        date,
+                        deletedAt: null,
+                    };
+
+                    const update = {
+                        dateStatus: 'booked',
+                        listingId: item.listingId,
+                        variantId: item.variantId || null,
+                        date,
+                    };
+
+                    calendarUpserts.push(
+                        CalendarModel.findOneAndUpdate(filter, update, {
+                            upsert: true,
+                            new: true,
+                            setDefaultsOnInsert: true,
+                        })
+                    );
+                }
+            }
+
+            await Promise.all(calendarUpserts);
+        }
 
         return response(true, 200, 'Booking status updated successfully.');
     } catch (error) {
         return catchError(error);
     }
 }
+

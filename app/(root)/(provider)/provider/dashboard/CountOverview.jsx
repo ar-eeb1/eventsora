@@ -11,7 +11,7 @@ const CountOverview = () => {
     const { data: countData } = useFetch('/api/provider/dashboard/count')
 
     return (
-        <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 sm:gap-10 gap-5 mt-4 lg:gap-5">
+        <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 sm:gap-3 gap-5 lg:gap-5">
             <Link href={PROVIDER_LISTING_SHOW}>
                 <div className='flex items-center justify-between p-3 rounded-lg border shadow border-l-4 border-l-pink-400 bg-white dark:bg-card dark:border-gray-800 dark:border-l-pink-800'>
                     <div>
@@ -38,7 +38,7 @@ const CountOverview = () => {
                 <div className='flex items-center justify-between p-3 rounded-lg border shadow border-l-4 border-l-fuchsia-400 bg-white dark:bg-card dark:border-gray-800 dark:border-l-fuchsia-800'>
                     <div>
                         <h4 className='font-medium text-gray-500'>Today Booking</h4>
-                        <span className='text-xl font-bold'>10</span>
+                        <span className='text-xl font-bold'>{countData?.data?.todayBookings || 0}</span>
                     </div>
                     <div>
                         <span className='w-12 h-12 border flex justify-center items-center rounded-full bg-fuchsia-500 dark:bg-fuchsia-800 text-white'><CalendarCheck size={20} /></span>
@@ -49,7 +49,7 @@ const CountOverview = () => {
                 <div className='flex items-center justify-between p-3 rounded-lg border shadow border-l-4 border-l-purple-400 bg-white dark:bg-card dark:border-gray-800 dark:border-l-purple-800'>
                     <div>
                         <h4 className='font-medium text-gray-500'>Earnings</h4>
-                        <span className='text-xl font-bold'>10</span>
+                        <span className='text-xl font-bold'>{countData?.data?.earnings?.toLocaleString() || 0}</span>
                     </div>
                     <div>
                         <span className='w-12 h-12 border flex justify-center items-center rounded-full bg-purple-500 dark:bg-purple-800 text-white'><Banknote size={20} /></span>

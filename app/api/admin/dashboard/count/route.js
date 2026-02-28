@@ -13,12 +13,19 @@ export async function GET(request) {
 
         await connectDB();
 
-        const [listing, bookings] = await Promise.all([
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const [listing, bookings, todayBookings] = await Promise.all([
             ListingModel.countDocuments({ deletedAt: null }),
-            bookingModel.countDocuments({ deletedAt: null })
+            bookingModel.countDocuments({ deletedAt: null }),
+            bookingModel.countDocuments({
+                deletedAt: null,
+                createdAt: { $gte: today }
+            })
         ])
 
-        return response(true, 200, 'Dashboard Count', { listing, bookings })
+        return response(true, 200, 'Dashboard Count', { listing, bookings, todayBookings })
     } catch (error) {
         return catchError(error);
     }

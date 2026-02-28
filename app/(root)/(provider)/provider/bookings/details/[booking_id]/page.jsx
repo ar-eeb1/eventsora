@@ -36,13 +36,13 @@ const BookingDetails = () => {
       label: s.charAt(0).toUpperCase() + s.slice(1),
       value: s,
       // Disable 'confirmed' if payment is not paid
-      disabled: s === 'confirmed' && booking?.status !== 'paid'
+      disabled: s === 'confirmed' && booking?.paymentStatus !== 'paid'
     })))
-  }, [booking?.status])
+  }, [booking?.paymentStatus])
 
 
   const handleStatusUpdate = async (type, newValue) => {
-    if (newValue === 'confirmed' && booking.status !== 'paid') {
+    if (newValue === 'confirmed' && booking.paymentStatus !== 'paid') {
       showToast('error', 'Cannot confirm booking until payment is paid.')
       return
     }
@@ -153,7 +153,7 @@ const BookingDetails = () => {
                     {booking.bookingStatus && (
                       <div className="flex flex-col items-end gap-1">
                         <div className="flex items-center gap-2 text-sm font-normal text-gray-500">
-                          Payment: <StatusBadge status={booking.status} type="payment" />
+                          Payment: <StatusBadge status={booking.paymentStatus} type="payment" />
                         </div>
                         <div className="flex items-center gap-2 text-sm font-normal text-gray-500">
                           Booking: <StatusBadge status={booking.bookingStatus} type="booking" />
@@ -302,7 +302,7 @@ const BookingDetails = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-gray-500 uppercase">Payment Status</label>
                   <div className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded-md border text-sm">
-                    <StatusBadge status={booking.status} type="payment" />
+                    <StatusBadge status={booking.paymentStatus} type="payment" />
                   </div>
 
                 </div>

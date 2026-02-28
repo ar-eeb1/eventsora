@@ -25,7 +25,8 @@ function Select({
     setSelected,
     placeholder = "Select options",
     isMulti = false, // Added prop to determine if multi-select is enabled
-    disabled = false
+    disabled = false,
+    popoverContentClassName = ""
 }) {
     const [open, setOpen] = useState(false);
 
@@ -57,6 +58,7 @@ function Select({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger className="w-full " asChild>
                 <Button
+                    type="button"
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
@@ -94,7 +96,7 @@ function Select({
                     </div>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent align="start" className="p-0 ">
+            <PopoverContent align="start" className={`p-0 ${popoverContentClassName}`}>
                 <Command className=''>
                     <CommandList>
                         <CommandInput placeholder="Search options..." />
@@ -105,6 +107,7 @@ function Select({
                                     key={option.value}
                                     value={option.label}
                                     onSelect={() => handleSelect(option)}
+                                // onClick={() => handleSelect(option)} // Adding click as fallback
                                 >
                                     {option.label}
                                     <CheckIcon

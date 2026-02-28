@@ -89,10 +89,10 @@ const BookingDetails = () => {
         <div className="text-center mb-10">
 
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {booking.status === 'paid' ? 'Payment Received!' : 'Booking Placed Successfully!'}
+            {booking.paymentStatus === 'paid' ? 'Payment Received!' : 'Booking Placed Successfully!'}
           </h1>
           <p className="text-gray-600 italic">
-            {booking.status === 'paid'
+            {booking.paymentStatus === 'paid'
               ? 'Thank you for your payment. Your booking is being processed.'
               : 'Please complete your payment to confirm your booking.'}
           </p>
@@ -111,7 +111,7 @@ const BookingDetails = () => {
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2 text-sm font-normal text-gray-500">
-                      Payment: <StatusBadge status={booking.status} type="payment" />
+                      Payment: <StatusBadge status={booking.paymentStatus} type="payment" />
                     </div>
                     {booking.bookingStatus && (
                       <div className="flex items-center gap-2 text-sm font-normal text-gray-500">

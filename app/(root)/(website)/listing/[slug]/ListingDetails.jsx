@@ -11,7 +11,7 @@ import { BsFillPeopleFill } from 'react-icons/bs'
 import Link from 'next/link'
 import BreadCrumb from '@/components/application/BreadCrumb'
 import ButtonLoading from '@/components/application/ButtonLoading'
-import AvailabilityCalendar from '@/components/application/Website/AvailabilityCalendar'
+import UserCalendar from '@/components/application/Website/UserCalendar'
 import { useRouter, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { showToast } from '@/lib/showToast'
@@ -414,7 +414,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                     </p>
                 </div>
 
-                <AvailabilityCalendar
+                <UserCalendar
                     listingId={listing._id}
                     variantId={activeVariant?._id}
                     onDateSelect={handleDateSelect}

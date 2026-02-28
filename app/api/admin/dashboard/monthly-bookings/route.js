@@ -15,7 +15,7 @@ export async function GET(request) {
         const monthlyBookingRevenue = await bookingModel.aggregate([
             {
                 $match: {
-                    status: { $in: ['pending', 'confirmed', 'paid', 'partially-paid'] }
+                    paymentStatus: { $in: ['pending', 'paid', 'partially-paid'] }
                 }
             },
             {

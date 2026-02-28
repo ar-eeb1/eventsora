@@ -29,9 +29,68 @@ export async function GET(request) {
         if (variantId) query.variantId = variantId;
 
         // Fetch calendar entries
-        const calendarData = await CalendarModel.find(query)
+        let calendarData = await CalendarModel.find(query)
             .sort({ date: 1 })
             .lean();
+
+        // Fetch bookings matching this listing/variant
+        const mongoose = require('mongoose');
+
+        // Define match conditions
+        const matchConditions = [
+            { 'listings.listingId': new mongoose.Types.ObjectId(listingId) }
+        ];
+
+        if (variantId) {
+            matchConditions.push({ 'listings.variantId': new mongoose.Types.ObjectId(variantId) });
+        }
+
+        const BookingModel = require('@/models/Booking.model').default;
+
+        // Bookings that contain this listing and variant
+        const bookings = await BookingModel.find({
+            $and: matchConditions
+        }).lean();
+
+        // Create a mapping of dates to booking details for fast lookup
+        const bookingMap = {};
+
+        bookings.forEach(booking => {
+            booking.listings.forEach(item => {
+                // Ensure we only process the relevant listing item
+                const isMatchListing = item.listingId.toString() === listingId;
+                const isMatchVariant = variantId ? (item.variantId && item.variantId.toString() === variantId) : true;
+
+                if (isMatchListing && isMatchVariant && item.bookingDate && item.bookingDate.length > 0) {
+                    item.bookingDate.forEach(bDate => {
+                        // bDate format might be YYYY-MM-DD or ISO string. Convert to YYYY-MM-DD for matching
+                        const formattedDate = new Date(bDate).toISOString().split('T')[0];
+
+                        bookingMap[formattedDate] = {
+                            name: booking.name,
+                            phone: booking.phone,
+                            bookingStatus: booking.bookingStatus,
+                            paymentStatus: booking.paymentStatus,
+                            bookingId: booking._id
+                        };
+                    });
+                }
+            });
+        });
+
+        // Merge booking data into calendar data
+        calendarData = calendarData.map(entry => {
+            const dateStr = new Date(entry.date).toISOString().split('T')[0];
+            const overlap = bookingMap[dateStr];
+
+            if (overlap) {
+                return {
+                    ...entry,
+                    ...overlap
+                };
+            }
+            return entry;
+        });
 
         return response(true, 200, 'Calendar data fetched successfully.', calendarData);
 
