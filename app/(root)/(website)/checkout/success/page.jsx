@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { CheckCircle2, Package, ArrowRight, Home, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WEBSITE_HOME } from '@/routes/AdminPanelRoute'
-import { WEBSITE_BOOKINGS, WEBSITE_BOOKING_DETAILS } from '@/routes/WebsiteRoute'
+import { USER_BOOKINGS, WEBSITE_BOOKINGS, WEBSITE_BOOKING_DETAILS } from '@/routes/WebsiteRoute'
 import BreadCrumb from '@/components/application/BreadCrumb'
 
 const breadCrumbData = [
@@ -71,7 +71,7 @@ const SuccessPage = () => {
 
                 <div className='flex flex-wrap justify-center gap-4'>
                     <Button asChild size='lg' className='rounded-full px-8'>
-                        <Link href={WEBSITE_BOOKINGS} className='flex items-center gap-2'>
+                        <Link href={USER_BOOKINGS} className='flex items-center gap-2'>
                             <Calendar className='w-5 h-5' />
                             View All Bookings
                         </Link>

@@ -41,12 +41,13 @@ const Booking = () => {
     const [itemToRemove, setItemToRemove] = useState(null)
     const [isRemoving, setIsRemoving] = useState(false)
 
-    // Calculate total price
+    // Calculate total price (use variant/listing price, quantity only for variable pricing)
+    const isVariablePricing = (pt) => pt === 'per_person' || pt === 'per_hour' || pt === 'per_day'
     const totalPrice = useMemo(() => {
         return booking.listings?.reduce((sum, listing) => {
-            const itemPrice = listing.price || listing.startingPrice || 0
-            const quantity = listing.quantity || 1
-            return sum + (itemPrice * quantity)
+            const unitPrice = listing.price ?? listing.variantPrice ?? listing.startingPrice ?? 0
+            const quantity = isVariablePricing(listing.pricingType) ? (listing.quantity || 1) : 1
+            return sum + (unitPrice * quantity)
         }, 0) || 0
     }, [booking.listings])
 
@@ -177,12 +178,22 @@ const Booking = () => {
                                                         </p>
                                                     )}
 
-                                                    {listing?.price ? (
+                                                    {(listing?.price ?? listing?.variantPrice) ? (
                                                         <div className='font-medium text-gray-900'>
-                                                            {formatCurrency(listing.price)} × {listing.quantity || 1} = {' '}
+                                                            {listing.discount > 0 && (
+                                                                <span className='text-xs line-through text-gray-400 mr-1'>
+                                                                    {formatCurrency((listing.variantPrice || listing.price) * (listing.quantity || 1))}
+                                                                </span>
+                                                            )}
+                                                            {formatCurrency(listing.price ?? listing.variantPrice ?? 0)} × {listing.quantity || 1} = {' '}
                                                             <span className='text-primary font-semibold'>
-                                                                {formatCurrency(listing.price * (listing.quantity || 1))}
+                                                                {formatCurrency((listing.price ?? listing.variantPrice ?? 0) * (listing.quantity || 1))}
                                                             </span>
+                                                            {listing.discount > 0 && (
+                                                                <span className='block text-xs text-green-600'>
+                                                                    Discount: {formatCurrency(listing.discount)}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     ) : listing?.startingPrice ? (
                                                         <p className='text-sm text-gray-600'>
@@ -235,7 +246,7 @@ const Booking = () => {
                                     </SheetClose>
                                     <SheetClose asChild>
                                         <Link href={WEBSITE_CHECKOUT} className='flex-1' >
-                                            <Button variant="outline" className='bg-primary hover:bg-primary/90 w-full cursor-pointer' disabled={booking.count === 0}>
+                                            <Button variant="outline" className='bg-pink-700 text-white hover:text-white hover:bg-primary/90 w-full cursor-pointer' disabled={booking.count === 0}>
                                                 Proceed to Checkout
                                             </Button>
                                         </Link>

@@ -42,7 +42,7 @@ export async function GET(req) {
       .populate('category', '_id category slug')
       .populate('city', '_id city')
       .populate('locality', '_id locality')
-      .limit(4)
+      .limit(20)
       .lean();
 
 

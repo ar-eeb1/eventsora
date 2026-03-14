@@ -38,15 +38,23 @@ const CheckoutPage = () => {
   const dispatch = useDispatch()
 
   const [isSynced, setIsSynced] = useState(false);
-  const [serverTotalAmount, setServerTotalAmount] = useState(0);
   const [placingBooking, setPlacingBooking] = useState(false)
   const [savingBooking, setSavingBooking] = useState(false)
 
+  // Compute total from synced listings (includes discount when preserved)
+  const isVariablePricing = (pt) => pt === 'per_person' || pt === 'per_hour' || pt === 'per_day'
+  const displayTotal = useMemo(() => {
+    return booking.listings?.reduce((sum, item) => {
+      const unitPrice = item.price ?? item.variantPrice ?? item.startingPrice ?? 0
+      const qty = isVariablePricing(item.pricingType) ? (item.quantity || 1) : 1
+      return sum + (unitPrice * qty)
+    }, 0) ?? 0
+  }, [booking.listings])
+
   useEffect(() => {
     if (getVerifiedBookingData && getVerifiedBookingData.success && !isSynced) {
-      const { listings, totalAmount } = getVerifiedBookingData.data
+      const { listings } = getVerifiedBookingData.data
       dispatch(syncVerifiedBookings(listings))
-      setServerTotalAmount(totalAmount)
       setIsSynced(true)
     }
   }, [getVerifiedBookingData, isSynced])
@@ -249,7 +257,7 @@ const CheckoutPage = () => {
                     </div>
 
                     <div className='mb-3 text-end col-span-2'>
-                      <ButtonLoading type='submit' text='Place Booking' loading={placingBooking} className='bg-pink-400 rounded-full px-5' />
+                      <ButtonLoading type='submit' text='Place Booking' loading={placingBooking} className='bg-pink-700 rounded-full px-5' />
                     </div>
                   </form>
                 </Form>
@@ -276,8 +284,8 @@ const CheckoutPage = () => {
 
                   <table className='w-full'>
                     <tbody>
-                      {booking.listings.map((listing) => (
-                        <tr key={`${listing.listingId}-${listing.variantId}`} className='border-b last:border-0'>
+                      {booking.listings.map((listing, i) => (
+                        <tr key={`${listing.listingId}-${listing.variantId}-${i}`} className='border-b last:border-0'>
                           <td className='py-3'>
                             <div className='flex items-center gap-4'>
                               <div className='relative w-12 h-12 rounded overflow-hidden border'>
@@ -297,14 +305,24 @@ const CheckoutPage = () => {
                             </div>
                           </td>
                           <td className='py-3 text-end '>
-                            <div className='text-sm font-semibold gap-2 flex justify-end'>
-                              <div>
-                                {(listing.variantPrice || listing.startingPrice || 0).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                            <div className='text-sm font-semibold gap-2 flex flex-col items-end'>
+                              {listing.discount > 0 && (
+                                <span className='text-xs line-through text-gray-400'>
+                                  {(listing.variantPrice || listing.startingPrice || 0).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })} × {listing.quantity || 1}
+                                </span>
+                              )}
+                              <div className='flex gap-1'>
+                                <span>
+                                  {(listing.price ?? listing.variantPrice ?? listing.startingPrice ?? 0).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                </span>
+                                <span>×</span>
+                                <span>{listing.quantity || 1}</span>
                               </div>
-                              x
-                              <div>
-                                {(listing.quantity || 1)}
-                              </div>
+                              {listing.discount > 0 && (
+                                <span className='text-xs text-green-600'>
+                                  Discount: {listing.discount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                </span>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -315,14 +333,37 @@ const CheckoutPage = () => {
 
                   <table className='w-full mt-4 border-t'>
                     <tbody>
-                      <tr>
-                        <td className='font-bold py-4'>Total Amount</td>
-                        <td className='text-end py-4'>
-                          <span className='font-bold text-lg text-pink-600'>
-                            {serverTotalAmount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
-                          </span>
-                        </td>
-                      </tr>
+                      {(() => {
+                        const totalDiscount = booking.listings?.reduce((sum, item) => sum + (item.discount || 0), 0) || 0
+                        return (
+                          <>
+                            {totalDiscount > 0 && (
+                              <tr>
+                                <td className='py-2 text-sm text-gray-600'>Subtotal</td>
+                                <td className='py-2 text-end text-sm'>
+                                  {(displayTotal + totalDiscount).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                </td>
+                              </tr>
+                            )}
+                            {totalDiscount > 0 && (
+                              <tr>
+                                <td className='py-2 text-sm text-green-600'>Discount</td>
+                                <td className='py-2 text-end text-sm text-green-600'>
+                                  -{totalDiscount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                </td>
+                              </tr>
+                            )}
+                            <tr>
+                              <td className='font-bold py-4'>Total Amount</td>
+                              <td className='text-end py-4'>
+                                <span className='font-bold text-lg text-pink-600'>
+                                  {displayTotal.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                </span>
+                              </td>
+                            </tr>
+                          </>
+                        )
+                      })()}
                     </tbody>
                   </table>
                 </div>

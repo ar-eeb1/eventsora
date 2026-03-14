@@ -6,18 +6,24 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
     try {
-        const auth = await isAuthenticated('provider')
-        if (!auth.isAuth) {
-            return response(false, 403, 'Unauthorized,')
-        }
-
         await connectDB()
         const searchParams = request.nextUrl.searchParams
         const page = parseInt(searchParams.get('page'), 10) || 0
         const limit = parseInt(searchParams.get('limit'), 10) || 0
         const deleteType = searchParams.get('deleteType')
+        const userId = searchParams.get('userId')
 
-        let filter = { userId: auth.userId };
+        let filter = {};
+
+        if (userId) {
+            filter.userId = userId;
+        } else {
+            const auth = await isAuthenticated('provider')
+            if (!auth.isAuth) {
+                return response(false, 403, 'Unauthorized,')
+            }
+            filter.userId = auth.userId;
+        }
 
         if (deleteType === 'SD') {
             filter.deletedAt = null;

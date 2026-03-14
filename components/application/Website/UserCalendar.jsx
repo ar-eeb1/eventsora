@@ -59,9 +59,19 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
 
     // Handle date selection
     const handleDateSelect = (dates) => {
-        // Check if at least one date is selected
-        if (!dates || dates.length === 0) {
-            showToast("error", "Please select any date")
+        // If dates is null or undefined just ignore
+        if (!dates) return
+
+        // When only one date allowed, always keep last choice
+        if (maxSelectable === 1 && dates.length > 1) {
+            // assume the most recently added date is at the end
+            dates = [dates[dates.length - 1]]
+        }
+
+        // Allow clearing all selections
+        if (dates.length === 0) {
+            setSelected([])
+            if (onDateSelect) onDateSelect([], {})
             return
         }
 
@@ -81,8 +91,15 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
 
         setSelected(validDates)
 
+        // Build date prices map for selected dates (for discount calculation)
+        const datePrices = {}
+        validDates.forEach(dateKey => {
+            const price = calendarData[dateKey]?.price
+            if (price != null) datePrices[dateKey] = price
+        })
+
         if (onDateSelect) {
-            onDateSelect(validDates)
+            onDateSelect(validDates, datePrices)
         }
     }
 

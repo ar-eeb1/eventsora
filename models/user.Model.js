@@ -39,10 +39,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    phone: {
-        type: String,
-        trim: true
-    },
+        phone: {
+            type: String,
+            trim: true
+        },
     address: {
         type: String,
         trim: true

@@ -379,9 +379,9 @@ const ListingCalendar = () => {
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                             {/* Selection Card */}
-                            <div className="bg-linear-to-r from-pink-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl border border-pink-100 dark:border-gray-700">
+                            <div className="bg-pink-100 dark:bg-pink-950 p-6 rounded-xl border border-pink-100 dark:border-gray-700">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
+                                    <div className="p-2 bg-pink-100 dark:bg-pink-900 rounded-lg">
                                         <Tag className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                                     </div>
                                     <div>

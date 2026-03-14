@@ -23,8 +23,9 @@ import { Button } from '@/components/ui/button'
 import { is } from 'zod/v4/locales'
 import Loading from '@/components/application/Loading'
 import ListingReview from '@/components/application/Website/ListingReview'
-import { Card, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { url } from 'zod'
+import PortfolioMedia from '@/components/application/Website/PortfolioMedia'
 
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
@@ -84,6 +85,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     // Booking handle
     const [isAddedIntoBooking, setIsAddedIntoBooking] = useState(false)
     const [selectedDates, setSelectedDates] = useState([])
+    const [selectedDatePrices, setSelectedDatePrices] = useState({})
     const bookingStore = useSelector(store => store.bookingStore)
 
     useEffect(() => {
@@ -104,11 +106,35 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
         setIsListingLoading(false)
     }, [bookingStore, listing, activeVariant, selectedDates])
 
-    const handleDateSelect = (dates) => {
+    const handleDateSelect = (dates, datePrices = {}) => {
         setSelectedDates(dates)
+        setSelectedDatePrices(datePrices)
     }
 
     const handleAddToBooking = () => {
+        const variantPrice = activeVariant?.startingPrice || listing?.startingPrice || 0
+        const quantity = qty || activeVariant?.minPersons || 1
+        const variantTotal = activeVariant ? (variantPrice * quantity) : (listing?.startingPrice || 0)
+
+        // Sum calendar prices for selected dates (per-unit for variable pricing, total for fixed)
+        const calendarPricePerUnit = selectedDates.reduce((sum, dateKey) => {
+            const price = selectedDatePrices[dateKey]
+            return sum + (price != null ? Number(price) : 0)
+        }, 0)
+
+        const isVariablePricing = (pt) => pt === 'per_person' || pt === 'per_hour' || pt === 'per_day'
+        const calendarPriceTotal = calendarPricePerUnit > 0 && isVariablePricing(activeVariant?.pricingType)
+            ? calendarPricePerUnit * quantity
+            : calendarPricePerUnit
+
+        // Use calendar price when available and lower than variant; otherwise use variant price
+        const hasCalendarPrice = calendarPriceTotal > 0
+        const actualTotal = hasCalendarPrice ? calendarPriceTotal : variantTotal
+        const discount = hasCalendarPrice && calendarPriceTotal < variantTotal
+            ? variantTotal - calendarPriceTotal
+            : 0
+        const unitPrice = quantity > 0 ? actualTotal / quantity : variantPrice
+
         const bookingItem = {
             // relations
             listingId: listing._id,
@@ -118,15 +144,17 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
             // snapshot info
             listingName: listing.name,
             variantTitle: activeVariant?.title || null,
-            variantPrice: activeVariant?.startingPrice || null,
+            variantPrice: activeVariant?.startingPrice ?? listing?.startingPrice ?? null,
             slug: listing.slug,
 
             // pricing snapshot
             startingPrice: listing?.startingPrice || null,
-            price: activeVariant?.startingPrice || null,
+            price: unitPrice,
+            calendarPrice: hasCalendarPrice ? calendarPriceTotal : null,
+            discount: discount || null,
             pricingType: activeVariant?.pricingType || null,
             minPersons: activeVariant?.minPersons || null,
-            quantity: qty || activeVariant?.minPersons || 1,
+            quantity: quantity,
             // media
             thumbnail: listing.media?.[0],
             // booking meta
@@ -403,7 +431,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 </div>
             </div>
 
-            <div className='mb-5'>
+            <div className='mb-5 calendar'>
                 <div className="flex flex-col items-center justify-center my-10 space-y-2">
                     <div className="h-1 w-20 bg-primary rounded-full mb-5"></div>
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white text-center">
@@ -430,6 +458,27 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 </CardHeader>
                 <div dangerouslySetInnerHTML={{ __html: encode(listing.description) }}></div>
             </Card>
+            {/* PORTFOLIO */}
+            <Card className={'mb-10 p-4'}>
+                <CardHeader className={'font-semibold text-2xl border-b border-pink-400 p-0 m-0 [.border-b]:pb-0'}>
+                    <h2>Portfolio</h2>
+                </CardHeader>
+                <CardContent>
+                    <PortfolioMedia userId={listing?.userId?._id || listing?.userId} />
+                </CardContent>
+            </Card>
+            {/* <Card className={'mb-10 p-4'}>
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.569993409171!2d67.050618!3d24.946714699999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb340813dc70c37%3A0xe503df5734802d4a!2sNorth%20Marriage%20Garden!5e0!3m2!1sen!2s!4v1772465330808!5m2!1sen!2s"
+                    width="100%"
+                    height="450"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="North Marriage Garden Location"
+                />
+            </Card> */}
 
             <ListingReview listingId={listing._id} />
         </div >

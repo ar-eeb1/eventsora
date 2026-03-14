@@ -4,8 +4,6 @@ import React from 'react'
 
 const suspended = ({ children }) => {
     return (
-
-
         <div>
             You are suspended
             contact support

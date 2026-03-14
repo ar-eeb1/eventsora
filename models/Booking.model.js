@@ -43,6 +43,8 @@ const bookingSchema = new mongoose.Schema({
             quantity: { type: Number, required: true },
             bookingDate: [{ type: String, required: true }],
             media: { type: String, required: false },
+            variantPrice: { type: Number, required: false },
+            discount: { type: Number, required: false },
         }
     ],
     bookingStatus: {

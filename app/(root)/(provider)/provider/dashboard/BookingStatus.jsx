@@ -4,6 +4,8 @@ import { CardContent } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import React, { useEffect, useState } from "react"
 import useFetch from "@/hooks/useFetch"
+import Link from "next/link"
+import { PROVIDER_BOOKINGS_SHOW } from "@/routes/ProviderPanelRoute"
 
 export const description = "A chart"
 
@@ -67,7 +69,7 @@ export function BookingStatus() {
     }, [chartData])
     return (
         <div>
-            <CardContent className="flex-1 pb-0">
+            <CardContent className="flex-1 pb-0 ">
                 <ChartContainer
                     config={chartConfig}
                     className="mx-auto aspect-square max-h-[250px]"
@@ -115,11 +117,9 @@ export function BookingStatus() {
                         </Pie>
                     </PieChart>
                 </ChartContainer>
-            </CardContent>
-            <div>
-                <ul>
+                <div className=" h-full">
                     {chartData.map((item) => (
-                        <li key={item.status} className="flex justify-between items-center mb-3 text-sm">
+                        <Link href={`${PROVIDER_BOOKINGS_SHOW}?bookingStatus=${item.status}`} key={item.status} className="flex justify-between items-around text-sm hover:bg-gray-300 py-1 rounded-full px-2">
                             <span className="capitalize">{item.status.replace(/-/g, ' ')}</span>
                             <span
                                 className="rounded-full text-xs text-white p-1 px-2"
@@ -127,10 +127,10 @@ export function BookingStatus() {
                             >
                                 {item.count}
                             </span>
-                        </li>
+                        </Link>
                     ))}
-                </ul>
-            </div>
+                </div>
+            </CardContent>
         </div>
     )
 }

@@ -3,7 +3,6 @@ import React from 'react'
 import ThemeSwitch from '../Website/ThemeSwitch'
 import UserDropdown from '../Main/UserDropdown'
 import logo from '@/public/assets/eventsora.png'
-
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import { useSidebar } from '@/components/ui/sidebar'

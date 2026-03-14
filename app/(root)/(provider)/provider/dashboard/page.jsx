@@ -37,7 +37,7 @@ const ProviderDashboard = () => {
             <div className='flex justify-between items-center'>
               <span className='font-semibold'>Bookings Overview</span>
               <Button type='button'>
-                <Link href={''}>View All</Link>
+                <Link href={PROVIDER_BOOKINGS_SHOW}>View All</Link>
               </Button>
             </div>
           </CardHeader>
@@ -46,16 +46,16 @@ const ProviderDashboard = () => {
           </CardContent>
 
         </Card>
-        <Card className='rounded lg:w-[30%] w-full p-0'>
+        <Card className='rounded lg:w-[30%] w-full p-0 '>
           <CardHeader className='py-3 border-b [.border-b]:pb-2'>
             <div className='flex justify-between items-center'>
               <span className='font-semibold'>Booking Status</span>
               <Button type='button'>
-                <Link href={''}>View All</Link>
+                <Link href={PROVIDER_BOOKINGS_SHOW}>View All</Link>
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className={' w-full h-full'}>
             <BookingStatus />
           </CardContent>
 

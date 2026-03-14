@@ -38,7 +38,7 @@ const Categories = () => {
             <NavigationMenu>
                 <NavigationMenuList>
                     <NavigationMenuItem className="">
-                        <NavigationMenuTrigger className=' bg-[#CE416F] h-0 hover:text-white '>
+                        <NavigationMenuTrigger className=' bg-pink-900 h-0 hover:text-white '>
                             Categories
                         </NavigationMenuTrigger>
 
@@ -82,7 +82,7 @@ export default Categories
 //         <NavigationMenu>
 //             <NavigationMenuList>
 //                 <NavigationMenuItem className="hidden md:block">
-//                     <NavigationMenuTrigger className="bg-[#CE416F] h-0 hover:text-white">
+//                     <NavigationMenuTrigger className="bg-pink-900 h-0 hover:text-white">
 //                         Category
 //                     </NavigationMenuTrigger>
 

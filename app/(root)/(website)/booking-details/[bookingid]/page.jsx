@@ -8,7 +8,6 @@ import { showToast } from '@/lib/showToast'
 import BreadCrumb from '@/components/application/BreadCrumb'
 import { WEBSITE_HOME } from '@/routes/AdminPanelRoute'
 import axios from 'axios'
-import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import Link from 'next/link'
 import { WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
@@ -149,9 +148,21 @@ const BookingDetails = () => {
                         </div>
                         <div className="flex justify-between items-center mt-2">
                           <span className="text-sm">Qty: {item.quantity}</span>
-                          <span className="font-bold text-pink-600">
-                            {(item.price * item.quantity).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
-                          </span>
+                          <div className="flex flex-col items-end">
+                            {item.discount > 0 && (
+                              <>
+                                <span className="text-xs line-through text-gray-400">
+                                  {((item.variantPrice || item.price) * item.quantity).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                </span>
+                                <span className="text-xs text-green-600">
+                                  Discount: {item.discount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                </span>
+                              </>
+                            )}
+                            <span className="font-bold text-pink-600">
+                              {(item.price * item.quantity).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -8,27 +8,22 @@ import Select from '@/components/application/Main/Select'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
-import { MASTER_DASHBOARD } from '@/routes/MasterPanelRoute'
+import { MASTER_DASHBOARD, MASTER_USER_SHOW } from '@/routes/MasterPanelRoute'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import React, { use, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { userRoleOptions } from '@/lib/utils'
 
 const breadCrumbData = [
     { href: MASTER_DASHBOARD, label: 'Dashboard' },
+    { href: MASTER_USER_SHOW, label: 'Users' },
     { href: '', label: 'Edit User Role' },
-]
-
-const roleOptions = [
-    { label: 'User', value: 'user' },
-    { label: 'Provider', value: 'provider' },
-    { label: 'Admin', value: 'admin' },
-    { label: 'Master', value: 'master' },
-    { label: 'Suspended', value: 'suspended' },
 ]
 
 const EditUser = ({ params }) => {
     const { id } = use(params)
+    const [fetchingUserData, setFetchingUserData] = useState(false)
     const [loading, setLoading] = useState(false)
 
     const { data: userData } = useFetch(`/api/master/users/get/${id}`)
@@ -47,12 +42,20 @@ const EditUser = ({ params }) => {
     })
 
     useEffect(() => {
-        if (userData?.success) {
-            const user = userData.data
-            form.reset({
-                _id: user._id,
-                role: user.role,
-            })
+        setFetchingUserData(true)
+        try {
+            if (userData?.success) {
+                const user = userData.data
+                form.reset({
+                    _id: user._id,
+                    role: user.role,
+                })
+            }
+        } catch (error) {
+            console.error(error)
+            showToast('error', 'Failed to fetch booking details')
+        } finally {
+            setFetchingUserData(false)
         }
     }, [userData])
 
@@ -67,6 +70,14 @@ const EditUser = ({ params }) => {
         } finally {
             setLoading(false)
         }
+    }
+
+    if (fetchingUserData) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+            </div>
+        )
     }
 
     return (
@@ -108,7 +119,7 @@ const EditUser = ({ params }) => {
                                             <FormLabel>User Role</FormLabel>
                                             <FormControl>
                                                 <Select
-                                                    options={roleOptions}
+                                                    options={userRoleOptions}
                                                     selected={field.value}
                                                     setSelected={(val) => field.onChange(val)}
                                                     placeholder="Select role"

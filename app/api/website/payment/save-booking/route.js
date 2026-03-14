@@ -61,9 +61,10 @@ export async function POST(request) {
             const booking_id = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
 
             // Calculate total for this provider's items
+            const isVariablePricing = (pt) => pt === 'per_person' || pt === 'per_hour' || pt === 'per_day';
             const providerTotalWithQuantities = providerListings.reduce((total, item) => {
-                const price = item.variantPrice || item.startingPrice || 0;
-                const quantity = item.variantTitle === null ? 1 : (item.quantity || 1);
+                const price = item.price || item.variantPrice || item.startingPrice || 0;
+                const quantity = isVariablePricing(item.pricingType) ? (item.quantity || 1) : 1;
                 return total + (price * quantity);
             }, 0);
 
@@ -81,11 +82,13 @@ export async function POST(request) {
                     variantId: item.variantId,
                     name: item.name,
                     variantTitle: item.variantTitle,
-                    price: item.variantPrice || item.startingPrice,
-                    quantity: item.quantity,
+                    price: item.price,
+                    quantity: isVariablePricing(item.pricingType) ? (item.quantity || 1) : 1,
                     bookingDate: item.bookingDate,
                     media: item.media,
-                    slug: item.slug
+                    slug: item.slug,
+                    variantPrice: item.variantPrice,
+                    discount: item.discount
                 }))
             });
 

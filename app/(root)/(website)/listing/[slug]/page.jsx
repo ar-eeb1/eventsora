@@ -12,7 +12,7 @@ const ListingPage = async ({ params, searchParams }) => {
         url += `?startingPrice=${startingPrice}&capacity=${capacity}`
     }
     const { data: getListing } = await axios.get(url)
-    
+
 
     if (!getListing.success) {
         return (
@@ -24,13 +24,16 @@ const ListingPage = async ({ params, searchParams }) => {
         )
     } else {
         return (
-            <ListingDetails
-                listing={getListing?.data?.listing}
-                variants={getListing?.data?.variant}
-                startingPrice={getListing?.data?.startingPrice}
-                capacity={getListing?.data?.capacity}
-                reviewCount={getListing?.data?.reviewCount}
-            />
+            <>
+                <ListingDetails
+                    listing={getListing?.data?.listing}
+                    variants={getListing?.data?.variant}
+                    startingPrice={getListing?.data?.startingPrice}
+                    capacity={getListing?.data?.capacity}
+                    reviewCount={getListing?.data?.reviewCount}
+                />
+               
+            </>
         )
     }
 }

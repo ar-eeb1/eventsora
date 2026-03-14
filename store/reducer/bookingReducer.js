@@ -65,27 +65,36 @@ export const bookingReducer = createSlice({
         syncVerifiedBookings: (state, action) => {
             const verifiedData = action.payload; // This is the array from server
 
-            state.listings = state.listings.map(localItem => {
-                // Find matching item from server
-                const verifiedItem = verifiedData.find(v =>
-                    v.listingId === localItem.listingId &&
-                    v.variantId === localItem.variantId
-                );
+            state.listings = state.listings.map((localItem, index) => {
+                // Prefer index-based match (1:1 correspondence) when lengths match
+                let verifiedItem = verifiedData[index];
+                const matchByFields = (v) =>
+                    String(v?.listingId) === String(localItem?.listingId) &&
+                    String(v?.variantId || '') === String(localItem?.variantId || '') &&
+                    JSON.stringify([...(v?.bookingDate || [])].sort()) === JSON.stringify([...(localItem?.bookingDate || [])].sort());
+
+                if (!verifiedItem || !matchByFields(verifiedItem)) {
+                    verifiedItem = verifiedData.find(matchByFields);
+                }
 
                 if (verifiedItem) {
-                    // Update server-side fields but KEEP local-side fields (like bookingDate, quantity)
-                    return {
-                        ...localItem, // Keep everything local (bookingDate, quantity, etc.)
-                        ...verifiedItem, // Override with server data (price, slug, name, etc.)
-                        // Ensure we don't accidentally overwrite local fields if server returns them as null or different shape
+                    const merged = {
+                        ...localItem,
+                        ...verifiedItem,
                         bookingDate: localItem.bookingDate,
                         quantity: localItem.quantity,
                         status: localItem.status || 'pending',
-                        // If verified thumbnail is just a string (ID) but local is an object, keep local
                         thumbnail: (typeof verifiedItem.thumbnail === 'object' && verifiedItem.thumbnail !== null)
                             ? verifiedItem.thumbnail
-                            : localItem.thumbnail
+                            : localItem.thumbnail,
+                        // Preserve local discount/price when server didn't find calendar entries
+                        discount: typeof verifiedItem.discount === 'number' ? verifiedItem.discount : localItem.discount,
+                        price: (typeof verifiedItem.discount === 'number' && verifiedItem.discount > 0)
+                            ? verifiedItem.price
+                            : (localItem.discount > 0 ? localItem.price : verifiedItem.price),
+                        calendarPrice: typeof verifiedItem.calendarPrice === 'number' ? verifiedItem.calendarPrice : localItem.calendarPrice,
                     };
+                    return merged;
                 }
                 return localItem;
             });

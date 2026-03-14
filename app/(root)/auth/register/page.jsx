@@ -23,13 +23,16 @@ import Link from 'next/link'
 import { WEBSITE_LOGIN, WEBSITE_REGISTER } from '@/routes/AdminPanelRoute'
 import axios from 'axios'
 import { showToast } from '@/lib/showToast'
-import { useRouter } from 'next/navigation'
-
+import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 const RegisterPage = () => {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [isTypePassword, setIsTypePassword] = useState(true)
+    const searchParams = useSearchParams()
+    const roleParam = searchParams.get('role')
+    const isProvider = roleParam === 'provider'
 
     const formSchema = zSchema.pick({
         name: true,
@@ -57,7 +60,8 @@ const RegisterPage = () => {
     const handleRegisterSubmit = async (values) => {
         try {
             setLoading(true)
-            const { data: registerResponse } = await axios.post('/api/auth/register', values)
+            const payload = { ...values, role: isProvider ? 'provider' : 'user' }
+            const { data: registerResponse } = await axios.post('/api/auth/register', payload)
 
             if (!registerResponse.success) {
                 throw new Error(registerResponse.message)
@@ -81,7 +85,7 @@ const RegisterPage = () => {
                             <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-64'></Image>
                         </div>
                         <div className='text-center relative -top-5'>
-                            <h1 className='text-2xl font-semibold mb-5'>Create a new account</h1>
+                            <h1 className='text-2xl font-semibold mb-5'>{isProvider ? 'Provider Signup' : 'Create a new account'}</h1>
                         </div>
                     </div>
                     <div>
@@ -172,12 +176,44 @@ const RegisterPage = () => {
                                 <div className='mb-5'>
                                     <ButtonLoading type='submit' text='SIGN UP' className='w-full' loading={loading} />
                                 </div>
+                                {!isProvider && (
+                                    <>
+                                        <div className="relative my-4">
+                                            <div className="absolute inset-0 flex items-center">
+                                                <span className="w-full border-t" />
+                                            </div>
+                                            <div className="relative flex justify-center text-xs uppercase">
+                                                <span className="bg-background px-2 text-muted-foreground">
+                                                    Or continue with
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className='mb-5'>
+                                            <button
+                                                type='button'
+                                                onClick={() => signIn('google')}
+                                                className='w-full border py-2 rounded-md flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors cursor-pointer'
+                                            >
+                                                <Image src="https://www.svgrepo.com/show/475656/google-color.svg" width={20} height={20} alt="Google logo" />
+                                                <span>Google</span>
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                                 <hr />
                                 <div className='text-center mt-2'>
-                                    <Link href={WEBSITE_LOGIN} className='rounded-full text-sm flex flex-col'>
+                                    <Link href={`${WEBSITE_LOGIN}${isProvider ? '?role=provider' : ''}`} className='rounded-full text-sm flex flex-col'>
                                         <span>Already have an account? </span>
                                         <span className='underline underline-offset-3 '>LOGIN</span>
                                     </Link>
+                                </div>
+                                <div className='text-center mt-3'>
+                                    {isProvider ?
+                                        <Link href='/auth/register' className='text-sm text-pink-500 hover:underline'>Join as a Customer</Link>
+                                        :
+                                        <Link href='/auth/register?role=provider' className='text-sm text-pink-500 hover:underline'>Join as a Provider</Link>
+                                    }
                                 </div>
                             </form>
                         </Form>

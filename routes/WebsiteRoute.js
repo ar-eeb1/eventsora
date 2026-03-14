@@ -1,4 +1,5 @@
 export const WEBSITE = '/'
+export const SUSPENDED = '/suspended'
 
 export const WEBSITE_LISTING = '/listing'
 export const WEBSITE_CATEGORY = (slug) => slug ? `/${slug}` : ''

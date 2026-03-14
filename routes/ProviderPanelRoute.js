@@ -38,3 +38,11 @@ export const PROVIDER_MESSAGES = '/provider/messages'
 
 
 export const PROVIDER_TRASH = '/provider/trash'
+
+//staff
+export const PROVIDER_STAFF_SHOW = '/provider/staff'
+export const PROVIDER_STAFF_ADD = '/provider/staff/add'
+export const PROVIDER_STAFF_EDIT = '/provider/staff/edit'
+
+//support
+export const PROVIDER_SUPPORT = '/provider/support'

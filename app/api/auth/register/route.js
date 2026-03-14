@@ -14,6 +14,8 @@ export async function POST(request) {
             email: true,
             password: true,
             phone: true
+        }).extend({
+            role: z.string().optional()
         })
 
         const payload = await request.json()
@@ -23,7 +25,7 @@ export async function POST(request) {
             return response(false, 401, 'Invalid or Missing input fields', validatedData.error)
         }
 
-        const { name, email, password, phone } = validatedData.data
+        const { name, email, password, phone, role } = validatedData.data
         const checkUser = await UserModel.exists({ email })
 
         if (checkUser) {
@@ -31,7 +33,7 @@ export async function POST(request) {
         }
 
         const newRegistration = new UserModel({
-            name, email, password, phone
+            name, email, password, phone, role: role || 'user'
         })
 
         await newRegistration.save()

@@ -1,8 +1,17 @@
-import axios from 'axios'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import ListingBox from './ListingBox'
+import axios from 'axios'
+import { Playfair_Display } from 'next/font/google'
+
+const playfair = Playfair_Display({
+    weight: ['400', '700'],
+    display: 'swap',
+    subsets: ['latin'],
+})
+
+import HorizontalScrollContainer from './HorizontalScrollContainer'
 
 const AddHomeListing = async () => {
 
@@ -11,48 +20,66 @@ const AddHomeListing = async () => {
 
     if (!listingData) return <div>No Listing Found</div>
     return (
-        <section className='lg:px-20 md:px-16 px-6'>
-
+        <section className='xl:px-16 lg:px-10 md:px-6 px-6'>
             <div className='my-5'>
                 <div className='flex justify-between items-center mb-2'>
-                    <h2 className='lg:text-2xl sm:text-lg font-bold'>Venues</h2>
+                    <h2 className={`lg:text-4xl md:text-4xl sm:text-2xl font-bold text-pink-900 ${playfair.className}`}>Venues</h2>
                     <Link href='' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
                         View All
                         <ArrowRight size={20} />
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <HorizontalScrollContainer>
+
                     {!listingData.success && (
-                        <div className=''>
-                            <span className='text-lg font-semibold text-gray-700'>No Listing Found</span>
+                        <div>
+                            <span className="text-lg font-semibold text-gray-700">
+                                No Listing Found
+                            </span>
                         </div>
                     )}
+
                     {listingData.success &&
                         listingData.data.map((list) => (
-                            <ListingBox key={list._id} listing={list} />
-                        ))}
-                </div>
+                            <div key={list._id} className="shrink-0 w-72 grid">
+                                <ListingBox listing={list} />
+                            </div>
+                        ))
+                    }
+
+                </HorizontalScrollContainer>
             </div>
 
-            <div className='my-5'>
-                <div className='flex justify-between items-center mb-2'>
-                    <h2 className='lg:text-2xl sm:text-lg font-bold'>Cars</h2>
+            {/* CARS */}
+            <div className='my-5 '>
+                <div className='flex justify-between items-center mb-2 mt-20'>
+                    <h2 className={`lg:text-4xl md:text-4xl sm:text-2xl font-bold text-pink-900 ${playfair.className}`}>Cars & Caterers</h2>
                     <Link href='' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
                         View All
                         <ArrowRight size={20} />
                     </Link>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {!carData.success &&
-                        <div className=''>
-                            <span className='text-lg font-semibold text-gray-700'>No Listing Found</span>
+
+                <HorizontalScrollContainer>
+
+                    {!carData.success && (
+                        <div>
+                            <span className="text-lg font-semibold text-gray-700">
+                                No Listing Found
+                            </span>
                         </div>
+                    )}
+
+                    {carData.success &&
+                        carData.data.map((cars) => (
+                            <div key={cars._id} className="shrink-0 w-72 grid">
+                                <ListingBox listing={cars} />
+                            </div>
+                        ))
                     }
-                    {carData.success && carData.data.map((cars) => (
-                        <ListingBox key={cars._id} listing={cars} />
-                    ))}
-                </div>
+
+                </HorizontalScrollContainer>
             </div>
         </section>
     )

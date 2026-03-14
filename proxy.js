@@ -53,6 +53,14 @@ export async function proxy(request) {
 
   // for valid token
 
+  // if user account is suspended, always send to suspension page
+  if (role === 'suspended' && pathname !== '/suspended') {
+    const resp = NextResponse.redirect(new URL('/suspended', url))
+    // also clear token to force login if they try again
+    resp.cookies.delete('access_token')
+    return resp
+  }
+
   // users can't access login page
   if (pathname.startsWith("/auth")) {
     const allowedWhenLoggedIn = [

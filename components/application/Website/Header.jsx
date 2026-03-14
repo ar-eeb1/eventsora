@@ -31,17 +31,17 @@ const Header = () => {
     }, [])
 
     return (
-        <div className='border-b lg:px-12 px-4 bg-[#CE416F] md:mx-5 rounded-b-2xl sticky top-0 z-50'>
+        <div className='lg:px-12 px-4 bg-pink-900 md:mx-5 rounded-b-2xl sticky top-0 z-50'>
             <div className='flex justify-between items-center lg:py-5 py-4 max-w-screen-2xl mx-auto'>
 
                 <Link href={WEBSITE_HOME}>
                     <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-40 md:w-52' />
                 </Link>
                 <div className='flex justify-between gap-20'>
-                    <nav className={`lg:relative lg:w-auto lg:top-0 lg:left-0 lg:p-0 lg:h-auto lg:bg-transparent bg-white fixed z-50 top-0 w-full h-screen transition-all duration-500 ease-in-out ${isMobileMenu ? 'right-0' : '-right-full'}`}>
+                    <nav className={`lg:relative lg:w-auto lg:top-0 lg:left-0 lg:p-0 lg:h-auto lg:bg-transparent fixed z-50 top-0 w-full h-screen transition-all duration-500 ease-in-out ${isMobileMenu ? 'right-0' : '-right-full'}`}>
 
                         {/* FOR MOBILE */}
-                        <div className='lg:hidden bg-[#CE416F] flex justify-between items-center py-4 border-b border-gray-200 px-4 shadow-sm'>
+                        <div className='lg:hidden bg-pink-900 flex justify-between items-center py-4 border-b border-gray-200 px-4 shadow-sm'>
                             <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-40 md:w-52' />
                             <button type='button' className='p-2 rounded-full hover:bg-gray-200 transition-all duration-200 active:scale-95' onClick={toggleMobileMenu}>
                                 <X className='text-white ' size={25} />

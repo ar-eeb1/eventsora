@@ -5,11 +5,11 @@ import logo from '@/public/assets/eventsoraWhite.png'
 import React from 'react'
 import { Email, Facebook, Instagram, MapOutlined, PhoneOutlined } from '@mui/icons-material'
 import { WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER } from '@/routes/AdminPanelRoute'
-import { USER_DASHBOARD } from '@/routes/WebsiteRoute'
+import { USER_DASHBOARD, WEBSITE_CATEGORY } from '@/routes/WebsiteRoute'
 
 const Footer = () => {
   return (
-    <footer className='bg-[#CE416F] border-t w-full'>
+    <footer className='bg-pink-900 border-t w-full'>
 
       <div className='grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-10 py-10 lg:px-32 px-4'>
         <div className='lg:col-span-1 md:col-span-2 col-span-1'>
@@ -28,10 +28,10 @@ const Footer = () => {
         <div>
           <h4 className='text-white text-sm md:text-xl md:font-bold uppercase mb-3 md:mb-5'>Categories</h4>
           <ul>
-            <li className='md:mb-2 text-sm text-white'><Link href={`${''}?category=t-shirts`}>Venues </Link></li>
-            <li className='md:mb-2 text-sm text-white'><Link href={`${''}?category=hoodies`}>Catering & Food</Link></li>
-            <li className='md:mb-2 text-sm text-white'><Link href={`${''}?category=oversized`}>Photography</Link></li>
-            <li className='md:mb-2 text-sm text-white'><Link href={`${''}?category=full-sleeves`}>Decor</Link></li>
+            <li className='md:mb-2 text-sm text-white'><Link href={`${WEBSITE_CATEGORY('venues')}`}>Venues </Link></li>
+            <li className='md:mb-2 text-sm text-white'><Link href={`${WEBSITE_CATEGORY('catering')}`}> Food</Link></li>
+            <li className='md:mb-2 text-sm text-white'><Link href={`${WEBSITE_CATEGORY('photography')}`}>Photography</Link></li>
+            <li className='md:mb-2 text-sm text-white'><Link href={`${WEBSITE_CATEGORY('decor')}`}>Decor</Link></li>
           </ul>
         </div>
 
@@ -53,7 +53,7 @@ const Footer = () => {
             <li className='md:mb-2 text-sm text-white'><Link href={WEBSITE_LOGIN}>Login</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href={USER_DASHBOARD}>My Account</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href='/privacy-policy'>Privacy Policy</Link></li>
-            <li className='md:mb-2 text-sm text-white'><Link href='/term-and-conditions'>Terms & Condition</Link></li>
+            <li className='md:mb-2 text-sm text-white'><Link href='/terms-and-conditions'>Terms & Condition</Link></li>
           </ul>
         </div>
 

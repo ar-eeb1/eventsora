@@ -88,7 +88,7 @@ const Search = ({ isShow, onClose }) => {
   return (
     <div
       ref={searchContainerRef}
-      className={`absolute transition-all left-0 py-5 md:px-32 px-5 z-10 bg-[#CE416F] w-full ${isShow ? "top-18" : "-top-full"
+      className={`absolute transition-all left-0 py-5 md:px-32 px-5 z-10 bg-pink-900 w-full ${isShow ? "top-18" : "-top-full"
         }`}
     >
       <form

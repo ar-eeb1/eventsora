@@ -6,7 +6,7 @@ import reviewModel from "@/models/Review.model";
 
 export async function POST(request) {
     try {
-        const auth = await isAuthenticated('user')
+        const auth = await isAuthenticated(['provider', 'user'])
         if (!auth.isAuth) {
             return response(false, 401, 'Unauthorized')
         }

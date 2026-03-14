@@ -66,12 +66,18 @@ const PriceDisplay = ({ amount, className = '' }) => {
   )
 }
 
+const isVariablePricing = (pricingType) =>
+  pricingType === 'per_person' || pricingType === 'per_hour' || pricingType === 'per_day'
+
 // Booking Item Component
 const BookingItem = ({ item, onIncrease, onDecrease, onRemove }) => {
-  const itemPrice = item.variantPrice || item.startingPrice || 0
-  const itemTotal = item.variantTitle === null
-    ? (item.startingPrice || 0)
-    : (item.variantPrice || 0) * (item.quantity || 1)
+  const unitPrice = item.price ?? item.variantPrice ?? item.startingPrice ?? 0
+  const variantPrice = item.variantPrice ?? item.startingPrice ?? 0
+  const useQuantity = isVariablePricing(item.pricingType)
+  const itemTotal = useQuantity
+    ? unitPrice * (item.quantity || 1)
+    : unitPrice
+  const hasDiscount = item.discount != null && item.discount > 0
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Date not set'
@@ -120,7 +126,7 @@ const BookingItem = ({ item, onIncrease, onDecrease, onRemove }) => {
             {item?.variantTitle || 'Standard'}
           </div>
 
-          {item.variantTitle && (
+          {(item.variantTitle || item.pricingType) && (
             <div className='space-y-1 text-sm text-gray-600'>
               <div className='flex justify-between'>
                 <span className='text-gray-500'>Pricing Type:</span>
@@ -130,12 +136,19 @@ const BookingItem = ({ item, onIncrease, onDecrease, onRemove }) => {
               </div>
               <div className='flex justify-between'>
                 <span className='text-gray-500'>Unit Price:</span>
-                <PriceDisplay amount={item.variantPrice} className='font-medium text-gray-700' />
+                <div className='flex flex-col items-end'>
+                  {hasDiscount && (
+                    <span className='text-sm line-through text-gray-400'>
+                      <PriceDisplay amount={variantPrice} />
+                    </span>
+                  )}
+                  <PriceDisplay amount={unitPrice} className='font-medium text-gray-700' />
+                </div>
               </div>
             </div>
           )}
 
-          {item.variantTitle && (
+          {isVariablePricing(item.pricingType) && (
             <QuantitySelector
               item={item}
               onIncrease={onIncrease}
@@ -149,7 +162,14 @@ const BookingItem = ({ item, onIncrease, onDecrease, onRemove }) => {
       <td className='md:p-4 p-3 md:table-cell'>
         <div className='md:block flex justify-between items-center'>
           <span className='md:hidden text-sm text-gray-500'>Price:</span>
-          <PriceDisplay amount={itemPrice} className='font-semibold' />
+          <div className='flex flex-col items-end'>
+            {hasDiscount && (
+              <span className='text-xs line-through text-gray-400'>
+                <PriceDisplay amount={variantPrice * (item.quantity || 1)} />
+              </span>
+            )}
+            <PriceDisplay amount={itemTotal} className='font-semibold' />
+          </div>
         </div>
       </td>
 
@@ -157,7 +177,14 @@ const BookingItem = ({ item, onIncrease, onDecrease, onRemove }) => {
       <td className='md:p-4 p-3 md:table-cell'>
         <div className='flex justify-between items-center md:flex-col md:items-end gap-2'>
           <span className='md:hidden text-sm text-gray-500'>Total:</span>
-          <PriceDisplay amount={itemTotal} className='font-bold text-lg text-pink-600' />
+          <div className='flex flex-col items-end'>
+            {hasDiscount && (
+              <span className='text-xs text-green-600 font-medium'>
+                Discount: <PriceDisplay amount={item.discount} />
+              </span>
+            )}
+            <PriceDisplay amount={itemTotal} className='font-bold text-lg text-pink-600' />
+          </div>
         </div>
       </td>
 
@@ -197,15 +224,17 @@ const EmptyState = () => (
 const BookingSummary = ({ listings }) => {
   const summary = useMemo(() => {
     const subtotal = listings.reduce((total, item) => {
-      return total + (item.variantTitle === null
-        ? item.startingPrice
-        : item.variantPrice * item.quantity)
+      const unitPrice = item.price ?? item.variantPrice ?? item.startingPrice ?? 0
+      const qty = isVariablePricing(item.pricingType) ? (item.quantity || 1) : 1
+      return total + (unitPrice * qty)
     }, 0)
 
+    const totalDiscount = listings.reduce((sum, item) => sum + (item.discount || 0), 0)
+    const originalSubtotal = subtotal + totalDiscount
     const tax = subtotal * 0.0 // Adjust tax rate as needed
     const total = subtotal + tax
 
-    return { subtotal, tax, total, itemCount: listings.length }
+    return { subtotal, totalDiscount, originalSubtotal, tax, total, itemCount: listings.length }
   }, [listings])
 
   return (
@@ -215,8 +244,22 @@ const BookingSummary = ({ listings }) => {
       <div className='space-y-3 mb-6'>
         <div className='flex justify-between text-sm'>
           <span className='text-gray-600'>Items ({summary.itemCount})</span>
-          <PriceDisplay amount={summary.subtotal} className='font-medium' />
+          <div className='flex flex-col items-end'>
+            {summary.totalDiscount > 0 && (
+              <span className='text-xs line-through text-gray-400'>
+                <PriceDisplay amount={summary.originalSubtotal} />
+              </span>
+            )}
+            <PriceDisplay amount={summary.subtotal} className='font-medium' />
+          </div>
         </div>
+
+        {summary.totalDiscount > 0 && (
+          <div className='flex justify-between text-sm text-green-600'>
+            <span>Discount</span>
+            <span className='font-medium'>-<PriceDisplay amount={summary.totalDiscount} /></span>
+          </div>
+        )}
 
         {summary.tax > 0 && (
           <div className='flex justify-between text-sm'>
@@ -234,7 +277,7 @@ const BookingSummary = ({ listings }) => {
       </div>
       <Link href={WEBSITE_CHECKOUT}>
         <Button
-          className='w-full cursor-pointer'
+          className='w-full cursor-pointer bg-pink-700 text-white'
           size='lg'
         >
           Proceed to Checkout
@@ -252,8 +295,6 @@ const BookingSummary = ({ listings }) => {
 
 const BookingPage = () => {
   const booking = useSelector((store) => store.bookingStore)
-  console.log(booking);
-  
   const dispatch = useDispatch()
 
   const [itemToRemove, setItemToRemove] = useState(null)
@@ -317,7 +358,7 @@ const BookingPage = () => {
                         <th className='text-start p-4 font-semibold text-gray-700'>Variant Details</th>
                         <th className='text-start p-4 font-semibold text-gray-700'>Price</th>
                         <th className='text-end p-4 font-semibold text-gray-700'>Total</th>
-                        <th className='text-end p-4 font-semibold text-gray-700'>Action</th>
+                     T   <th className='text-end p-4 font-semibold text-gray-700'>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -369,12 +410,3 @@ const BookingPage = () => {
 }
 
 export default BookingPage
-
-{
-  $or: [
-    { message1: RegExp("\\b\\b", "i") },
-    { message2: RegExp("\\b\\b", "i") },
-    { quizzes: RegExp("\\b\\b", "i") },
-    { romanticLetter: RegExp("\\b\\b", "i") }
-  ]
-}
