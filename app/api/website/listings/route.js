@@ -3,6 +3,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import CategoryModel from "@/models/Category.model";
 import ListingModel from "@/models/Listing.model";
 import SubcategoryModel from "@/models/Subcategory.model";
+import CalendarModel from "@/models/Calendar.model";
 import mongoose from "mongoose";
 
 export async function GET(request) {
@@ -18,6 +19,8 @@ export async function GET(request) {
         const minCapacity = parseInt(searchParams.get('minCapacity')) || 0
         const maxCapacity = parseInt(searchParams.get('maxCapacity')) || 3000
         const search = searchParams.get('q')
+        const filterStartDate = searchParams.get('startDate')
+        const filterEndDate = searchParams.get('endDate')
 
 
         // PAGINATION
@@ -54,6 +57,18 @@ export async function GET(request) {
         let matchStage = {
             status: 'approved'
         }
+
+        // Apply Price and Capacity Filters to Match Stage directly so pagination doesn't break
+        matchStage.$and = [
+            { startingPrice: { $gte: minPrice, $lte: maxPrice } },
+            {
+                $or: [
+                    { capacity: null },
+                    { capacity: { $gte: minCapacity, $lte: maxCapacity } }
+                ]
+            }
+        ];
+
         if (categoryId.length > 0) matchStage.category = { $in: categoryId } // filter by category
         if (subcategoryId.length > 0) matchStage.subcategory = { $in: subcategoryId } // filter by subcategory
 
@@ -74,36 +89,77 @@ export async function GET(request) {
             matchStage.locality = { $in: localityIds }
         }
 
+        if (filterStartDate || filterEndDate) {
+            let startQueryDate = new Date();
+            let endQueryDate = new Date();
+
+            if (filterStartDate) {
+                startQueryDate = new Date(filterStartDate);
+                startQueryDate.setUTCHours(0, 0, 0, 0);
+            } else if (filterEndDate) {
+                startQueryDate = new Date(filterEndDate);
+                startQueryDate.setUTCHours(0, 0, 0, 0);
+            }
+
+            if (filterEndDate) {
+                endQueryDate = new Date(filterEndDate);
+                endQueryDate.setUTCHours(23, 59, 59, 999);
+            } else if (filterStartDate) {
+                endQueryDate = new Date(filterStartDate);
+                endQueryDate.setUTCHours(23, 59, 59, 999);
+            }
+
+            // Find entries for this date range that are either explicitly booked or blocked
+            const unavailableListings = await CalendarModel.find({
+                date: { $gte: startQueryDate, $lte: endQueryDate },
+                dateStatus: { $in: ['booked', 'blocked'] },
+                deletedAt: null
+            }).select('listingId variantId').lean();
+
+            if (unavailableListings.length > 0) {
+                const blockedListingIds = unavailableListings
+                    .filter(item => !item.variantId) // Entire listing is blocked/booked
+                    .map(item => item.listingId);
+                
+                if(blockedListingIds.length > 0) {
+                     matchStage._id = { $nin: blockedListingIds };
+                }
+            }
+        }
+
+
+        let blockedVariantIds = [];
+        if (filterStartDate || filterEndDate) {
+             let startQueryDate = new Date();
+             let endQueryDate = new Date();
+             if (filterStartDate) { startQueryDate = new Date(filterStartDate); startQueryDate.setUTCHours(0, 0, 0, 0); } else if (filterEndDate) { startQueryDate = new Date(filterEndDate); startQueryDate.setUTCHours(0, 0, 0, 0); }
+             if (filterEndDate) { endQueryDate = new Date(filterEndDate); endQueryDate.setUTCHours(23, 59, 59, 999); } else if (filterStartDate) { endQueryDate = new Date(filterStartDate); endQueryDate.setUTCHours(23, 59, 59, 999); }
+             
+             const unavailableVariants = await CalendarModel.find({
+                date: { $gte: startQueryDate, $lte: endQueryDate },
+                dateStatus: { $in: ['booked', 'blocked'] },
+                variantId: { $ne: null },
+                deletedAt: null
+            }).select('variantId').lean();
+            
+            if(unavailableVariants.length > 0) {
+                blockedVariantIds = unavailableVariants.map(item => item.variantId);
+            }
+        }
 
         // AGGREAGATION PIPELINE
-        // AGGREGATION PIPELINE
         const listings = await ListingModel.aggregate([
             { $match: matchStage },
             { $sort: sortQuery },
             { $skip: skip },
             { $limit: limit + 1 },
 
-            // Filter listings by their own price and capacity
-            {
-                $match: {
-                    $and: [
-                        { startingPrice: { $gte: minPrice, $lte: maxPrice } },
-                        {
-                            $or: [
-                                { capacity: null },
-                                { capacity: { $gte: minCapacity, $lte: maxCapacity } }
-                            ]
-                        }
-                    ]
-                }
-            },
-
             // Lookup variants (just for display, not for filtering)
             {
                 $lookup: {
                     from: 'listingvariants',
                     localField: '_id',
-                    foreignField: 'listing',
+                    foreignField: 'listingId',
                     as: 'variants'
                 }
             },
@@ -117,6 +173,7 @@ export async function GET(request) {
                             as: 'variant',
                             cond: {
                                 $and: [
+                                    { $not: { $in: ["$$variant._id", blockedVariantIds] } },
                                     { $gte: ["$$variant.startingPrice", minPrice] },
                                     { $lte: ["$$variant.startingPrice", maxPrice] },
                                     {

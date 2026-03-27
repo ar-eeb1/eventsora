@@ -15,7 +15,9 @@ import { WEBSITE_BOOKING_DETAILS, WEBSITE_BOOKINGS, WEBSITE_LISTING_DETAILS } fr
 import { zSchema } from '@/lib/zodSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { Textarea } from '@/components/ui/textarea'
 import ButtonLoading from '@/components/application/ButtonLoading'
@@ -67,6 +69,10 @@ const CheckoutPage = () => {
     phone: true,
     note: true,
     userId: true,
+  }).extend({
+    eventType: z.string().min(1, 'Event type is required'),
+    timeSlot: z.string().min(1, 'Time slot is required'),
+    guestCount: z.coerce.number().min(1, 'Guest count is required')
   })
 
   const bookingForm = useForm({
@@ -76,6 +82,9 @@ const CheckoutPage = () => {
       email: '',
       phone: '',
       note: '',
+      eventType: '',
+      timeSlot: '',
+      guestCount: '',
       userId: auth?._id,
     }
   })
@@ -240,6 +249,73 @@ const CheckoutPage = () => {
 
                     </div>
 
+                    <div className='mb-3'>
+                      <FormField
+                        control={bookingForm.control}
+                        name='eventType'
+                        render={({ field }) => (
+                          <FormItem>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Event Type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Wedding">Wedding</SelectItem>
+                                <SelectItem value="Birthday">Birthday</SelectItem>
+                                <SelectItem value="Corporate">Corporate</SelectItem>
+                                <SelectItem value="Party">Party</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className='mb-3'>
+                      <FormField
+                        control={bookingForm.control}
+                        name='timeSlot'
+                        render={({ field }) => (
+                          <FormItem>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Time Slot" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Morning (9 AM - 1 PM)">Morning (9 AM - 1 PM)</SelectItem>
+                                <SelectItem value="Afternoon (1 PM - 5 PM)">Afternoon (1 PM - 5 PM)</SelectItem>
+                                <SelectItem value="Evening (5 PM - 9 PM)">Evening (5 PM - 9 PM)</SelectItem>
+                                <SelectItem value="Night (9 PM - 1 AM)">Night (9 PM - 1 AM)</SelectItem>
+                                <SelectItem value="Full Day">Full Day</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className='mb-3'>
+                      <FormField
+                        control={bookingForm.control}
+                        name='guestCount'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input type="number" {...field} placeholder="Guest Count" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
                     <div className='mb-3 col-span-2'>
                       <FormField
                         control={bookingForm.control}
@@ -254,6 +330,10 @@ const CheckoutPage = () => {
                         )}
                       />
 
+                    </div>
+
+                    <div className="col-span-2 mb-3 mt-2 p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200">
+                      <strong>Note:</strong> Please send 20% advance for confirming the booking, otherwise the booking will be declined.
                     </div>
 
                     <div className='mb-3 text-end col-span-2'>
@@ -288,7 +368,7 @@ const CheckoutPage = () => {
                         <tr key={`${listing.listingId}-${listing.variantId}-${i}`} className='border-b last:border-0'>
                           <td className='py-3'>
                             <div className='flex items-center gap-4'>
-                              <div className='relative w-12 h-12 rounded overflow-hidden border'>
+                              <div className='relative w-20 h-20 rounded overflow-hidden border'>
                                 <Image
                                   src={listing.thumbnail?.secure_url || listing.media}
                                   fill
@@ -299,8 +379,11 @@ const CheckoutPage = () => {
                               <div className='flex flex-col'>
                                 <Link href={WEBSITE_LISTING_DETAILS(listing?.slug)} className='font-semibold line-clamp-2 hover:text-pink-600 transition-colors mb-1'>{listing.listingName}</Link>
                                 {listing.variantTitle && (
-                                  <span className='text-xs text-gray-500 rounded-full bg-white w-fit px-4'>{listing.variantTitle}</span>
+                                  <span className='text-xs text-gray-500 rounded-full bg-white w-fit px-2'>{listing.variantTitle}</span>
                                 )}
+                                <div className='text-md font-bold text-pink-600 w-fit px-2 mt-2'>
+                                  Date: {listing.bookingDate}
+                                </div>
                               </div>
                             </div>
                           </td>

@@ -141,7 +141,7 @@ const Booking = () => {
                                             <Link
                                                 href={WEBSITE_LISTING_DETAILS(listing.url)}
                                                 target='_blank'
-                                                className='flex-shrink-0'
+                                                className='shrink-0'
                                                 aria-label={`View ${listing.listingName} details`}
                                             >
                                                 <div className='relative w-24 h-24 rounded-md overflow-hidden bg-gray-100'>
@@ -204,7 +204,7 @@ const Booking = () => {
                                             </div>
 
                                             {/* Delete Button */}
-                                            <div className='flex-shrink-0'>
+                                            <div className='shrink-0'>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

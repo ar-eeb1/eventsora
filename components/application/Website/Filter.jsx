@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { WEBSITE_CATEGORY } from '@/routes/WebsiteRoute'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { Input } from '@/components/ui/input'
 
 const Filter = () => {
   const [capacityFilter, setCapacityFilter] = useState({ minCapacity: 0, maxCapacity: 3000 })
@@ -22,6 +23,8 @@ const Filter = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState([])
   const [city, setCity] = useState([])
   const [locality, setLocality] = useState([])
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
   const category = params.category
   const [subcategoryList, setSubcategoryList] = useState([])
@@ -36,6 +39,8 @@ const Filter = () => {
     searchParams.get('subcategory') ? setSelectedSubcategory(searchParams.get('subcategory').split(',')) : setSelectedSubcategory([])
     searchParams.get('city') ? setCity(searchParams.get('city').split(',')) : setCity([])
     searchParams.get('locality') ? setLocality(searchParams.get('locality').split(',')) : setLocality([])
+    searchParams.get('startDate') ? setStartDate(searchParams.get('startDate')) : setStartDate('')
+    searchParams.get('endDate') ? setEndDate(searchParams.get('endDate')) : setEndDate('')
   }, [searchParams])
 
 
@@ -104,6 +109,20 @@ const Filter = () => {
   const handleCapacityFilter = () => {
     urlSearchParams.set('minCapacity', capacityFilter.minCapacity)
     urlSearchParams.set('maxCapacity', capacityFilter.maxCapacity)
+    router.push(`${WEBSITE_CATEGORY(`${category}`)}?${urlSearchParams}`)
+  }
+
+  const handleDateFilter = () => {
+    if (startDate) {
+      urlSearchParams.set('startDate', startDate)
+    } else {
+      urlSearchParams.delete('startDate')
+    }
+    if (endDate) {
+      urlSearchParams.set('endDate', endDate)
+    } else {
+      urlSearchParams.delete('endDate')
+    }
     router.push(`${WEBSITE_CATEGORY(`${category}`)}?${urlSearchParams}`)
   }
 
@@ -227,6 +246,53 @@ const Filter = () => {
           </AccordionContent>
         </AccordionItem>
 
+      </Accordion>
+
+      <Accordion type="multiple" defaultValue={['6']} className='mt-2'>
+        <AccordionItem value="6">
+          <AccordionTrigger className='uppercase font-semibold hover:no-underline'>
+            AVAILABILITY DATE
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className='flex gap-2 mb-3 flex-col'>
+              <div className='w-full'>
+                <span className='text-xs mb-1 block'>From</span>
+                <Input 
+                  type="date" 
+                  value={startDate} 
+                  onChange={(e) => setStartDate(e.target.value)} 
+                />
+              </div>
+              <div className='w-full'>
+                <span className='text-xs mb-1 block'>To</span>
+                <Input 
+                  type="date" 
+                  value={endDate} 
+                  onChange={(e) => setEndDate(e.target.value)} 
+                />
+              </div>
+            </div>
+            <div className='mt-2 flex gap-2'>
+              <ButtonLoading onClick={handleDateFilter} type='button' text='Filter Date' className='rounded-full w-full' />
+              {(searchParams.get('startDate') || searchParams.get('endDate')) && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className='rounded-full w-full'
+                  onClick={() => {
+                    setStartDate('')
+                    setEndDate('')
+                    urlSearchParams.delete('startDate')
+                    urlSearchParams.delete('endDate')
+                    router.push(`${WEBSITE_CATEGORY(`${category}`)}?${urlSearchParams}`)
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
     </div>
   )

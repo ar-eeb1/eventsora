@@ -3,14 +3,15 @@ import BreadCrumb from '@/components/application/BreadCrumb'
 import { Button } from '@/components/ui/button'
 import { WEBSITE_HOME } from '@/routes/AdminPanelRoute'
 import Link from 'next/link'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
+import { showToast } from '@/lib/showToast'
 import { useDispatch, useSelector } from 'react-redux'
 import imgPlaceholder from '@/public/assets/img-placeholder.png'
 import Image from 'next/image'
 import { WEBSITE_CHECKOUT, WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
 import { Package, Trash2, Calendar, ShoppingBag } from 'lucide-react'
 import { BiMinus, BiPlus } from 'react-icons/bi'
-import { decreaseQuantity, increaseQuantity, removeFromBooking } from '@/store/reducer/bookingReducer'
+import { decreaseQuantity, increaseQuantity, removeFromBooking, updateQuantity } from '@/store/reducer/bookingReducer'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 const breadCrumbData = [
@@ -19,9 +20,40 @@ const breadCrumbData = [
 ]
 
 // Reusable QuantitySelector Component
-const QuantitySelector = ({ item, onIncrease, onDecrease }) => {
+const QuantitySelector = ({ item, onIncrease, onDecrease, onUpdateQuantity }) => {
   const minQuantity = item.minPersons || 1
   const maxQuantity = item.maxPersons || 999
+  const [inputValue, setInputValue] = useState(item.quantity || 1)
+
+  useEffect(() => {
+    setInputValue(item.quantity || 1)
+  }, [item.quantity])
+
+  const handleBlur = () => {
+    let val = parseInt(inputValue, 10)
+    if (isNaN(val) || val < minQuantity) {
+      showToast('error', `Minimum quantity allowed is ${minQuantity}`)
+      val = minQuantity
+    } else if (val > maxQuantity) {
+      showToast('error', `Maximum quantity allowed is ${maxQuantity}`)
+      val = maxQuantity
+    }
+    setInputValue(val)
+    if (val !== item.quantity) {
+      onUpdateQuantity(item, val)
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleBlur()
+    }
+  }
+
+  const handleChange = (e) => {
+    setInputValue(e.target.value)
+  }
 
   return (
     <div className='flex items-center h-10 border w-fit rounded-full mt-2 bg-white'>
@@ -35,10 +67,12 @@ const QuantitySelector = ({ item, onIncrease, onDecrease }) => {
         <BiMinus size={18} />
       </button>
       <input
-        type="text"
-        value={item.quantity || 1}
+        type="number"
+        value={inputValue}
         className='w-14 text-center border-none outline-none bg-transparent font-medium'
-        readOnly
+        onChange={handleChange}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
         aria-label={`Quantity: ${item.quantity}`}
       />
       <button
@@ -70,7 +104,7 @@ const isVariablePricing = (pricingType) =>
   pricingType === 'per_person' || pricingType === 'per_hour' || pricingType === 'per_day'
 
 // Booking Item Component
-const BookingItem = ({ item, onIncrease, onDecrease, onRemove }) => {
+const BookingItem = ({ item, onIncrease, onDecrease, onRemove, onUpdateQuantity }) => {
   const unitPrice = item.price ?? item.variantPrice ?? item.startingPrice ?? 0
   const variantPrice = item.variantPrice ?? item.startingPrice ?? 0
   const useQuantity = isVariablePricing(item.pricingType)
@@ -153,6 +187,7 @@ const BookingItem = ({ item, onIncrease, onDecrease, onRemove }) => {
               item={item}
               onIncrease={onIncrease}
               onDecrease={onDecrease}
+              onUpdateQuantity={onUpdateQuantity}
             />
           )}
         </div>
@@ -316,6 +351,15 @@ const BookingPage = () => {
     }))
   }
 
+  const handleUpdateQuantity = (item, quantity) => {
+    dispatch(updateQuantity({
+      listingId: item.listingId,
+      variantId: item.variantId,
+      bookingDate: item.bookingDate,
+      quantity
+    }))
+  }
+
   const handleRemoveClick = (item) => {
     setItemToRemove(item)
     setShowRemoveDialog(true)
@@ -335,7 +379,7 @@ const BookingPage = () => {
 
 
   return (
-    <div className='lg:px-32 px-4 mt-10 mb-20'>
+    <div className='lg:px-20 md:px-10 px-10 my-20'>
       <BreadCrumb breadCrumbData={breadCrumbData} />
 
       {booking.count === 0 ? (
@@ -369,6 +413,7 @@ const BookingPage = () => {
                           onIncrease={handleIncrease}
                           onDecrease={handleDecrease}
                           onRemove={handleRemoveClick}
+                          onUpdateQuantity={handleUpdateQuantity}
                         />
                       ))}
                     </tbody>

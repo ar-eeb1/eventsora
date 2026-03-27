@@ -24,7 +24,7 @@ export async function POST(request) {
             currency: 'PKR'
         }
 
-        const booking_id = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+        const booking_id = 'BK-' + crypto.randomBytes(4).toString('hex').toUpperCase();
         return response(true, 200, 'Booking ID Created',booking_id)
 
     } catch (error) {

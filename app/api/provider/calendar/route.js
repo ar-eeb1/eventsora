@@ -26,7 +26,11 @@ export async function GET(request) {
         // Build query
         const query = { deletedAt: null };
         if (listingId) query.listingId = listingId;
-        if (variantId) query.variantId = variantId;
+        if (variantId) {
+            query.variantId = variantId;
+        } else {
+            query.variantId = null;
+        }
 
         // Fetch calendar entries
         let calendarData = await CalendarModel.find(query)
@@ -43,6 +47,8 @@ export async function GET(request) {
 
         if (variantId) {
             matchConditions.push({ 'listings.variantId': new mongoose.Types.ObjectId(variantId) });
+        } else {
+            matchConditions.push({ 'listings.variantId': null });
         }
 
         const BookingModel = require('@/models/Booking.model').default;

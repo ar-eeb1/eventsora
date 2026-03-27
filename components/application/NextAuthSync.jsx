@@ -1,7 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { login } from '@/store/reducer/authReducer'
 import { useRouter } from 'next/navigation'
 import { USER_DASHBOARD } from '@/routes/WebsiteRoute'
@@ -13,9 +13,10 @@ export default function NextAuthSync() {
     const { data: session, status } = useSession()
     const dispatch = useDispatch()
     const router = useRouter()
+    const isAuthenticated = useSelector(state => state.authStore.auth)
 
     useEffect(() => {
-        if (status === 'authenticated' && session?.user) {
+        if (status === 'authenticated' && session?.user && !isAuthenticated) {
             // NextAuth login succeeded and our backend updated MongoDB and cookies
             // Now sync the frontend Redux state
             const userData = {

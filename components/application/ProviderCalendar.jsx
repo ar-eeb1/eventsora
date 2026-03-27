@@ -25,7 +25,7 @@ const calendarFormSchema = z.object({
     price: z.number().min(0, 'Price cannot be negative').default(0),
 })
 
-const ProviderCalendar = () => {
+const ProviderCalendar = ({ isPage = false }) => {
     const [selectedDates, setSelectedDates] = useState([])
     const [calendarData, setCalendarData] = useState({})
     const [isLoadingCalendar, setIsLoadingCalendar] = useState(false)
@@ -48,11 +48,18 @@ const ProviderCalendar = () => {
     const { data: variantsResponse } = useFetch(listingId ? `/api/provider/variants-by-listing?listingId=${listingId}` : null)
 
     const listingOptions = listingsResponse?.data?.map(l => ({ label: l.name, value: l._id })) || []
-    const variantOptions = [
-        { label: 'Main Listing (No Variant)', value: '' },
-        ...(variantsResponse?.data?.map(v => ({ label: v.title, value: v._id })) || [])
-    ]
+    const variantOptions = variantsResponse?.data?.length > 0 
+        ? variantsResponse.data.map(v => ({ label: v.title, value: v._id }))
+        : []
     const hasVariants = variantsResponse?.data?.length > 0
+
+    useEffect(() => {
+        if (variantsResponse?.data && variantsResponse.data.length > 0) {
+            form.setValue('variantId', variantsResponse.data[0]._id)
+        } else {
+            form.setValue('variantId', '')
+        }
+    }, [variantsResponse?.data, form])
 
     const statusOptions = dateStatus.map(status => ({
         label: status.charAt(0).toUpperCase() + status.slice(1),
@@ -123,7 +130,7 @@ const ProviderCalendar = () => {
         }
     }
 
-    const [calendarOpen, setCalendarOpen] = useState(false)
+    const [calendarOpen, setCalendarOpen] = useState(isPage)
 
     return (
         <Card className='rounded-sm border shadow-sm overflow-hidden bg-white mt-6 pb-0 dark:bg-gray-950'>
@@ -147,16 +154,18 @@ const ProviderCalendar = () => {
                             Update {selectedDates.length} Selected
                         </Button>
                     )}
-                    <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setCalendarOpen(o => !o)}
-                        className="flex items-center gap-2"
-                    >
-                        <CalendarIcon className="w-4 h-4" />
-                        {calendarOpen ? <ArrowDropUpRounded /> : <ArrowDropDownRounded />}
-                    </Button>
+                    {!isPage && (
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setCalendarOpen(o => !o)}
+                            className="flex items-center gap-2"
+                        >
+                            <CalendarIcon className="w-4 h-4" />
+                            {calendarOpen ? <ArrowDropUpRounded /> : <ArrowDropDownRounded />}
+                        </Button>
+                    )}
                 </div>
 
                 <div
@@ -192,7 +201,7 @@ const ProviderCalendar = () => {
                                     options={variantOptions}
                                     selected={form.watch('variantId')}
                                     setSelected={(val) => form.setValue('variantId', val)}
-                                    placeholder="Main Listing"
+                                    placeholder="Select Variant"
                                     className="bg-white dark:bg-gray-900"
                                 />
                             </div>

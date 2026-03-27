@@ -10,17 +10,20 @@ import LatestBooking from './LatestBooking'
 import LatestReview from './LatestReview'
 import { PROVIDER_BOOKINGS_SHOW } from '@/routes/ProviderPanelRoute'
 import ProviderCalendar from '@/components/application/ProviderCalendar'
-// import RandomListing from './RandomListing'
+import BookingStats from './BookingStats'
+import UpcomingEvents from './UpcomingEvents'
 
 const ProviderDashboard = () => {
   return (
     <div className='pt-5'>
       <CountOverview />
+      <BookingStats />
       <QuickAdd />
 
       {/* <div className='mt-10 grid lg:grid-cols-12 grid-cols-1 gap-10 items-start'>
         <div className='lg:col-span-8'> */}
       <ProviderCalendar />
+      <UpcomingEvents />
       {/* </div>
         <div className='lg:col-span-4'>
           <div className='flex items-center justify-between mb-4'>

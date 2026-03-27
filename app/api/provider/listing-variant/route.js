@@ -73,7 +73,7 @@ export async function GET(request) {
             {
                 $lookup: {
                     from: 'listings',
-                    localField: 'listing',
+                    localField: 'listingId',
                     foreignField: '_id',
                     as: 'listingData'
                 }
@@ -91,6 +91,7 @@ export async function GET(request) {
                 $project: {
                     _id: 1,
                     listing: "$listingData.name",
+                    listingId: 1,
                     title: 1,
                     serviceCode: 1,
                     startingPrice: 1,

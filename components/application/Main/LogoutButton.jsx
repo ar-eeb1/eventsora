@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
+import { signOut } from 'next-auth/react'
+
 const LogoutButton = () => {
     const router = useRouter()
     const dispatch = useDispatch()
@@ -19,6 +21,7 @@ const LogoutButton = () => {
             }
 
             dispatch(logout())
+            await signOut({ redirect: false })
             router.push(WEBSITE_LOGIN)
             showToast('success', logoutResponse.message)
         } catch (error) {

@@ -15,61 +15,83 @@ export async function GET(request) {
         await connectDB();
         const userObjectId = new mongoose.Types.ObjectId(auth.userId);
 
-        // Find all listings owned by this provider
-        const providerListings = await ListingModel.find({ userId: userObjectId }).select('_id').lean();
-        const listingIds = providerListings.map(l => l._id);
-
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const [listing, bookings, todayBookings, earningsData] = await Promise.all([
-            ListingModel.countDocuments({ deletedAt: null, userId: auth.userId }),
-            bookingModel.countDocuments({ 'listings.listingId': { $in: listingIds }, deletedAt: null }),
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        const [listing, bookings, todayBookings, earningsData, monthlyData, paymentData] = await Promise.all([
+            ListingModel.countDocuments({ deletedAt: null, userId: userObjectId }),
+
+            bookingModel.countDocuments({ providerId: userObjectId, deletedAt: null }),
+
             bookingModel.countDocuments({
-                'listings.listingId': { $in: listingIds },
+                providerId: userObjectId,
                 createdAt: { $gte: today },
                 deletedAt: null
             }),
+
+            // Total earnings (paid bookings)
+            bookingModel.aggregate([
+                { $match: { providerId: userObjectId, paymentStatus: 'paid', deletedAt: null } },
+                { $group: { _id: null, totalEarnings: { $sum: '$totalAmount' } } }
+            ]),
+
+            // Monthly bookings: total + confirmed
             bookingModel.aggregate([
                 {
                     $match: {
-                        'listings.listingId': { $in: listingIds },
-                        paymentStatus: 'paid',
+                        providerId: userObjectId,
+                        createdAt: { $gte: monthStart },
                         deletedAt: null
-                    }
-                },
-                {
-                    $addFields: {
-                        providerItems: {
-                            $filter: {
-                                input: "$listings",
-                                as: "item",
-                                cond: { $in: ["$$item.listingId", listingIds] }
-                            }
-                        }
                     }
                 },
                 {
                     $group: {
                         _id: null,
-                        totalEarnings: {
-                            $sum: {
-                                $reduce: {
-                                    input: "$providerItems",
-                                    initialValue: 0,
-                                    in: { $add: ["$$value", { $multiply: ["$$this.price", "$$this.quantity"] }] }
-                                }
-                            }
+                        total: { $sum: 1 },
+                        confirmed: {
+                            $sum: { $cond: [{ $eq: ['$bookingStatus', 'confirmed'] }, 1, 0] }
                         }
                     }
                 }
+            ]),
+
+            // Payment stats: total advance received + total remaining balance
+            bookingModel.aggregate([
+                { $match: { providerId: userObjectId, deletedAt: null } },
+                {
+                    $group: {
+                        _id: null,
+                        totalAdvance: { $sum: '$advance' },
+                        totalReceived: { $sum: '$receivedAmount' },
+                        totalCharges: { $sum: '$totalAmount' }
+                    }
+                }
             ])
-        ])
+        ]);
 
-        const earnings = earningsData.length > 0 ? earningsData[0].totalEarnings : 0;
+        const earnings = earningsData[0]?.totalEarnings || 0;
+        const monthlyBookings = monthlyData[0]?.total || 0;
+        const monthlyConfirmed = monthlyData[0]?.confirmed || 0;
+        const totalAdvance = paymentData[0]?.totalAdvance || 0;
+        const totalReceived = paymentData[0]?.totalReceived || 0;
+        const totalCharges = paymentData[0]?.totalCharges || 0;
+        const pendingPayments = totalCharges - totalReceived;
 
-        return response(true, 200, 'Dashboard Count', { listing, bookings, todayBookings, earnings })
+        return response(true, 200, 'Dashboard Count', {
+            listing,
+            bookings,
+            todayBookings,
+            earnings,
+            monthlyBookings,
+            monthlyConfirmed,
+            totalAdvance,
+            pendingPayments
+        });
     } catch (error) {
         return catchError(error);
     }
 }
+
+

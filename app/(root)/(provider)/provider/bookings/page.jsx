@@ -8,6 +8,8 @@ import DatatableWrapper from '@/components/application/Main/DatatableWrapper'
 import { columnConfig } from '@/lib/helperFunction'
 import ViewAction from '@/components/application/Main/ViewAction'
 import { useSearchParams } from 'next/navigation'
+import ManualBookingModal from './ManualBookingModal'
+import ReceivePaymentAction from './ReceivePaymentAction'
 
 const breadCrumbData = [
     { href: PROVIDER_DASHBOARD, label: 'Dashboard' },
@@ -30,6 +32,7 @@ const ShowBookings = () => {
     const action = useCallback((row) => {
         let actionMenu = []
         actionMenu.push(<ViewAction key='view' href={PROVIDER_BOOKINGS_DETAILS(row.original.booking_id)} />)
+        actionMenu.push(<ReceivePaymentAction key='payment' booking={row.original} />)
         return actionMenu
     }, [])
 
@@ -44,6 +47,7 @@ const ShowBookings = () => {
                 <CardHeader className='pt-3 px-3 border-b [.border-b]:pb-2'>
                     <div className='flex items-center justify-between'>
                         <h4 className='text-xl font-semibold'>{title}</h4>
+                        <ManualBookingModal />
                     </div>
                 </CardHeader>
                 <CardContent className='px-0'>

@@ -27,10 +27,39 @@ const bookingSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    advance: {
+        type: Number,
+        default: 0
+    },
+    receivedAmount: {
+        type: Number,
+        default: 0
+    },
+    paymentMethod: {
+        type: String,
+        default: 'Online'
+    },
     paymentStatus: {
         type: String,
         enum: paymentStatus,
         default: 'pending'
+    },
+    eventType: {
+        type: String,
+        required: false
+    },
+    timeSlot: {
+        type: String,
+        required: false
+    },
+    guestCount: {
+        type: Number,
+        required: false
+    },
+    bookingSource: {
+        type: String,
+        enum: ['website', 'manual'],
+        default: 'website'
     },
     listings: [
         {
@@ -61,7 +90,19 @@ const bookingSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
         index: true
-    }
+    },
+    isReviewed: {
+        type: Boolean,
+        default: false
+    },
+    review: {
+        type: String,
+        required: false
+    },
+    rating: {
+        type: Number,
+        required: false
+    },
 
 
 }, { timestamps: true })

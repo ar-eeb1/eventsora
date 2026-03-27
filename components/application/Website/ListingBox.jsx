@@ -18,7 +18,7 @@ const ListingBox = ({ listing }) => {
     return (
         <Link href={WEBSITE_LISTING_DETAILS(listing.slug)} className='bg-white rounded-md shadow-sm transition-transform duration-200 ease-in-out hover:-translate-y-2 hover:shadow-2xl'>
             {/* Image Container */}
-            <div className='relative w-full h-48 overflow-hidden'>
+            <div className='relative w-full h-48 overflow-hidden rounded-md shadow-xl'>
                 <Image
                     src={imageUrl}
                     fill
@@ -27,7 +27,7 @@ const ListingBox = ({ listing }) => {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 {capacity &&
-                    <div className='flex items-center gap-2 text-gray-600 absolute right-5 top-2 bg-[#F8E7E6] px-2 rounded-full py-1'>
+                    <div className='flex items-center gap-2 text-gray-600 absolute right-2 top-2 bg-[#F8E7E6] px-2 rounded-full py-1'>
                         <Users size={15} className='text-pink-700' aria-hidden="true" />
                         <span className='text-xs font-medium'>
                             {capacity} {capacity === 1 ? 'Guest' : 'Guests'}

@@ -15,6 +15,7 @@ import { PROVIDER_DASHBOARD } from '@/routes/ProviderPanelRoute'
 import Select from '@/components/application/Main/Select'
 import { bookingStatus } from '@/lib/utils'
 import StatusBadge from '@/components/application/StatusBadge'
+import ReceivePaymentModal from '../../ReceivePaymentModal'
 
 
 const breadCrumbData = [
@@ -27,8 +28,6 @@ const BookingDetails = () => {
   const [booking, setBooking] = useState(null)
   const [loading, setLoading] = useState(true)
 
-
-
   const [statusOptions, setStatusOptions] = useState([])
 
   useEffect(() => {
@@ -39,7 +38,6 @@ const BookingDetails = () => {
       disabled: s === 'confirmed' && booking?.paymentStatus !== 'paid'
     })))
   }, [booking?.paymentStatus])
-
 
   const handleStatusUpdate = async (type, newValue) => {
     if (newValue === 'confirmed' && booking.paymentStatus !== 'paid') {
@@ -184,7 +182,7 @@ const BookingDetails = () => {
                         className="relative w-20 h-20 rounded-lg overflow-hidden border shrink-0 hover:opacity-80 transition-opacity"
                       >
                         <Image
-                          src={item.media || '/placeholder-image.png'}
+                          src={item.mediaUrl || '/placeholder-image.png'}
                           fill
                           alt={item.name}
                           className="object-cover"
@@ -221,13 +219,33 @@ const BookingDetails = () => {
                 </div>
               </CardContent>
 
-              <div className="px-6 border-t pt-4">
+              <div className="px-6 border-t pt-4 space-y-2 pb-4">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg text-gray-900">Total Amount</span>
                   <span className="font-extrabold text-2xl text-pink-600">
                     {booking.totalAmount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
                   </span>
                 </div>
+                {(() => {
+                  const received = (booking.receivedAmount || 0) 
+                  const remaining = booking.totalAmount - received
+                  return (
+                    <>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Amount Received</span>
+                        <span className="font-semibold text-green-600">
+                          {received.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm border-t pt-2">
+                        <span className="font-semibold text-gray-700">Remaining Balance</span>
+                        <span className={`font-bold ${remaining > 0 ? 'text-red-500' : 'text-green-600'}`}>
+                          {remaining <= 0 ? 'Fully Paid' : remaining.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                        </span>
+                      </div>
+                    </>
+                  )
+                })()}
               </div>
             </Card>
 
@@ -313,8 +331,14 @@ const BookingDetails = () => {
                     selected={booking.bookingStatus}
                     setSelected={(val) => handleStatusUpdate('booking', val)}
                     placeholder="Update Booking"
+                    disabled={booking.bookingSource === 'website'}
                   />
-                  {booking.status !== 'paid' && (
+                  {booking.bookingSource === 'website' && (
+                    <p className="text-[10px] text-amber-600 font-medium leading-tight">
+                      * Website bookings cannot be edited manually.
+                    </p>
+                  )}
+                  {booking.bookingStatus !== 'confirmed' && booking.paymentStatus !== 'paid' && (
                     <p className="text-[10px] text-red-500 font-medium leading-tight">
                       * Payment must be paid before you can confirm the booking.
                     </p>
@@ -330,6 +354,10 @@ const BookingDetails = () => {
         <div className="mt-12 text-center px-5 flex justify-center gap-4">
           <Button variant="outline" asChild className="rounded-full px-8">
             <a href={PROVIDER_DASHBOARD}>Back to Dashboard</a>
+          </Button>
+          <ReceivePaymentModal booking={booking} onSuccess={() => window.location.reload()} />
+          <Button className="rounded-full px-8 bg-blue-600 hover:bg-blue-700" onClick={() => window.open(`/provider/bookings/invoice/${booking.booking_id || booking._id}`, '_blank')}>
+            Print Invoice
           </Button>
         </div>
       </div>

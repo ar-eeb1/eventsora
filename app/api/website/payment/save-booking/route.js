@@ -4,6 +4,7 @@ import { zSchema } from "@/lib/zodSchema";
 import z from "zod";
 import { getVerifiedBookingData } from "@/lib/bookingVerification";
 import BookingModel from "@/models/Booking.model";
+import CalendarModel from "@/models/Calendar.model";
 import crypto from 'crypto';
 import { bookingNotification } from "@/email/bookingNotification";
 import { ownerBookingNotification } from "@/email/ownerBookingNotification";
@@ -22,6 +23,9 @@ export async function POST(request) {
             note: true,
             userId: true,
         }).extend({
+            eventType: z.string().optional().nullable(),
+            timeSlot: z.string().optional().nullable(),
+            guestCount: z.coerce.number().optional().nullable(),
             listings: z.array(z.object({
                 listingId: z.string().length(24, 'Invalid Listing id format'),
                 variantId: z.string().length(24, 'Invalid Variant id format').nullable().optional(),
@@ -34,7 +38,7 @@ export async function POST(request) {
         if (!validate.success) {
             return response(false, 400, 'Invalid or missing Fields', { error: validate.error })
         }
-        const { name, email, phone, note, userId, listings: rawListings } = validate.data
+        const { name, email, phone, note, userId, eventType, timeSlot, guestCount, listings: rawListings } = validate.data
 
         // Server-side verification of listings and price
         const { listings: verifiedListings } = await getVerifiedBookingData(rawListings)
@@ -58,7 +62,7 @@ export async function POST(request) {
 
         // For each provider group, create a separate booking
         for (const [providerId, providerListings] of Object.entries(groupedByProvider)) {
-            const booking_id = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+            const booking_id = 'BK-' + crypto.randomBytes(4).toString('hex').toUpperCase();
 
             // Calculate total for this provider's items
             const isVariablePricing = (pt) => pt === 'per_person' || pt === 'per_hour' || pt === 'per_day';
@@ -74,6 +78,10 @@ export async function POST(request) {
                 email,
                 phone,
                 note,
+                eventType,
+                timeSlot,
+                guestCount,
+                bookingSource: 'website',
                 totalAmount: providerTotalWithQuantities,
                 booking_id,
                 providerId: providerId,
@@ -93,6 +101,30 @@ export async function POST(request) {
             });
 
             createdBookings.push(newBooking);
+
+            // Sync with Calendar
+            try {
+                const calendarPromises = providerListings.flatMap(item => {
+                    if (item.bookingDate && item.bookingDate.length > 0) {
+                        return item.bookingDate.map(bDate => {
+                            const filter = {
+                                listingId: item.listingId,
+                                variantId: item.variantId || null,
+                                date: new Date(bDate)
+                            };
+                            return CalendarModel.findOneAndUpdate(
+                                filter,
+                                { $set: { dateStatus: 'booked' } },
+                                { upsert: true, new: true, setDefaultsOnInsert: true }
+                            );
+                        });
+                    }
+                    return [];
+                });
+                await Promise.all(calendarPromises);
+            } catch (calendarError) {
+                console.error('Calendar sync error:', calendarError);
+            }
 
             // Send Email to this Provider
             try {

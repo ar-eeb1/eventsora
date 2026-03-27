@@ -210,12 +210,12 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     // Initialize quantity based on active variant's minimum persons
     const [qty, setQty] = useState(activeVariant?.minPersons || 1)
     const increment = () => {
-        setQty(prev => prev + 10)
+        setQty(prev => prev + 1)
     }
 
     const decrement = () => {
         const minPersons = activeVariant?.minPersons || 1
-        setQty(prev => Math.max(prev - 10, minPersons))
+        setQty(prev => Math.max(prev - 1, minPersons))
     }
 
     // Update quantity when active variant changes

@@ -28,7 +28,7 @@ export const bookingReducer = createSlice({
                     JSON.stringify([...(listing.bookingDate || [])].sort()) === JSON.stringify([...(bookingDate || [])].sort())
             )
             if (existingBooking >= 0) {
-                state.listings[existingBooking].quantity += 10
+                state.listings[existingBooking].quantity += 1
             }
         },
         decreaseQuantity: (state, action) => {
@@ -40,8 +40,19 @@ export const bookingReducer = createSlice({
             )
             if (existingBooking >= 0) {
                 if (state.listings[existingBooking].quantity > 1) {
-                    state.listings[existingBooking].quantity -= 10
+                    state.listings[existingBooking].quantity -= 1
                 }
+            }
+        },
+        updateQuantity: (state, action) => {
+            const { listingId, variantId, bookingDate, quantity } = action.payload
+            const existingBooking = state.listings.findIndex(
+                (listing) => listing.listingId === listingId &&
+                    listing.variantId === variantId &&
+                    JSON.stringify([...(listing.bookingDate || [])].sort()) === JSON.stringify([...(bookingDate || [])].sort())
+            )
+            if (existingBooking >= 0 && quantity > 0) {
+                state.listings[existingBooking].quantity = quantity
             }
         },
         removeFromBooking: (state, action) => {
@@ -108,6 +119,7 @@ export const {
     addIntoBooking,
     increaseQuantity,
     decreaseQuantity,
+    updateQuantity,
     removeFromBooking,
     clearBooking,
     syncVerifiedBookings
