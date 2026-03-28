@@ -72,7 +72,7 @@ export default function ReceivePaymentModal({ booking, onSuccess, openExternal, 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button disabled={fullyPaid}>Receive Payment</Button>
+        <Button className={'rounded-full'} disabled={fullyPaid}>Receive Payment</Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>

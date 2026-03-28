@@ -164,7 +164,7 @@ const BookingDetails = () => {
                 <CardDescription className="flex flex-col gap-1 mt-1">
                   <span className="flex items-center gap-1">
                     <Hash className="w-3 h-3" />
-                    Order ID: <span className="font-semibold text-gray-800">{booking.booking_id || booking._id}</span>
+                    Booking ID: <span className="font-semibold text-gray-800">{booking.booking_id || booking._id}</span>
                   </span>
                   <span className="flex items-center gap-1 text-xs text-gray-400">
                     <Clock className="w-3 h-3" />
@@ -331,13 +331,8 @@ const BookingDetails = () => {
                     selected={booking.bookingStatus}
                     setSelected={(val) => handleStatusUpdate('booking', val)}
                     placeholder="Update Booking"
-                    disabled={booking.bookingSource === 'website'}
                   />
-                  {booking.bookingSource === 'website' && (
-                    <p className="text-[10px] text-amber-600 font-medium leading-tight">
-                      * Website bookings cannot be edited manually.
-                    </p>
-                  )}
+                 
                   {booking.bookingStatus !== 'confirmed' && booking.paymentStatus !== 'paid' && (
                     <p className="text-[10px] text-red-500 font-medium leading-tight">
                       * Payment must be paid before you can confirm the booking.

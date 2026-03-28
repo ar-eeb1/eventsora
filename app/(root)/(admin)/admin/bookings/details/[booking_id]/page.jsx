@@ -154,7 +154,7 @@ const BookingDetails = () => {
                 <CardDescription className="flex flex-col gap-1 mt-1">
                   <span className="flex items-center gap-1">
                     <Hash className="w-3 h-3" />
-                    Order ID: <span className="font-semibold text-gray-800">{booking.booking_id || booking._id}</span>
+                    Booking ID: <span className="font-semibold text-gray-800">{booking.booking_id || booking._id}</span>
                   </span>
                   <span className="flex items-center gap-1 text-xs text-gray-400">
                     <Clock className="w-3 h-3" />

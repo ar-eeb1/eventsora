@@ -44,7 +44,7 @@ const SuccessPage = () => {
                 <div className='space-y-4 mb-12'>
                     <h2 className='text-xl font-semibold text-gray-800 flex items-center justify-center gap-2 mb-6'>
                         <Package className='w-5 h-5 text-pink-500' />
-                        Your Order IDs
+                        Your Booking IDs
                     </h2>
 
                     <div className='grid gap-4'>

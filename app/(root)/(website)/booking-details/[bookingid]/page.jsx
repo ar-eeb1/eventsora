@@ -23,6 +23,10 @@ const BookingDetails = () => {
   const { bookingid } = useParams()
   const [booking, setBooking] = useState(null)
   const [loading, setLoading] = useState(true)
+  
+  const totalReceived = booking ? (booking.receivedAmount || 0) : 0
+  const remainingBalance = booking ? (booking.totalAmount - totalReceived) : 0
+  const advanceAmount = booking ? (booking.advance || Math.round(booking.totalAmount * 0.2)) : 0
 
 
 
@@ -93,7 +97,7 @@ const BookingDetails = () => {
           <p className="text-gray-600 italic">
             {booking.paymentStatus === 'paid'
               ? 'Thank you for your payment. Your booking is being processed.'
-              : 'Please complete your payment to confirm your booking.'}
+              : 'Please pay 20% advance to confirm your booking.'}
           </p>
 
         </div>
@@ -127,9 +131,9 @@ const BookingDetails = () => {
                   {booking.listings.map((item, index) => (
                     <div key={index} className="flex gap-4 py-4 border-b last:border-0">
                       {/* {`/listing/${item.listingId?.slug || item.slug}`}  */}
-                      <Link href={`${WEBSITE_LISTING_DETAILS(item.listingId?.slug || item.slug)}`} className="relative w-20 h-20 rounded-lg overflow-hidden border shrink-0 hover:opacity-80 transition-opacity">
+                      <Link href={`${WEBSITE_LISTING_DETAILS(item.listingId?.slug || item.slug)}`} className="relative w-24 h-24 rounded-lg overflow-hidden border shrink-0 hover:opacity-80 transition-opacity">
                         <Image
-                          src={item.media || '/placeholder-image.png'}
+                          src={item.mediaUrl || '/placeholder-image.png'}
                           fill
                           alt={item.name}
                           className="object-cover"
@@ -146,7 +150,27 @@ const BookingDetails = () => {
                           <Calendar className="w-3 h-3" />
                           {item.bookingDate.join(', ')}
                         </div>
-                        <div className="flex justify-between items-center mt-2">
+                        
+                        <div className="mt-3 grid grid-cols-2 gap-4 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                          <div>
+                            <span className="font-semibold block text-gray-700">Event Type</span>
+                            {booking.eventType || 'N/A'}
+                          </div>
+                          <div>
+                            <span className="font-semibold block text-gray-700">Time Slot</span>
+                            {booking.timeSlot || 'N/A'}
+                          </div>
+                          <div>
+                            <span className="font-semibold block text-gray-700">Guests</span>
+                            {booking.guestCount || 'N/A'}
+                          </div>
+                          <div>
+                            <span className="font-semibold block text-gray-700">Payment</span>
+                            {booking.paymentMethod || 'N/A'}
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center mt-3">
                           <span className="text-sm">Qty: {item.quantity}</span>
                           <div className="flex flex-col items-end">
                             {item.discount > 0 && (
@@ -176,6 +200,20 @@ const BookingDetails = () => {
                     {booking.totalAmount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
                   </span>
                 </div>
+                
+                <div className="flex justify-between items-center mt-3 text-sm">
+                  <span className="text-gray-600">Amount Received</span>
+                  <span className="font-semibold text-green-600">
+                    {totalReceived.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center mt-2 pt-2 border-t">
+                  <span className="font-bold text-gray-700">Remaining Balance</span>
+                  <span className={`font-bold ${remainingBalance > 0 ? 'text-red-500' : 'text-green-600'}`}>
+                    {remainingBalance <= 0 ? 'Fully Paid' : remainingBalance.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                  </span>
+                </div>
               </div>
             </Card>
 
@@ -189,10 +227,17 @@ const BookingDetails = () => {
                   <div>
                     <h4 className="font-bold text-yellow-900 mb-1">What to do next?</h4>
                     <ul className="text-sm text-yellow-800 space-y-2 list-disc pl-4">
-                      <li>Transfer the total amount to the bank account mentioned.</li>
+                      <li>Pay <strong>20% advance amount</strong> to confirm your booking.</li>
+                      <li>Total Booking Amount: <strong>{booking.totalAmount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</strong></li>
+                      <li>Advance Payable: <strong>{advanceAmount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</strong></li>
+                      <li>Transfer the advance to the bank account mentioned.</li>
                       <li>Take a screenshot of the successful transaction.</li>
-                      <li>Share the screenshot along with your **Booking ID ({booking.booking_id || booking._id.slice(-8).toUpperCase()})** on our WhatsApp or email.</li>
-                      <li>Your booking will be confirmed after payment verification.</li>
+                      <li>
+                        Share the screenshot along with your Booking ID (
+                        <strong>{booking.booking_id || booking._id.slice(-8).toUpperCase()}</strong>
+                        ) on our WhatsApp or email.
+                      </li>
+                      <li>Remaining amount can be paid later before the event.</li>
                     </ul>
                   </div>
                 </div>
@@ -200,9 +245,34 @@ const BookingDetails = () => {
             </Card>
           </div>
 
-          {/* Right Column: Bank Info (Sticky) */}
-          <div className="lg:col-span-1">
-            <Card className="border-pink-100 sticky top-5">
+          {/* Right Column: Bank Info & Contact Details (Sticky Sidebar) */}
+          <div className="lg:col-span-1 border-0">
+            <div className="sticky top-5 space-y-5">
+            <Card className="border-pink-100">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <User className="w-6 h-6 text-pink-500" />
+                  Contact Details
+                </CardTitle>
+                <CardDescription>Your Information</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-gray-400 uppercase">Name</span>
+                  <span className="font-semibold text-gray-800">{booking.name}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-gray-400 uppercase">Email</span>
+                  <span className="font-semibold text-gray-800">{booking.email}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-gray-400 uppercase">Phone</span>
+                  <span className="font-semibold text-gray-800">{booking.phone}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-pink-100">
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Landmark className="w-6 h-6 text-pink-500" />
@@ -234,6 +304,7 @@ const BookingDetails = () => {
                 ))}
               </CardContent>
             </Card>
+            </div>
           </div>
         </div>
 

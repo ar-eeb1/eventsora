@@ -19,7 +19,7 @@ const Sorting = ({ limit, setLimit, sorting, setSorting, mobileFilterOpen, setMo
             </Button>
             <ul className='flex items-center gap-4'>
                 <li className=''>Show</li>
-                {[9, 18, 27, 36].map(limitNumber => (
+                {[30, 60, 90, 120].map(limitNumber => (
                     <li key={limitNumber}>
                         <button onClick={() => setLimit(limitNumber)} type='button' className={`cursor-pointer ${limitNumber === limit ? 'text-white text-sm w-8 h-8 flex justify-center items-center rounded-full bg-primary' : ''}`}>
                             {limitNumber}

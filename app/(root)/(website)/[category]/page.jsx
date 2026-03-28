@@ -27,7 +27,7 @@ const page = () => {
     const label = webLabel.charAt(0).toUpperCase() + webLabel.slice(1)
     const windowSize = useWindowSize()
 
-    const [limit, setLimit] = useState(9)
+    const [limit, setLimit] = useState(30)
     const [sorting, setSorting] = useState("default_sorting")
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
     const [isMobileFilter, setisMobileFilter] = useState(false)
