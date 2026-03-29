@@ -4,6 +4,7 @@ import BookingModel from "@/models/Booking.model";
 import CalendarModel from "@/models/Calendar.model";
 import crypto from 'crypto';
 import { isAuthenticated } from "@/lib/authentication";
+import ListingModel from "@/models/Listing.model";
 
 export async function POST(request) {
     try {
@@ -22,6 +23,17 @@ export async function POST(request) {
 
         if (!listings || listings.length === 0) {
             return response(false, 400, 'No valid listings found in your booking.')
+        }
+
+        // Verify all listings belong to this provider
+        const listingIds = listings.map(l => l.listingId);
+        const ownedListingsCount = await ListingModel.countDocuments({
+            _id: { $in: listingIds },
+            userId: auth.userId
+        });
+
+        if (ownedListingsCount !== new Set(listingIds.map(id => id.toString())).size) {
+            return response(false, 403, 'One or more listings do not belong to you or do not exist.');
         }
 
         const booking_id = 'BK-' + crypto.randomBytes(4).toString('hex').toUpperCase();

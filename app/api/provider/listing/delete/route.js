@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
@@ -19,9 +20,10 @@ export async function PUT(request) {
             return response(false, 403, 'Invalid or empty ID list.')
         }
 
-        const listing = await ListingModel.find({ _id: { $in: ids } }).lean()
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
+        const listing = await ListingModel.find({ _id: { $in: ids }, userId: userObjectId }).lean()
         if (!listing.length) {
-            return response(false, 404, 'Data not found.')
+            return response(false, 404, 'Data not found or access denied.')
         }
 
         if (!['SD', 'RSD'].includes(deleteType)) {
@@ -29,9 +31,9 @@ export async function PUT(request) {
         }
 
         if (deleteType === 'SD') {
-            await ListingModel.updateMany({ _id: { $in: ids } }, { $set: { deletedAt: new Date().toISOString() } })
+            await ListingModel.updateMany({ _id: { $in: ids }, userId: userObjectId }, { $set: { deletedAt: new Date().toISOString() } })
         } else {
-            await ListingModel.updateMany({ _id: { $in: ids } }, { $set: { deletedAt: null } })
+            await ListingModel.updateMany({ _id: { $in: ids }, userId: userObjectId }, { $set: { deletedAt: null } })
         }
 
         return response(true, 200, deleteType === 'SD' ? 'Data mode into Trash' : 'Data Restored')

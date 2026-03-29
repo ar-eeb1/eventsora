@@ -3,6 +3,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { zSchema } from "@/lib/zodSchema";
 import ListingVariantModel from "@/models/ListingVariant.model";
+import ListingModel from "@/models/Listing.model";
 
 export async function POST(request) {
     try {
@@ -32,6 +33,12 @@ export async function POST(request) {
         }
 
         const listingVariantData = validate.data
+
+        // Check if listing belongs to provider
+        const listing = await ListingModel.findOne({ _id: listingVariantData.listingId, userId: auth.userId });
+        if (!listing) {
+            return response(false, 403, 'Parent listing not found or access denied.');
+        }
         const newListing = new ListingVariantModel({
             ...listingVariantData,
             userId: auth.userId

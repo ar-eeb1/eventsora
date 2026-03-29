@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import BookingModel from "@/models/Booking.model";
@@ -19,9 +20,10 @@ export async function POST(request) {
             return response(false, 400, 'Missing required fields.')
         }
 
-        const booking = await BookingModel.findById(bookingId)
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
+        const booking = await BookingModel.findOne({ _id: bookingId, providerId: userObjectId })
         if (!booking) {
-            return response(false, 404, 'Booking not found.')
+            return response(false, 404, 'Booking not found or access denied.')
         }
 
         // Logic to update receivedAmount and potentially paymentStatus

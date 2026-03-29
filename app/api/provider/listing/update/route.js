@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
@@ -45,9 +46,10 @@ export async function PUT(request) {
 
         const validatedData = validate.data
 
-        const getListing = await ListingModel.findOne({ deletedAt: null, _id: validatedData._id })
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
+        const getListing = await ListingModel.findOne({ deletedAt: null, _id: validatedData._id, userId: userObjectId })
         if (!getListing) {
-            return response(false, 404, 'Listing not found')
+            return response(false, 404, 'Listing not found or access denied')
         }
 
         getListing.name = validatedData.name

@@ -25,9 +25,10 @@ export async function GET(request) {
         }
 
         // Verify the listing exists and belongs to the provider
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
         const listing = await ListingModel.findOne({
             _id: listingId,
-            provider: auth.userId,
+            userId: userObjectId,
             deletedAt: null
         }).lean()
 

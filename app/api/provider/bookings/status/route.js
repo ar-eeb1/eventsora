@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
@@ -23,9 +24,10 @@ export async function PUT(request) {
             return response(false, 400, 'Invalid status.');
         }
 
-        const booking = await BookingModel.findById(bookingId);
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
+        const booking = await BookingModel.findOne({ _id: bookingId, providerId: userObjectId });
         if (!booking) {
-            return response(false, 404, 'Booking not found.');
+            return response(false, 404, 'Booking not found or access denied.');
         }
 
         // Logic: If trying to confirm booking, check if payment is already paid

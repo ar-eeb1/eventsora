@@ -1,8 +1,9 @@
+import mongoose, { isValidObjectId } from "mongoose";
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import ListingModel from "@/models/Listing.model";
-import { isValidObjectId } from "mongoose";
+import ListingModel from "@/models/Listing.model";
 
 export async function GET(request, { params }) {
     try {
@@ -23,8 +24,10 @@ export async function GET(request, { params }) {
             return response(false, 403, 'Invalid object id')
         }
 
-        filter._id = id
-        const getListing = await ListingModel.findOne(filter).populate('media', '_id secure_url').lean()
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
+        filter.userId = userObjectId;
+        filter._id = id;
+        const getListing = await ListingModel.findOne(filter).populate('media', '_id secure_url').lean();
         if (!getListing) {
             return response(false, 404, 'Listing not found')
         }

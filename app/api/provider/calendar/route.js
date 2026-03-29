@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import CalendarModel from "@/models/Calendar.model";
+import ListingModel from "@/models/Listing.model";
 import { zSchema } from "@/lib/zodSchema";
 
 export async function GET(request) {
@@ -21,6 +22,12 @@ export async function GET(request) {
         // At least one ID is required
         if (!listingId && !variantId) {
             return response(false, 400, 'Either listingId or variantId is required.');
+        }
+
+        // Verify listing ownership
+        const listing = await ListingModel.findOne({ _id: listingId, userId: auth.userId });
+        if (!listing) {
+            return response(false, 403, 'Listing not found or access denied.');
         }
 
         // Build query
@@ -132,6 +139,12 @@ export async function POST(request) {
         }
 
         const { listingId, variantId, date, dateStatus, price } = validate.data;
+
+        // Verify listing ownership
+        const listing = await ListingModel.findOne({ _id: listingId, userId: auth.userId });
+        if (!listing) {
+            return response(false, 403, 'Listing not found or access denied.');
+        }
 
         // Build filter for findOneAndUpdate
         const filter = { date, deletedAt: null };

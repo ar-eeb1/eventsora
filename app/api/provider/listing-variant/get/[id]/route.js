@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
@@ -24,8 +25,10 @@ export async function GET(request, { params }) {
             return response(false, 403, 'Invalid object id')
         }
 
-        filter._id = id
-        const getListingVariant = await ListingVariantModel.findOne(filter).populate('media', '_id secure_url').lean()
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
+        filter.userId = userObjectId;
+        filter._id = id;
+        const getListingVariant = await ListingVariantModel.findOne(filter).populate('media', '_id secure_url').lean();
         if (!getListingVariant) {
             return response(false, 404, 'Listing variant not found')
         }

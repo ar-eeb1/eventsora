@@ -12,8 +12,10 @@ export async function GET(request) {
         }
 
         await connectDB()
+        const userObjectId = new mongoose.Types.ObjectId(auth.userId);
         const filter = {
-            deletedAt: null
+            deletedAt: null,
+            userId: userObjectId
         }
         const getListing = await ListingModel.find(filter).select('-media -description').sort({ createdAt: -1 }).lean()
         if (!getListing) {
