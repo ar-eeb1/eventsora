@@ -5,6 +5,8 @@ import CalendarModel from "@/models/Calendar.model";
 import crypto from 'crypto';
 import { isAuthenticated } from "@/lib/authentication";
 import ListingModel from "@/models/Listing.model";
+import { manualBookingEmail } from "@/email/manualBookingEmail";
+import { sendMail } from "@/lib/sendMail";
 
 export async function POST(request) {
     try {
@@ -81,6 +83,17 @@ export async function POST(request) {
             } catch (calendarError) {
                 console.error('Calendar sync error:', calendarError);
             }
+        }
+
+        // Send Email to Customer
+        try {
+            await sendMail(
+                `Booking Confirmation: ${newBooking.booking_id}`,
+                newBooking.email,
+                manualBookingEmail(newBooking)
+            );
+        } catch (emailError) {
+            console.error('Manual booking email error:', emailError);
         }
 
         return response(true, 201, 'Manual Booking created successfully!', newBooking)
