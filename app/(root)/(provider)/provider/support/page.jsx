@@ -4,7 +4,7 @@ import React from 'react'
 
 const Support = () => {
   return (
-    <div className="flex justify-center items-center min-h-[60vh] min-w-full p-6 bg-white">
+    <div className="flex justify-center items-center min-h-[60vh] min-w-full p-6 ">
       <Card className="w-full rounded-2xl shadow-xl border">
         
         <CardHeader className="border-b px-6 py-4">
@@ -38,10 +38,10 @@ const Support = () => {
             <div>
               <p className="text-sm text-muted-foreground">Phone</p>
               <a 
-                href="tel:+92370182844"
+                href="tel:+923700182844"
                 className="font-medium hover:underline"
               >
-                +92 370 182844
+                +92 370 0182844
               </a>
             </div>
           </div>
@@ -52,7 +52,7 @@ const Support = () => {
             <div>
               <p className="text-sm text-muted-foreground">WhatsApp</p>
               <a 
-                href="https://wa.me/92370182844"
+                href="https://wa.me/923700182844"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-green-600 hover:underline"

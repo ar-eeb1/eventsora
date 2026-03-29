@@ -128,7 +128,7 @@ const Filter = () => {
 
   return (
 
-    <div>
+    <div className='text-black'>
       {searchParams.size > 0 &&
         <Button variant='destructive' className='w-full' asChild type='button'>
           <Link href={WEBSITE_CATEGORY(`${category}`)}>
@@ -224,7 +224,7 @@ const Filter = () => {
             </div>
 
             <div className='mt-2'>
-              <ButtonLoading onClick={handlePriceFilter} type='button' text='Filter Price' className='rounded-full' />
+              <ButtonLoading onClick={handlePriceFilter} type='button' text='Filter Price' className='rounded-full ' />
             </div>
           </AccordionContent>
         </AccordionItem>

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { PROVIDER_BOOKINGS_DETAILS } from '@/routes/ProviderPanelRoute'
 import StatusBadge from '@/components/application/StatusBadge'
 import Image from 'next/image'
+import { Card } from '@/components/ui/card'
 
 const getDaysRemaining = (dateStr) => {
     if (!dateStr) return null
@@ -21,7 +22,7 @@ const UpcomingEvents = () => {
     const events = data?.data || []
 
     return (
-        <div className='mt-10'>
+        <Card className='mt-10 p-4'>
             <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center gap-2'>
                     <CalendarClock className='w-5 h-5 text-pink-500' />
@@ -35,7 +36,7 @@ const UpcomingEvents = () => {
             ) : events.length === 0 ? (
                 <div className='text-center py-8 text-gray-400 text-sm'>No upcoming events.</div>
             ) : (
-                <div className='grid lg:grid-cols-2 grid-cols-1 gap-4'>
+                <div className='grid lg:grid-cols-1 grid-cols-1 gap-4'>
                     {events.map((evt) => {
                         const days = getDaysRemaining(evt.earliestDate)
                         const remaining = (evt.totalAmount || 0) - (evt.receivedAmount || 0)
@@ -83,7 +84,7 @@ const UpcomingEvents = () => {
                     })}
                 </div>
             )}
-        </div>
+        </Card>
     )
 }
 

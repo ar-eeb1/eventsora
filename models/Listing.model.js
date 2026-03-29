@@ -103,6 +103,18 @@ const listingSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
+    featuredAt: {
+        type: Date,
+        default: null
+    },
+    featuredUntil: {
+        type: Date,
+        default: null
+    }
 
 
 }, { timestamps: true })

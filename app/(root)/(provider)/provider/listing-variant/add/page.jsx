@@ -113,7 +113,7 @@ const AddListingVariant = () => {
       if (!response.success) {
         throw new Error(response.message)
       }
-      // form.reset()
+      form.reset()
       showToast('success', response.message)
     } catch (error) {
       showToast('error', error.message)
