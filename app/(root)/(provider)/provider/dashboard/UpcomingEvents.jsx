@@ -22,11 +22,13 @@ const UpcomingEvents = () => {
     const events = data?.data || []
 
     return (
-        <Card className='mt-10 p-4'>
+        <Card className='mt-5 p-4 rounded-md'>
             <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center gap-2'>
-                    <CalendarClock className='w-5 h-5 text-pink-500' />
-                    <span className='font-bold text-gray-900 dark:text-white text-lg'>Upcoming Events</span>
+                    <CalendarClock className='w-5 h-5 text-primary' />
+                    {/* <span className='font-bold text-gray-900 dark:text-white text-lg'></span> */}
+                    <h2 className='text-xl font-bold text-gray-900 dark:text-white'>Upcoming Events</h2>
+
                 </div>
                 <span className='text-xs text-gray-400'>Next scheduled events</span>
             </div>
@@ -46,10 +48,10 @@ const UpcomingEvents = () => {
                                 <div className='flex items-center gap-4 p-3 rounded-lg border bg-white dark:bg-card dark:border-gray-800 hover:border-pink-300 hover:shadow-md transition-all'>
                                     {/* Image Thumbnail */}
                                     <div className='relative w-16 h-16 rounded overflow-hidden border shrink-0 bg-gray-50'>
-                                        <Image 
-                                            src={evt.mediaUrl || '/placeholder-image.png'} 
-                                            fill 
-                                            alt={evt.listingName || 'event'} 
+                                        <Image
+                                            src={evt.mediaUrl || '/placeholder-image.png'}
+                                            fill
+                                            alt={evt.listingName || 'event'}
                                             className='object-cover'
                                         />
                                     </div>

@@ -53,7 +53,7 @@ const HorizontalScrollContainer = ({ children }) => {
             {/* Scrollable Area */}
             <div
                 ref={scrollRef}
-                className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth rounded-lg pt-10"
+                className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth rounded-lg md:pt-10 pt-2"
             >
                 {children}
             </div>

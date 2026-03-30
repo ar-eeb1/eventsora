@@ -16,11 +16,11 @@ const Home = () => {
   return (
     <div className='mt-8'>
       <Hero />
-      <div className='mt-10'>
+      <div className='md:mt-10 mt-5'>
         <div className='flex items-center justify-center'>
           <h1 className={`${playfair.className} lg:text-6xl md:text-6xl sm:text-5xl text-4xl text-pink-900 font-extrabold underline underline-offset-8 decoration-1 `}>Categories</h1>
         </div>
-        <div className='flex items-center justify-center gap-10 font-bold mt-10 flex-wrap'>
+        <div className='flex items-center justify-center md:gap-10 gap-5 font-bold md:mt-10 mt-5 flex-wrap'>
           <Link href={''} className='flex flex-col items-center justify-center'>
             <lord-icon
               src="https://cdn.lordicon.com/wsaaegar.json"

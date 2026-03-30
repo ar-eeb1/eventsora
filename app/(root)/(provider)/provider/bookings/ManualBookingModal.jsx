@@ -37,8 +37,6 @@ export default function ManualBookingModal({ onSuccess }) {
 
   const { data: listingsData } = useFetch('/api/provider/listing?deleteType=SD&&size=10000')
   const { data: variantsData } = useFetch('/api/provider/listing-variant?deleteType=SD&&size=10000')
-  console.log("listingsData", listingsData);
-  console.log("variantsData", variantsData);
 
 
   const form = useForm({

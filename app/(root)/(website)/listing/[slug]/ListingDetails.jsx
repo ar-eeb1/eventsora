@@ -321,7 +321,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         <IoLocationOutline className='text-pink-600' size={20} />
                         <span>{listing?.city?.city}, {listing?.locality?.locality}</span>
                     </div>
-                    <div className='flex items-center gap-2 mb-3 text-3xl'>
+                    <div className='flex items-center gap-2 mb-3 lg:text-4xl md:text-2xl text-xl'>
                         <h2 className='font-bold'>Starting Price :</h2>
                         <span>{listing?.startingPrice.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</span>
                     </div>
@@ -404,17 +404,17 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         </div>)
                     }
 
-                    <div className='gap-3 flex mt-10'>
+                    <div className='gap-3 flex flex-col md:mt-10 mt-5 md:block '>
                         {!isAddedIntoBooking ?
                             <ButtonLoading
                                 type='button'
                                 text={selectedDates.length === 0 ? 'Select Dates' : 'Add into Booking'}
                                 onClick={handleAddToBooking}
-                                className='w-1/2 rounded-full py-6 text-md text-white'
+                                className='md:w-1/2 rounded-full py-6 text-md text-white'
                                 disabled={selectedDates.length === 0}
                             />
                             :
-                            <Button type='button' className='w-1/2 rounded-full py-6 text-md text-white'>
+                            <Button type='button' className='md:w-1/2 rounded-full py-6 text-md text-white'>
                                 <Link href={WEBSITE_BOOKINGS}>
                                     View My Bookings
                                 </Link>
@@ -425,14 +425,14 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                             onClick={handleMessageProvider}
                             loading={isloading} // Check state name casing (isloading vs isLoading)
                             text='Message Provider'
-                            className='w-1/2 rounded-full py-6 text-md text-black bg-white cursor-pointer'
+                            className='md:w-1/2 rounded-full py-6 text-md text-black bg-white cursor-pointer'
                         />
                     </div>
                 </div>
             </div>
 
             <div className='mb-5 calendar'>
-                <div className="flex flex-col items-center justify-center my-10 space-y-2">
+                <div className="flex flex-col items-center justify-center md:my-10 my-5 space-y-2">
                     <div className="h-1 w-20 bg-primary rounded-full mb-5"></div>
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white text-center">
                         Availability for <span className="text-primary">&quot;{listing.name}&quot;</span>

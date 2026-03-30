@@ -23,7 +23,7 @@ const AddHomeListing = async () => {
         <section className='xl:px-16 lg:px-10 md:px-6 px-6'>
             <div className='my-5'>
                 <div className='flex justify-between items-center mb-2'>
-                    <h2 className={`lg:text-4xl md:text-4xl sm:text-2xl font-bold text-pink-900 ${playfair.className}`}>Venues</h2>
+                    <h2 className={`lg:text-4xl md:text-4xl text-3xl font-bold text-pink-900 ${playfair.className}`}>Venues</h2>
                     <Link href='' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
                         View All
                         <ArrowRight size={20} />
@@ -52,9 +52,9 @@ const AddHomeListing = async () => {
             </div>
 
             {/* CARS */}
-            <div className='my-5 '>
-                <div className='flex justify-between items-center mb-2 mt-20'>
-                    <h2 className={`lg:text-4xl md:text-4xl sm:text-2xl font-bold text-pink-900 ${playfair.className}`}>Cars & Caterers</h2>
+            <div className='my-5'>
+                <div className='flex justify-between items-center md:mb-2 md:mt-20 mt-10'>
+                    <h2 className={`lg:text-4xl md:text-4xl text-3xl font-bold text-pink-900 ${playfair.className}`}>Cars & Caterers</h2>
                     <Link href='' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
                         View All
                         <ArrowRight size={20} />

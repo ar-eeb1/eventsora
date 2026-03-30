@@ -53,7 +53,6 @@ export function BookingStatus() {
     const [totalCount, setTotalCount] = useState(0)
 
     const { data: bookingsStatus, loading } = useFetch('/api/admin/dashboard/bookings-status')
-    console.log(bookingsStatus);
 
     useEffect(() => {
         if (bookingsStatus && bookingsStatus.success) {

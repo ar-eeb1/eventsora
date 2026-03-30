@@ -432,7 +432,7 @@ const Calendar = ({
                             const isLocked = dateData && lockedStatuses.includes(dateData.status) && !!dateData.name
 
                             let cellClass = cn(
-                                'min-h-[120px] rounded-lg p-3 flex flex-col transition-all duration-200 relative group cursor-pointer',
+                                'md:min-h-[120px] min-h-[80px] rounded-lg p-3 flex flex-col transition-all duration-200 relative group cursor-pointer overflow-hidden',
                                 'border',
                                 todayClass,
                                 isPast || isDisabled

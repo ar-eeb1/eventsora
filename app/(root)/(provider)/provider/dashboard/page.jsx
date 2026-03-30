@@ -15,24 +15,49 @@ import UpcomingEvents from './UpcomingEvents'
 
 const ProviderDashboard = () => {
   return (
-    <div className='pt-5'>
-      <CountOverview />
-      <BookingStats />
-      <QuickAdd />
+    <div className=''>
+      <div className="space-y-8 mt-4">
 
-      {/* <div className='mt-10 grid lg:grid-cols-12 grid-cols-1 gap-10 items-start'>
-        <div className='lg:col-span-8'> */}
-      <ProviderCalendar />
-      <UpcomingEvents />
-      {/* </div>
-        <div className='lg:col-span-4'>
-          <div className='flex items-center justify-between mb-4'>
-            <span className='font-bold text-gray-900 dark:text-white'>Featured Listing</span>
-            <span className='text-xs text-pink-600 bg-pink-50 dark:bg-pink-900/20 px-2 py-1 rounded font-bold uppercase'>Random</span>
+        {/* Count Overview */}
+        <section>
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 tracking-tight">
+              Count Overview
+            </h2>
+            <div className="h-px flex-1 ml-4 bg-gradient-to-r from-gray-200 to-transparent dark:from-gray-700"></div>
           </div>
-          <RandomListing />
-        </div>
-      </div> */}
+          <CountOverview />
+        </section>
+
+        {/* Booking Stats */}
+        <section>
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 tracking-tight">
+              Booking Stats
+            </h2>
+            <div className="h-px flex-1 ml-4 bg-gradient-to-r from-gray-200 to-transparent dark:from-gray-700"></div>
+          </div>
+          <BookingStats />
+        </section>
+
+        {/* Quick Add */}
+        <section>
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 tracking-tight">
+              Quick Actions
+            </h2>
+            <div className="h-px flex-1 ml-4 bg-gradient-to-r from-gray-200 to-transparent dark:from-gray-700"></div>
+          </div>
+          <QuickAdd />
+        </section>
+
+      </div>
+
+      {/* Calendar Component */}
+      <ProviderCalendar />
+
+      {/* upcoming events */}
+      <UpcomingEvents />
 
       <div className='mt-10 flex lg:flex-nowrap flex-wrap gap-10'>
         <Card className='rounded lg:w-[70%] w-full p-0'>

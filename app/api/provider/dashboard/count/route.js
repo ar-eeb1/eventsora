@@ -20,7 +20,7 @@ export async function GET(request) {
 
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        const [listing, bookings, todayBookings, earningsData, monthlyData, paymentData] = await Promise.all([
+        const [listing, bookings, todayBookings, pendingBookings, earningsData, monthlyData, paymentData] = await Promise.all([
             ListingModel.countDocuments({ deletedAt: null, userId: userObjectId }),
 
             bookingModel.countDocuments({ providerId: userObjectId, deletedAt: null }),
@@ -28,6 +28,12 @@ export async function GET(request) {
             bookingModel.countDocuments({
                 providerId: userObjectId,
                 createdAt: { $gte: today },
+                deletedAt: null
+            }),
+
+            bookingModel.countDocuments({
+                providerId: userObjectId,
+                bookingStatus: 'pending',
                 deletedAt: null
             }),
 
@@ -83,6 +89,7 @@ export async function GET(request) {
             listing,
             bookings,
             todayBookings,
+            pendingBookings,
             earnings,
             monthlyBookings,
             monthlyConfirmed,

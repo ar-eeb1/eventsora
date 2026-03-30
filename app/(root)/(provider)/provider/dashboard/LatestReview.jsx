@@ -19,7 +19,6 @@ const LatestReview = () => {
     const { data: latestReviewsResponse, loading } = useFetch(
         '/api/provider/dashboard/latest-reviews'
     )
-    console.log(latestReviewsResponse);
     
     const reviews = latestReviewsResponse?.data || []
 

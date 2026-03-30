@@ -38,7 +38,7 @@ const Categories = () => {
             <NavigationMenu>
                 <NavigationMenuList>
                     <NavigationMenuItem className="">
-                        <NavigationMenuTrigger className=' bg-pink-900 h-0 hover:text-white '>
+                        <NavigationMenuTrigger className=' bg-pink-900 h-0 hover:text-pink-500 '>
                             Categories
                         </NavigationMenuTrigger>
 

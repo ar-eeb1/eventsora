@@ -135,22 +135,22 @@ const ProviderCalendar = ({ isPage = false }) => {
     return (
         <Card className='rounded-sm border shadow-sm overflow-hidden bg-white mt-6 pb-0 dark:bg-gray-950'>
             <CardHeader className=''>
-                <div className='flex flex-row md:items-center justify-between gap-4 '>
+                <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 '>
                     <div className='flex items-center justify-center gap-3'>
                         <div className='p-2 bg-primary/10 rounded-lg'>
                             <CalendarIcon className='w-5 h-5 text-primary' />
                         </div>
                         <div>
-                            <h2 className='text-xl font-bold text-gray-900 dark:text-white'>Availability Calendar</h2>
+                            <h2 className='md:text-xl text-lg font-bold text-gray-900 dark:text-white'>Availability Calendar</h2>
                         </div>
                     </div>
                     {selectedDates.length > 0 && (
                         <Button
                             onClick={() => setShowModal(true)}
-                            size="sm"
-                            className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
+                            size="md:sm text-xs"
+                            className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 py-3"
                         >
-                            <Settings2 className="w-4 h-4" />
+                            <Settings2 className="md:w-4 w-3 md:h-4 h-3" />
                             Update {selectedDates.length} Selected
                         </Button>
                     )}

@@ -15,7 +15,7 @@ import profileIcon from '@/public/assets/user.png'
 import { CiMenuFries } from "react-icons/ci";
 import Search from './Search'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import ThemeSwitch from './ThemeSwitch'
+
 const Header = () => {
     const auth = useSelector(store => store.authStore.auth)
     const pathname = usePathname()
@@ -26,6 +26,8 @@ const Header = () => {
         setIsMobileMenu(prev => !prev)
     }, [])
 
+    const closeMobileMenu = () => setIsMobileMenu(false)
+
     const toggleSearch = useCallback(() => {
         setShowSearch(prev => !prev)
     }, [])
@@ -34,78 +36,89 @@ const Header = () => {
         <div className='lg:px-12 px-4 bg-pink-900 md:mx-5 rounded-b-2xl sticky top-0 z-50'>
             <div className='flex justify-between items-center lg:py-5 py-4 max-w-screen-2xl mx-auto'>
 
+                {/* LOGO */}
                 <Link href={WEBSITE_HOME}>
-                    <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-40 md:w-52' />
+                    <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-34 md:w-52' />
                 </Link>
-                <div className='flex justify-between gap-20'>
-                    <nav className={`lg:relative lg:w-auto lg:top-0 lg:left-0 lg:p-0 lg:h-auto lg:bg-transparent fixed z-50 top-0 w-full h-screen transition-all duration-500 ease-in-out ${isMobileMenu ? 'right-0' : '-right-full'}`}>
 
-                        {/* FOR MOBILE */}
-                        <div className='lg:hidden bg-pink-900 flex justify-between items-center py-4 border-b border-gray-200 px-4 shadow-sm'>
-                            <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-40 md:w-52' />
-                            <button type='button' className='p-2 rounded-full hover:bg-gray-200 transition-all duration-200 active:scale-95' onClick={toggleMobileMenu}>
-                                <X className='text-white ' size={25} />
+                <div className='flex items-center gap-3 md:gap-8'>
+                    
+                    {/* DESKTOP & MOBILE NAV */}
+                    <nav className={`
+                        fixed inset-0 z-[60] bg-pink-100 transition-transform duration-300 ease-in-out lg:relative lg:inset-auto lg:bg-transparent lg:translate-x-0
+                        ${isMobileMenu ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+                    `}>
+                        {/* MOBILE MENU HEADER */}
+                        <div className='lg:hidden flex justify-between items-center py-5 px-6 border-b bg-pink-900'>
+                            <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-32' />
+                            <button onClick={toggleMobileMenu} className='text-white p-1'>
+                                <X size={28} />
                             </button>
                         </div>
 
-                        <ul className='lg:flex lg:text-white text-black lg:justify-between lg:items-center lg:gap-10 lg:flex-row lg:px-0 px-6 flex flex-col items-center gap-5  lg:pt-1 pt-8'>
-                            <li className='hover:font-semibold'>
-                                <Link href={WEBSITE_HOME} className='block py-0'>
-                                    Home
-                                </Link>
+                        {/* NAV LINKS */}
+                        <ul className='flex flex-col lg:flex-row items-start lg:items-center gap-8 p-8 lg:p-0 lg:gap-10 text-gray-800 lg:text-white font-medium'>
+                            <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
+                                <Link href={WEBSITE_HOME}>Home</Link>
                             </li>
-                            <li className='hover:font-semibold '>
-                                {/* <Link href={WEBSITE_HOME} className='block py-0'> */}
+                            <li className='w-full lg:w-auto hover:text-pink-500'>
                                 <Categories />
-                                {/* </Link> */}
                             </li>
-                            <li className='hover:font-semibold'>
-                                <Link href={WEBSITE_CATEGORY('venues')} className='block py-0'>
-                                    Venues
-                                </Link>
+                            <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
+                                <Link href={WEBSITE_CATEGORY('venues')}>Venues</Link>
                             </li>
-                            <li className='hover:font-semibold'>
-                                <Link href={WEBSITE_HOME} className='block py-0'>
-                                    Caterers
-                                </Link>
+                            <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
+                                <Link href={WEBSITE_HOME}>Caterers</Link>
                             </li>
-                            <li className='hover:font-semibold line-through cursor-none' title='Coming Soon'>
-                                {/* <Link href={WEBSITE_HOME} className='block py-0'> */}
+                            <li className='opacity-50 line-through cursor-not-allowed'>
                                 Shop
-                                {/* </Link> */}
                             </li>
-
                         </ul>
                     </nav>
-                    <div className='flex justify-between items-center gap-4 md:gap-8'>
-                        <button type='button' onClick={toggleSearch}>
+
+                    {/* BACKDROP FOR MOBILE */}
+                    {isMobileMenu && (
+                        <div 
+                            className="fixed inset-0 bg-black/50 z-[55] lg:hidden" 
+                            onClick={toggleMobileMenu}
+                        />
+                    )}
+
+                    {/* RIGHT ACTIONS */}
+                    <div className='flex items-center gap-3 md:gap-6'>
+                        <button type='button' onClick={toggleSearch} className="p-1">
                             <SearchIcon className='hover:text-pink-100 cursor-pointer text-white md:size-6 size-5' />
                         </button>
-                        <Link href={WEBSITE_MESSAGES}>
-                            <ChatBubbleOutlineIcon className='text-white' sx={{ fontSize: { xs: 20, md: 24 } }} />
+                        
+                        <Link href={WEBSITE_MESSAGES} className="p-1">
+                            <ChatBubbleOutlineIcon className='text-white' sx={{ fontSize: { xs: 22, md: 24 } }} />
                         </Link>
+
                         <Booking />
 
-                        {!auth
-                            ?
-                            <Link href={`${WEBSITE_LOGIN}?callback=${pathname}`} className=' text-white'>
-                                <div className='flex justify-center items-end gap-2 md:gap-3 bg-white/40 px-2 py-1 rounded-2xl'>
-                                    <CircleUserRound className='text-pink-200' size={20} />
-                                    <span className='text-sm md:text-md text-white hidden md:block'>SIGNUP/LOGIN</span>
+                        {!auth ? (
+                            <Link href={`${WEBSITE_LOGIN}?callback=${pathname}`}>
+                                <div className='flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-all'>
+                                    <CircleUserRound className='text-white' size={20} />
+                                    <span className='text-xs font-bold text-white hidden sm:block'>LOGIN</span>
                                 </div>
                             </Link>
-                            :
+                        ) : (
                             <Link href={USER_DASHBOARD}>
-                                <Avatar className='md:size-10 size-8'>
+                                <Avatar className='md:size-10 size-8 border border-white/20'>
                                     <AvatarImage src={auth?.avatar?.url || profileIcon.src} />
                                 </Avatar>
                             </Link>
-                        }
-                        <button type='button' className='cursor-pointer lg:hidden block' onClick={toggleMobileMenu}>
-                            <CiMenuFries className='text-white' size={22} />
-                        </button>
-                        {/* <ThemeSwitch /> */}
+                        )}
 
+                        {/* MOBILE HAMBURGER */}
+                        <button 
+                            type='button' 
+                            className='lg:hidden p-1 text-white' 
+                            onClick={toggleMobileMenu}
+                        >
+                            <CiMenuFries size={26} />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -115,4 +128,3 @@ const Header = () => {
 }
 
 export default Header
-
