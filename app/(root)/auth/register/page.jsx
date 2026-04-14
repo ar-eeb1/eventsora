@@ -176,7 +176,7 @@ const RegisterPage = () => {
                                 <div className='mb-5'>
                                     <ButtonLoading type='submit' text='SIGN UP' className='w-full' loading={loading} />
                                 </div>
-                                {!isProvider && (
+                                {/* {!isProvider && (
                                     <>
                                         <div className="relative my-4">
                                             <div className="absolute inset-0 flex items-center">
@@ -200,7 +200,7 @@ const RegisterPage = () => {
                                             </button>
                                         </div>
                                     </>
-                                )}
+                                )} */}
                                 <hr />
                                 <div className='text-center mt-2'>
                                     <Link href={`${WEBSITE_LOGIN}${isProvider ? '?role=provider' : ''}`} className='rounded-full text-sm flex flex-col'>
@@ -208,13 +208,13 @@ const RegisterPage = () => {
                                         <span className='underline underline-offset-3 '>LOGIN</span>
                                     </Link>
                                 </div>
-                                <div className='text-center mt-3'>
+                                {/* <div className='text-center mt-3'>
                                     {isProvider ?
                                         <Link href='/auth/register' className='text-sm text-pink-500 hover:underline'>Join as a Customer</Link>
                                         :
                                         <Link href='/auth/register?role=provider' className='text-sm text-pink-500 hover:underline'>Join as a Provider</Link>
                                     }
-                                </div>
+                                </div> */}
                             </form>
                         </Form>
                     </div>

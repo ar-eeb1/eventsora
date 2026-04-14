@@ -163,7 +163,7 @@ const LoginPage = () => {
                                         <div className='mb-5'>
                                             <ButtonLoading type='submit' text='LOGIN' className='w-full' loading={loading} />
                                         </div>
-
+{/* 
                                         {!isProvider && (
                                             <>
                                                 <div className="relative my-4">
@@ -188,7 +188,7 @@ const LoginPage = () => {
                                                     </button>
                                                 </div>
                                             </>
-                                        )}
+                                        )} */}
 
                                         <hr />
 
@@ -202,13 +202,13 @@ const LoginPage = () => {
                                             <Link href={WEBSITE_RESETPASSWORD} className='text-primary underline'>Forget Password</Link>
                                         </div>
 
-                                        <div className='text-center mt-3 bg-pink-300 m-0 text-white rounded-full px-5 py-1'>
+                                        {/* <div className='text-center mt-3 bg-pink-300 m-0 text-white rounded-full px-5 py-1'>
                                             {isProvider ?
                                                 <Link href='/auth/login' className='text-sm hover:underline'>Login as a Customer</Link>
                                                 :
                                                 <Link href='/auth/login?role=provider' className='text-sm hover:underline'>Login as a Provider</Link>
                                             }
-                                        </div>
+                                        </div> */}
                                     </form>
                                 </Form>
                             </div>
