@@ -37,6 +37,7 @@ export async function GET(request) {
         if (sortOption === 'price_low_high') sortQuery = { startingPrice: 1 }
         if (sortOption === 'price_high_low') sortQuery = { startingPrice: -1 }
 
+        
 
 
         let categoryId = []
