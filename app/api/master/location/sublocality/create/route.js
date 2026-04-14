@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/databaseConnection";
-import { catchError, response } from "@/lib/helperFunction";
+import { catchError, response, escapeRegExp } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { zSchema } from "@/lib/zodSchema";
 import SublocalityModel from "@/models/Sublocality.model";
@@ -22,9 +22,21 @@ export async function POST(request) {
             return response(false, 400, 'Invalid or Missing fields.', validate.error)
         }
 
-        const { locality, sublocality } = validate.data
+        const { locality } = validate.data
+        const sublocalityValue = validate.data.sublocality.trim()
+
+        const existingSublocality = await SublocalityModel.findOne({
+            locality,
+            sublocality: new RegExp(`^${escapeRegExp(sublocalityValue)}$`, 'i')
+        })
+
+        if (existingSublocality) {
+            return response(false, 409, 'Sublocality already exists for the selected locality.')
+        }
+
         const newSublocality = new SublocalityModel({
-            locality, sublocality
+            locality,
+            sublocality: sublocalityValue
         })
         await newSublocality.save()
 

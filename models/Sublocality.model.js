@@ -8,7 +8,7 @@ const sublocalitySchema = new mongoose.Schema({
     },
     sublocality: {
         type: String,
-        unique: true,
+        trim: true,
         default: null
     },
     deletedAt: {
@@ -17,6 +17,8 @@ const sublocalitySchema = new mongoose.Schema({
         index: true
     }
 }, { timestamps: true })
+
+sublocalitySchema.index({ locality: 1, sublocality: 1 }, { unique: true })
 
 const SublocalityModel = mongoose.models?.Sublocality || mongoose.model('Sublocality', sublocalitySchema, 'sublocalities')
 export default SublocalityModel

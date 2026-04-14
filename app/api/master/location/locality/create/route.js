@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/databaseConnection";
-import { catchError, response } from "@/lib/helperFunction";
+import { catchError, response, escapeRegExp } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { zSchema } from "@/lib/zodSchema";
 import LocalityModel from "@/models/Locality.model";
@@ -22,9 +22,21 @@ export async function POST(request) {
             return response(false, 400, 'Invalid or Missing fields.', validate.error)
         }
 
-        const { city, locality } = validate.data
+        const { city } = validate.data
+        const localityValue = validate.data.locality.trim()
+
+        const existingLocality = await LocalityModel.findOne({
+            city,
+            locality: new RegExp(`^${escapeRegExp(localityValue)}$`, 'i')
+        })
+
+        if (existingLocality) {
+            return response(false, 409, 'Locality already exists for the selected city.')
+        }
+
         const newLocality = new LocalityModel({
-            city, locality
+            city,
+            locality: localityValue
         })
         await newLocality.save()
 

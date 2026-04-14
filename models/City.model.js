@@ -9,7 +9,7 @@ const citySchema = new mongoose.Schema({
     city: {
         type: String,
         required: true,
-        unique: true
+        trim: true
     },
     deletedAt: {
         type: Date,
@@ -17,6 +17,8 @@ const citySchema = new mongoose.Schema({
         index: true
     }
 }, { timestamps: true })
+
+citySchema.index({ state: 1, city: 1 }, { unique: true })
 
 const CityModel = mongoose.models.City || mongoose.model('City', citySchema, 'cities')
 export default CityModel

@@ -32,6 +32,7 @@ export async function POST(request) {
                 capacity: true,
             })
             .partial({
+                locality: true,
                 sublocality: true,
                 capacity: true,
             });

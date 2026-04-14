@@ -61,7 +61,6 @@ const listingSchema = new mongoose.Schema({
     locality: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Locality',
-        required: true
     },
     sublocality: {
         type: mongoose.Schema.Types.ObjectId,

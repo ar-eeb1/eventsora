@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/databaseConnection";
-import { catchError, response } from "@/lib/helperFunction";
+import { catchError, response, escapeRegExp } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { zSchema } from "@/lib/zodSchema";
 import CountryModel from "@/models/Country.model";
@@ -22,12 +22,25 @@ export async function POST(request) {
             return response(false, 400, 'Invalid or Missing fields.', validate.error)
         }
 
-        const { country, code } = validate.data
+        const countryValue = validate.data.country.trim()
+        const codeValue = validate.data.code.trim().toUpperCase()
+
+        const existingCountry = await CountryModel.findOne({
+            $or: [
+                { country: new RegExp(`^${escapeRegExp(countryValue)}$`, 'i') },
+                { code: codeValue }
+            ]
+        })
+
+        if (existingCountry) {
+            return response(false, 409, 'Country name or code already exists.')
+        }
+
         const newCountry = new CountryModel({
-            country, code
+            country: countryValue,
+            code: codeValue
         })
         await newCountry.save()
-
 
         return response(true, 200, 'Country added.')
     } catch (error) {

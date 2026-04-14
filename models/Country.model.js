@@ -4,7 +4,8 @@ const countrySchema = new mongoose.Schema({
     country: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true
     },
     code: {
         type: String,

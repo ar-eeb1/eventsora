@@ -9,7 +9,7 @@ const localitySchema = new mongoose.Schema({
     locality: {
         type: String,
         required: true,
-        unique: true
+        trim: true
     },
     deletedAt: {
         type: Date,
@@ -17,6 +17,8 @@ const localitySchema = new mongoose.Schema({
         index: true
     }
 }, { timestamps: true })
+
+localitySchema.index({ city: 1, locality: 1 }, { unique: true })
 
 const LocalityModel = mongoose.models.Locality || mongoose.model('Locality', localitySchema, 'localities')
 export default LocalityModel

@@ -37,6 +37,7 @@ export async function PUT(request) {
                 tags: true,
             })
             .partial({
+                locality: true,
                 sublocality: true,
                 capacity: true,
             });

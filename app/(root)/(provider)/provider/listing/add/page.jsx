@@ -70,6 +70,7 @@ const AddListing = () => {
     }
   })
 
+  const sortByLabel = (a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
 
   // WATCH SELECTED CATEGORY
   const selectedCategory = form.watch('category');
@@ -125,7 +126,7 @@ const AddListing = () => {
 
   useEffect(() => {
     if (getCountry && getCountry.success) {
-      const options = getCountry.data.map(coun => ({ label: coun.country, value: coun._id }))
+      const options = getCountry.data.map(coun => ({ label: coun.country, value: coun._id })).sort(sortByLabel)
       setCountryOptions(options)
     }
   }, [getCountry])
@@ -140,7 +141,7 @@ const AddListing = () => {
         label: sta.state,
         value: sta._id,
         countryId: sta.countryId,
-      }))
+      })).sort(sortByLabel)
       setStateOptions(options)
     }
   }, [getStateData])
@@ -170,7 +171,7 @@ const AddListing = () => {
         label: cit.city,
         value: cit._id,
         stateId: cit.stateId
-      }))
+      })).sort(sortByLabel)
       setCityOptions(options)
     }
   }, [getCityData])
@@ -199,7 +200,7 @@ const AddListing = () => {
         label: loc.locality,
         value: loc._id,
         cityId: loc.cityId
-      }))
+      })).sort(sortByLabel)
       setLocalityOptions(options)
     }
   }, [getLocalityData])
@@ -228,7 +229,7 @@ const AddListing = () => {
         label: sub.sublocality,
         value: sub._id,
         localityId: sub.localityId
-      }))
+      })).sort(sortByLabel)
       setSublocalityOptions(options)
     }
   }, [getSublocalityData])
@@ -501,7 +502,7 @@ const AddListing = () => {
                     {/* LOCALITY */}
                     <FormField control={form.control} name="locality" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">Locality<span className='text-red-500 ml-1'>*</span></FormLabel>
+                        <FormLabel className="text-sm font-medium">Locality</FormLabel>
                         <FormControl>
                           <Select
                             options={filteredLocalities}

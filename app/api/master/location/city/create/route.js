@@ -1,8 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
-import { catchError, response } from "@/lib/helperFunction";
+import { catchError, response, escapeRegExp } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { zSchema } from "@/lib/zodSchema";
-import StateModel from "@/models/State.model";
 import CityModel from "@/models/City.model";
 
 export async function POST(request) {
@@ -23,9 +22,21 @@ export async function POST(request) {
             return response(false, 400, 'Invalid or Missing fields.', validate.error)
         }
 
-        const { state, city } = validate.data
+        const { state } = validate.data
+        const cityValue = validate.data.city.trim()
+
+        const existingCity = await CityModel.findOne({
+            state,
+            city: new RegExp(`^${escapeRegExp(cityValue)}$`, 'i')
+        })
+
+        if (existingCity) {
+            return response(false, 409, 'City already exists for the selected state.')
+        }
+
         const newCity = new CityModel({
-            state, city
+            state,
+            city: cityValue
         })
         await newCity.save()
 

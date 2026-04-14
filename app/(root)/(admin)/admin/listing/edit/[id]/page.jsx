@@ -30,6 +30,7 @@ const ReviewListing = ({ params }) => {
   const { id } = use(params)
   const { data: getListing, loading: getListingLoading } = useFetch(`/api/admin/listing/get/${id}`)
 
+  const sortByLabel = (a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
 
   //MEDIA MODAL STATES
 
@@ -186,7 +187,7 @@ const ReviewListing = ({ params }) => {
 
   useEffect(() => {
     if (getCountry && getCountry.success) {
-      const options = getCountry.data.map(coun => ({ label: coun.country, value: coun._id }))
+      const options = getCountry.data.map(coun => ({ label: coun.country, value: coun._id })).sort(sortByLabel)
       setCountryOptions(options)
     }
   }, [getCountry])
@@ -201,7 +202,7 @@ const ReviewListing = ({ params }) => {
         label: sta.state,
         value: sta._id,
         countryId: sta.countryId,
-      }))
+      })).sort(sortByLabel)
       setStateOptions(options)
     }
   }, [getStateData])
@@ -231,7 +232,7 @@ const ReviewListing = ({ params }) => {
         label: cit.city,
         value: cit._id,
         stateId: cit.stateId
-      }))
+      })).sort(sortByLabel)
       setCityOptions(options)
     }
   }, [getCityData])
@@ -260,7 +261,7 @@ const ReviewListing = ({ params }) => {
         label: loc.locality,
         value: loc._id,
         cityId: loc.cityId
-      }))
+      })).sort(sortByLabel)
       setLocalityOptions(options)
     }
   }, [getLocalityData])
@@ -289,7 +290,7 @@ const ReviewListing = ({ params }) => {
         label: sub.sublocality,
         value: sub._id,
         localityId: sub.localityId
-      }))
+      })).sort(sortByLabel)
       setSublocalityOptions(options)
     }
   }, [getSublocalityData])
@@ -556,7 +557,7 @@ const ReviewListing = ({ params }) => {
                     {/* LOCALITY */}
                     <FormField control={form.control} name="locality" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">Locality<span className='text-red-500 ml-1'>*</span></FormLabel>
+                        <FormLabel className="text-sm font-medium">Locality</FormLabel>
                         <FormControl>
                           <Select
                             options={filteredLocalities}

@@ -9,7 +9,7 @@ const stateSchema = new mongoose.Schema({
     state: {
         type: String,
         required: true,
-        unique: true
+        trim: true
     },
     deletedAt: {
         type: Date,
@@ -17,6 +17,8 @@ const stateSchema = new mongoose.Schema({
         index: true
     }
 }, { timestamps: true })
+
+stateSchema.index({ country: 1, state: 1 }, { unique: true })
 
 const StateModel = mongoose.models.State || mongoose.model('State', stateSchema, 'states')
 export default StateModel
