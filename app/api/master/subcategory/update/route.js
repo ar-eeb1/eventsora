@@ -3,7 +3,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { zSchema } from "@/lib/zodSchema";
 import CategoryModel from "@/models/Category.model";
-import SubcategoryModel from "@/models/subcategory.model";
+import SubcategoryModel from "@/models/Subcategory.model";
 
 export async function PUT(request) {
     try {
