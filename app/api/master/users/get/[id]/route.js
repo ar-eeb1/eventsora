@@ -2,7 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isValidObjectId } from "mongoose";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 
 export async function GET(request, { params }) {
     try {

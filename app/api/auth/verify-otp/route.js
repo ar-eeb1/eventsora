@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
 import OTPModel from "@/models/Otp.model";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
 export async function POST(request) {

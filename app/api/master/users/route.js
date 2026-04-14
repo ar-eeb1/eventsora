@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
@@ -47,7 +47,7 @@ export async function GET(request) {
         filters.forEach(filter => {
             matchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
         })
-        
+
         // sorting
         let sortQuery = {}
         sorting.forEach(sort => {

@@ -4,7 +4,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import CategoryModel from "@/models/Category.model";
 import ListingModel from "@/models/Listing.model";
 import SubcategoryModel from "@/models/Subcategory.model";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 
 export async function GET(request) {
     try {

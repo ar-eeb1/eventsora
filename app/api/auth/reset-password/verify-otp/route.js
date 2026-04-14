@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
 import OTPModel from "@/models/Otp.model";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 export async function POST(request) {
     try {
         await connectDB()
@@ -25,7 +25,7 @@ export async function POST(request) {
             return response(false, 404, 'User not found')
         }
 
-    
+
         await getOtpData.deleteOne()
 
         return response(true, 200, 'OTP Verified Successfully')

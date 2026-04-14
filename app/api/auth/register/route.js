@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
 import { z } from "zod";
 

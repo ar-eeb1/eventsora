@@ -4,7 +4,7 @@ import ListingModel from "@/models/Listing.model";
 import ListingVariantModel from "@/models/ListingVariant.model";
 import { MediaModel } from "@/models/Media.model";
 import reviewModel from "@/models/Review.model";
-import UserModel from "@/models/user.Model.js";
+import UserModel from "@/models/User.model.js";
 import CityModel from "@/models/City.model";
 import LocalityModel from "@/models/Locality.model";
 

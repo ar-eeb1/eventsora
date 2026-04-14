@@ -2,7 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import MediaModel from "@/models/Media.model";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 
 
 export async function POST(request) {
@@ -12,7 +12,7 @@ export async function POST(request) {
         if (!auth.isAuth) {
             return response(false, 403, "Unauthorized.");
         }
-      
+
         await connectDB();
         const mediaWithUserId = payload.map(item => ({
             ...item,

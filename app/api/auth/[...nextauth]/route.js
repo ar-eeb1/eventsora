@@ -1,9 +1,9 @@
 import NextAuth from "next-auth"
 import GoogleProvider from 'next-auth/providers/google'
 import { connectDB } from "@/lib/databaseConnection"
-import UserModel from "@/models/user.Model"
 import { SignJWT } from "jose"
 import { cookies } from "next/headers"
+import UserModel from "@/models/User.model"
 
 const handler = NextAuth({
     providers: [

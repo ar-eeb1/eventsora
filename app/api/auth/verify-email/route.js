@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 import { jwtVerify } from "jose";
 import { isValidObjectId } from "mongoose";
 

@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 
 export async function POST(request) {
     try {

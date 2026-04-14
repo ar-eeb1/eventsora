@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 
 export async function PUT(request) {
     try {
@@ -70,7 +70,7 @@ export async function DELETE(request) {
         }
 
         await UserModel.deleteMany({ _id: { $in: ids } })
-          return response(true, 200, 'Data Deleted Permanently')
+        return response(true, 200, 'Data Deleted Permanently')
 
     } catch (error) {
 

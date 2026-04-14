@@ -4,7 +4,7 @@ import { catchError, generateOTP, response } from "@/lib/helperFunction";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
 import OTPModel from "@/models/Otp.model";
-import UserModel from "@/models/user.Model";
+import UserModel from "@/models/User.model";
 
 export async function POST(request) {
     try {
@@ -23,7 +23,7 @@ export async function POST(request) {
         if (!getUser) {
             return response(false, 404, 'User not found')
         }
-        
+
         await OTPModel.deleteMany({ email })
         const otp = generateOTP()
         const newOtpData = new OTPModel({
