@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import SubcategoryModel from "@/models/Subcategory.model";
+import SubcategoryModel from "@/models/subcategory.model";
 
 export async function PUT(request) {
     try {
