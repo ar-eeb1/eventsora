@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import SubcategoryModel from "@/models/Subcategory.model";
 import CategoryModel from "@/models/Category.model";
+import SubcategoryModel from "@/models/Subcategory.model";
 
 export async function GET(request) {
   try {

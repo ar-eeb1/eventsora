@@ -5,7 +5,7 @@ import "./globals.css";
 import Script from 'next/script';
 import { Toaster } from 'sonner';
 import GlobalProvider from '@/components/application/GlobalProvider';
-import ThemeProvider from '@/components/Application/Website/ThemeProvider'
+import ThemeProvider from '@/components/application/Website/ThemeProvider'
 
 
 const geistSans = Geist({
