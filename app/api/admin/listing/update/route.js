@@ -34,6 +34,7 @@ export async function PUT(request) {
                 capacity: true,
                 status: true,
                 adminNote: true,
+                tags: true,
             })
             .partial({
                 sublocality: true,
@@ -70,6 +71,7 @@ export async function PUT(request) {
         getListing.capacity = validatedData.capacity
         getListing.status = validatedData.status
         getListing.adminNote = validatedData.adminNote || null
+        getListing.tags = validatedData.tags || []
 
         if (validatedData.status !== getListing.status) {
             getListing.reviewedAt = new Date()

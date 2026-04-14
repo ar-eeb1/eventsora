@@ -132,6 +132,7 @@ export async function GET(request) {
                     capacity: 1,
                     status: 1,
                     deletedAt: 1,
+                    tags: 1,
                 }
             }
         ]

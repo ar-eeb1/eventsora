@@ -40,7 +40,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     // Find active variant based on serviceCode
     const activeVariant = variants.find(v => v.serviceCode?.trim() === serviceCode?.trim())
 
-    const [isloading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const breadCrumbData = [
         { href: WEBSITE_HOME, label: 'Home' },
         { href: WEBSITE_LISTING, label: `All Listings` },
@@ -87,6 +87,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     const [selectedDates, setSelectedDates] = useState([])
     const [selectedDatePrices, setSelectedDatePrices] = useState({})
     const bookingStore = useSelector(store => store.bookingStore)
+    const { auth } = useSelector(store => store.authStore || {})
 
     useEffect(() => {
         const existingListing = bookingStore.listings?.findIndex((bookListing) => {
@@ -168,19 +169,30 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     }
 
     const handleMessageProvider = async () => {
+        if (!auth) {
+            showToast('error', 'Please login to message the provider')
+            return
+        }
 
         setIsLoading(true)
         try {
             const receiverId = listing.userId?._id
+            if (!receiverId) {
+                showToast('error', 'Provider information not found')
+                return
+            }
+
             const { data } = await axios.post('/api/message/conversation/create', {
                 receiverId: receiverId,
                 listingId: listing._id
             })
             if (data.success) {
                 router.push(`/user/messages/${data.data._id}`)
+            } else {
+                showToast('error', data.message || 'Failed to start chat')
             }
         } catch (error) {
-            showToast('error', error.response?.data?.message || 'Failed to start chat')
+            showToast('error', error.response?.data?.message || error.message || 'Failed to start chat')
         } finally {
             setIsLoading(false)
         }
@@ -309,7 +321,31 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 </div>
 
                 <div className='md:w-1/2 md:mt-0 mt-5'>
-                    <h1 className='text-3xl font-semibold mb-2'>{listing.name}</h1>
+                    <div className="flex items-start justify-between flex-wrap gap-2 mb-2">
+                        <h1 className='text-3xl font-semibold'>{listing.name}</h1>
+                        <div className="flex gap-2">
+                            {listing?.tags?.map((tag) => {
+                                const labels = {
+                                    eventsora_choice: 'Eventsora Choice',
+                                    managed_by_eventsora: 'Managed by Eventsora',
+                                    top_rated: 'Top Rated'
+                                }
+                                const styles = {
+                                    eventsora_choice: 'bg-amber-100 text-amber-700 border-amber-200',
+                                    managed_by_eventsora: 'bg-blue-100 text-blue-700 border-blue-200',
+                                    top_rated: 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                                }
+                                return (
+                                    <span 
+                                        key={tag} 
+                                        className={`text-[12px] font-bold px-3 py-1 rounded-full border shadow-sm ${styles[tag] || 'bg-gray-100 text-gray-700 border-gray-200'}`}
+                                    >
+                                        {labels[tag] || tag.replace(/_/g, ' ')}
+                                    </span>
+                                )
+                            })}
+                        </div>
+                    </div>
                     <div className='flex items-center gap-1 mb-5 '>
                         {Array.from({ length: 5 }).map((_, i) => (
                             <IoStar className='text-yellow-500' key={i} />
@@ -404,7 +440,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         </div>)
                     }
 
-                    <div className='gap-3 flex flex-col md:mt-10 mt-5 md:block '>
+                    <div className='gap-4 flex flex-col md:mt-10 mt-5 md:block '>
                         {!isAddedIntoBooking ?
                             <ButtonLoading
                                 type='button'
@@ -423,7 +459,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         <ButtonLoading
                             type='button'
                             onClick={handleMessageProvider}
-                            loading={isloading} // Check state name casing (isloading vs isLoading)
+                            loading={isLoading} // Check state name casing (isloading vs isLoading)
                             text='Message Provider'
                             className='md:w-1/2 rounded-full py-6 text-md text-black bg-white cursor-pointer'
                         />

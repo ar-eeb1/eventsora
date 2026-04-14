@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
-import { listingStatus } from '@/lib/utils'
+import { listingStatus, tags } from '@/lib/utils'
 import { zSchema } from '@/lib/zodSchema'
 import { ADMIN_DASHBOARD, ADMIN_LISTING_SHOW } from '@/routes/AdminPanelRoute'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -54,7 +54,8 @@ const ReviewListing = ({ params }) => {
     address: true,
     capacity: true,
     status: true,
-    adminNote: true
+    adminNote: true,
+    tags: true
   })
 
   const form = useForm({
@@ -76,6 +77,7 @@ const ReviewListing = ({ params }) => {
       capacity: undefined,
       status: '',
       adminNote: undefined,
+      tags: []
     }
   })
 
@@ -98,6 +100,7 @@ const ReviewListing = ({ params }) => {
         address: listing?.address,
         capacity: listing?.capacity,
         status: listing?.status,
+        tags: listing?.tags || [],
       })
 
       if (listing.media) {
@@ -116,6 +119,16 @@ const ReviewListing = ({ params }) => {
       value: status
     }))
     setStatusOptions(options)
+  }, [])
+  
+  // TAGS OPTIONS
+  const [tagOptions, setTagOptions] = useState([])
+  useEffect(() => {
+    const options = tags.map(tag => ({
+      label: tag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      value: tag
+    }))
+    setTagOptions(options)
   }, [])
 
 
@@ -647,6 +660,30 @@ const ReviewListing = ({ params }) => {
                       </p>
                     )}
                   </div>
+                </div>
+
+
+                {/* Tags Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b-2 border-primary/20">
+                    <div className="h-2 w-2 bg-primary rounded-full"></div>
+                    <h5 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Management Tags</h5>
+                  </div>
+                  <FormField control={form.control} name="tags" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">Listing Tags</FormLabel>
+                      <FormControl>
+                        <Select
+                          options={tagOptions}
+                          selected={field.value}
+                          setSelected={field.onChange}
+                          isMulti={true}
+                          placeholder='Select Tags'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
                 </div>
 
 

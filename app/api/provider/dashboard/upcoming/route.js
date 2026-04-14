@@ -14,9 +14,7 @@ export async function GET(request) {
 
         await connectDB();
         const userObjectId = new mongoose.Types.ObjectId(auth.userId);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const todayStr = today.toISOString().split('T')[0];
+        const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' });
 
         const upcoming = await BookingModel.aggregate([
             {
@@ -84,4 +82,3 @@ export async function GET(request) {
         return catchError(error);
     }
 }
-

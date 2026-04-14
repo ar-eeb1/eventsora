@@ -12,7 +12,8 @@ const getDaysRemaining = (dateStr) => {
     if (!dateStr) return null
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    const target = new Date(dateStr)
+    const [year, month, day] = dateStr.split('-').map(Number)
+    const target = new Date(year, month - 1, day)
     const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24))
     return diff
 }

@@ -1,4 +1,4 @@
-import { listingStatus } from "@/lib/utils";
+import { listingStatus, tags } from "@/lib/utils";
 import mongoose from "mongoose";
 
 const listingSchema = new mongoose.Schema({
@@ -31,8 +31,7 @@ const listingSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
-        index: true
+        required: true
     },
     media: [
         {
@@ -114,7 +113,15 @@ const listingSchema = new mongoose.Schema({
     featuredUntil: {
         type: Date,
         default: null
-    }
+    },
+    tags: [
+        {
+            type: String,
+            enum: tags,
+            trim: true,
+            lowercase: true
+        }
+    ],
 
 
 }, { timestamps: true })

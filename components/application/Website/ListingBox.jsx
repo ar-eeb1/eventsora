@@ -27,13 +27,37 @@ const ListingBox = ({ listing }) => {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 {capacity &&
-                    <div className='flex items-center gap-2 text-gray-600 absolute right-2 top-2 bg-[#F8E7E6] px-2 rounded-full py-1'>
+                    <div className='flex items-center gap-2 text-gray-600 absolute right-2 top-2 bg-white/90 backdrop-blur-sm px-2 rounded-full py-1 shadow-sm border border-pink-100'>
                         <Users size={15} className='text-pink-700' aria-hidden="true" />
                         <span className='text-xs font-medium'>
                             {capacity} {capacity === 1 ? 'Guest' : 'Guests'}
                         </span>
                     </div>
                 }
+
+                {/* Tags */}
+                <div className="absolute left-2 top-2 flex flex-col gap-1">
+                    {listing?.tags?.map((tag) => {
+                        const labels = {
+                            eventsora_choice: 'Eventsora Choice',
+                            managed_by_eventsora: 'Managed by Eventsora',
+                            top_rated: 'Top Rated'
+                        }
+                        const styles = {
+                            eventsora_choice: 'bg-amber-500 text-white',
+                            managed_by_eventsora: 'bg-blue-600 text-white',
+                            top_rated: 'bg-emerald-600 text-white'
+                        }
+                        return (
+                            <span 
+                                key={tag} 
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded shadow-sm ${styles[tag] || 'bg-gray-600 text-white'}`}
+                            >
+                                {labels[tag] || tag.replace(/_/g, ' ')}
+                            </span>
+                        )
+                    })}
+                </div>
 
             </div>
 

@@ -6,7 +6,7 @@ import { isValidObjectId } from "mongoose";
 
 export async function POST(request) {
     try {
-        const auth = await isAuthenticated('user')
+        const auth = await isAuthenticated(['user', 'provider'])
         if (!auth.isAuth) {
             return response(false, 403, 'Unauthorized')
         }
@@ -17,6 +17,10 @@ export async function POST(request) {
         }
         if (!isValidObjectId(listingId)) {
             return response(false, 400, 'Invalid Listing ID')
+        }
+
+        if (auth.userId === receiverId) {
+            return response(false, 400, "You cannot message yourself")
         }
 
         await connectDB()

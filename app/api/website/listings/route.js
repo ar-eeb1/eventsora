@@ -120,9 +120,9 @@ export async function GET(request) {
                 const blockedListingIds = unavailableListings
                     .filter(item => !item.variantId) // Entire listing is blocked/booked
                     .map(item => item.listingId);
-                
-                if(blockedListingIds.length > 0) {
-                     matchStage._id = { $nin: blockedListingIds };
+
+                if (blockedListingIds.length > 0) {
+                    matchStage._id = { $nin: blockedListingIds };
                 }
             }
         }
@@ -130,19 +130,19 @@ export async function GET(request) {
 
         let blockedVariantIds = [];
         if (filterStartDate || filterEndDate) {
-             let startQueryDate = new Date();
-             let endQueryDate = new Date();
-             if (filterStartDate) { startQueryDate = new Date(filterStartDate); startQueryDate.setUTCHours(0, 0, 0, 0); } else if (filterEndDate) { startQueryDate = new Date(filterEndDate); startQueryDate.setUTCHours(0, 0, 0, 0); }
-             if (filterEndDate) { endQueryDate = new Date(filterEndDate); endQueryDate.setUTCHours(23, 59, 59, 999); } else if (filterStartDate) { endQueryDate = new Date(filterStartDate); endQueryDate.setUTCHours(23, 59, 59, 999); }
-             
-             const unavailableVariants = await CalendarModel.find({
+            let startQueryDate = new Date();
+            let endQueryDate = new Date();
+            if (filterStartDate) { startQueryDate = new Date(filterStartDate); startQueryDate.setUTCHours(0, 0, 0, 0); } else if (filterEndDate) { startQueryDate = new Date(filterEndDate); startQueryDate.setUTCHours(0, 0, 0, 0); }
+            if (filterEndDate) { endQueryDate = new Date(filterEndDate); endQueryDate.setUTCHours(23, 59, 59, 999); } else if (filterStartDate) { endQueryDate = new Date(filterStartDate); endQueryDate.setUTCHours(23, 59, 59, 999); }
+
+            const unavailableVariants = await CalendarModel.find({
                 date: { $gte: startQueryDate, $lte: endQueryDate },
                 dateStatus: { $in: ['booked', 'blocked'] },
                 variantId: { $ne: null },
                 deletedAt: null
             }).select('variantId').lean();
-            
-            if(unavailableVariants.length > 0) {
+
+            if (unavailableVariants.length > 0) {
                 blockedVariantIds = unavailableVariants.map(item => item.variantId);
             }
         }
@@ -244,102 +244,11 @@ export async function GET(request) {
                         capacity: 1
                     },
                     city: { city: 1 },
-                    locality: { locality: 1 }
+                    locality: { locality: 1 },
+                    tags: 1
                 }
             }
         ])
-        // const listings = await ListingModel.aggregate([
-        //     { $match: matchStage },
-        //     { $sort: sortQuery },
-        //     { $skip: skip },
-        //     { $limit: limit + 1 },
-
-        //     // Filter listings by their own price and capacity
-        //     {
-        //         $match: {
-        //             $and: [
-        //                 { startingPrice: { $gte: minPrice, $lte: maxPrice } },
-        //                 {
-        //                     $or: [
-        //                         { capacity: null },
-        //                         { capacity: { $gte: minCapacity, $lte: maxCapacity } }
-        //                     ]
-        //                 }
-        //             ]
-        //         }
-        //     },
-
-        //     // Lookup variants (just for display, not for filtering)
-        //     {
-        //         $lookup: {
-        //             from: 'listingvariants',
-        //             localField: '_id',
-        //             foreignField: 'listing',
-        //             as: 'variants'
-        //         }
-        //     },
-
-        //     // Filter variants for display (optional)
-        //     {
-        //         $addFields: {
-        //             variants: {
-        //                 $filter: {
-        //                     input: "$variants",
-        //                     as: 'variant',
-        //                     cond: {
-        //                         $and: [
-        //                             { $gte: ["$$variant.startingPrice", minPrice] },
-        //                             { $lte: ["$$variant.startingPrice", maxPrice] },
-        //                             {
-        //                                 $or: [
-        //                                     { $eq: ["$$variant.capacity", null] },
-        //                                     {
-        //                                         $and: [
-        //                                             { $gte: ["$$variant.capacity", minCapacity] },
-        //                                             { $lte: ["$$variant.capacity", maxCapacity] }
-        //                                         ]
-        //                                     }
-        //                                 ]
-        //                             }
-        //                         ]
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     },
-
-        //     // Media lookup
-        //     {
-        //         $lookup: {
-        //             from: 'medias',
-        //             localField: 'media',
-        //             foreignField: '_id',
-        //             as: 'media'
-        //         }
-        //     },
-
-        //     // Projection
-        //     {
-        //         $project: {
-        //             _id: 1,
-        //             name: 1,
-        //             slug: 1,
-        //             startingPrice: 1,
-        //             capacity: 1,
-        //             media: {
-        //                 _id: 1,
-        //                 secure_url: 1,
-        //                 alt: 1
-        //             },
-        //             variants: {
-        //                 startingPrice: 1,
-        //                 capacity: 1
-        //             }
-        //         }
-        //     }
-        // ])
-
-        // CHECK FOR MORE DATA
         let nextPage = null
         if (listings.length > limit) {
             nextPage = page + 1

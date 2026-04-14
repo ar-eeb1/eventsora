@@ -1,4 +1,27 @@
 export const bookingNotification = (data) => {
+	const { bookingStatus = 'pending', paymentStatus = 'pending' } = data;
+
+	const getStatusHeader = () => {
+		switch (bookingStatus) {
+			case 'confirmed': return 'YOUR BOOKING IS CONFIRMED!';
+			case 'awaiting-payment': return 'AWAITING PAYMENT FOR YOUR BOOKING';
+			case 'completed': return 'YOUR BOOKING IS COMPLETED!';
+			case 'cancelled': return 'YOUR BOOKING HAS BEEN CANCELLED';
+			case 'unverified': return 'BOOKING VERIFICATION IN PROGRESS';
+			default: return 'BOOKING RECEIVED & PENDING VERIFICATION';
+		}
+	};
+
+	const getProgressStyle = (step) => {
+		const stepsOrder = ['pending', 'awaiting-payment', 'confirmed', 'completed'];
+		const currentIndex = stepsOrder.indexOf(bookingStatus);
+		const stepIndex = stepsOrder.indexOf(step);
+
+		if (stepIndex <= currentIndex && currentIndex !== -1) {
+			return { color: '#000000', weight: '700', icon: 'https://res.cloudinary.com/dliahmplq/image/upload/v1764930727/eventsora_bvxigy.png' };
+		}
+		return { color: '#e1cabf', weight: '400', icon: 'https://res.cloudinary.com/dliahmplq/image/upload/v1764930727/eventsora_bvxigy.png' }; // Placeholder for greyed out
+	};
 	const html = `
         <!DOCTYPE html>
   <html lang="en-US" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
@@ -248,8 +271,7 @@ export const bookingNotification = (data) => {
 																<h1
 																	style="margin: 0; color: #000000; direction: ltr; font-family: TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif; font-size: 40px; font-weight: 400; letter-spacing: -2px; line-height: 1.2; text-align: center; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 48px;">
 																	<span class="tinyMce-placeholder"
-																		style="word-break: break-word;">YOUR BOOKING WILL
-																		BE VERIFIED SOON!</span>
+																		style="word-break: break-word;">${getStatusHeader()}</span>
 																</h1>
 															</td>
 														</tr>
@@ -285,7 +307,7 @@ export const bookingNotification = (data) => {
 																style="width:100%;padding-right:0px;padding-left:0px;">
 																<div align="center" class="alignment">
 																	<div style="max-width: 13px;"><img alt="Check"
-																			height="auto" src="https://res.cloudinary.com/dliahmplq/image/upload/v1764930727/eventsora_bvxigy.png"
+																			height="auto" src="${getProgressStyle('pending').icon}"
 																			style="display: block; height: auto; border: 0; width: 100%;"
 																			title="Check" width="13" /></div>
 																</div>
@@ -299,8 +321,8 @@ export const bookingNotification = (data) => {
 														<tr>
 															<td class="pad" style="padding-top:10px;">
 																<div
-																	style="color:#000000;direction:ltr;font-family:TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif;font-size:18px;font-weight:700;letter-spacing:0px;line-height:1.2;text-align:center;mso-line-height-alt:22px;">
-																	<p style="margin: 0;">Confirmed</p>
+																	style="color:${getProgressStyle('pending').color};direction:ltr;font-family:TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif;font-size:18px;font-weight:${getProgressStyle('pending').weight};letter-spacing:0px;line-height:1.2;text-align:center;mso-line-height-alt:22px;">
+																	<p style="margin: 0;">Placed</p>
 																</div>
 															</td>
 														</tr>
@@ -344,8 +366,8 @@ export const bookingNotification = (data) => {
 														<tr>
 															<td class="pad" style="padding-top:25px;">
 																<div
-																	style="color:#e1cabf;direction:ltr;font-family:TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif;font-size:18px;font-weight:400;letter-spacing:0px;line-height:1.2;text-align:center;mso-line-height-alt:22px;">
-																	<p style="margin: 0;">Shipped</p>
+																	style="color:${getProgressStyle('confirmed').color};direction:ltr;font-family:TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif;font-size:18px;font-weight:${getProgressStyle('confirmed').weight};letter-spacing:0px;line-height:1.2;text-align:center;mso-line-height-alt:22px;">
+																	<p style="margin: 0;">Confirmed</p>
 																</div>
 															</td>
 														</tr>
@@ -389,8 +411,8 @@ export const bookingNotification = (data) => {
 														<tr>
 															<td class="pad" style="padding-left:10px;padding-top:25px;">
 																<div
-																	style="color:#e1cabf;direction:ltr;font-family:TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif;font-size:18px;font-weight:400;letter-spacing:0px;line-height:1.2;text-align:left;mso-line-height-alt:22px;">
-																	<p style="margin: 0;">Delivered</p>
+																	style="color:${getProgressStyle('completed').color};direction:ltr;font-family:TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif;font-size:18px;font-weight:${getProgressStyle('completed').weight};letter-spacing:0px;line-height:1.2;text-align:left;mso-line-height-alt:22px;">
+																	<p style="margin: 0;">Completed</p>
 																</div>
 															</td>
 														</tr>
@@ -440,7 +462,7 @@ export const bookingNotification = (data) => {
 														width="100%">
 														<tr>
 															<td class="pad"
-																style="padding-bottom:35px;padding-left:10px;padding-right:10px;padding-top:10px;text-align:center;width:100%;">
+																style="padding-bottom:10px;padding-left:10px;padding-right:10px;padding-top:10px;text-align:center;width:100%;">
 																<h3
 																	style="margin: 0; color: #4400ff; direction: ltr; font-family: TimesNewRoman, 'Times New Roman', Times, Baskerville, Georgia, serif; font-size: 24px; font-weight: 700; letter-spacing: normal; line-height: 1.2; text-align: center; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 29px;">
 																	<span class="tinyMce-placeholder"
@@ -450,6 +472,28 @@ export const bookingNotification = (data) => {
 															</td>
 														</tr>
 													</table>
+													${bookingStatus === 'awaiting-payment' ? `
+													<table border="0" cellpadding="0" cellspacing="0"
+														class="paragraph_block block-3" role="presentation"
+														style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;"
+														width="100%">
+														<tr>
+															<td class="pad" style="padding-bottom:20px;padding-left:10px;padding-right:10px;padding-top:10px;">
+																<div style="color:#000000;direction:ltr;font-family:Arial, Helvetica, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:1.5;text-align:center;">
+																	<p style="margin: 0;"><strong>Payment Instructions:</strong></p>
+																	<p style="margin: 0;">Please transfer the total amount to the following bank account to confirm your booking:</p>
+																	<div style="background-color: #f7f1ed; border-radius: 8px; padding: 15px; margin-top: 10px; display: inline-block; text-align: left; border: 1px dashed #9502f5;">
+																		<p style="margin: 0;"><strong>Bank:</strong> Allied Bank Limited</p>
+																		<p style="margin: 0;"><strong>Account Title:</strong> Eventsora Private Limited</p>
+																		<p style="margin: 0;"><strong>Account Number:</strong> 00100XXXXXXXXXXX</p>
+																		<p style="margin: 0;"><strong>IBAN:</strong> PK00 ABPA 00XXXXXXXXXXXXXX</p>
+																	</div>
+																	<p style="margin-top: 10px; font-size: 14px; color: #635A5E;">Once paid, please upload your receipt on the website or reply to this email.</p>
+																</div>
+															</td>
+														</tr>
+													</table>
+													` : ''}
 													<table border="0" cellpadding="0" cellspacing="0"
 														class="button_block block-3" role="presentation"
 														style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;"

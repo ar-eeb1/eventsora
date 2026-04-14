@@ -8,8 +8,33 @@ import { MASTER_DASHBOARD } from "./routes/MasterPanelRoute"
 export async function proxy(request) {
   const url = request.nextUrl
   const pathname = url.pathname
-  const hasToken = request.cookies.has("access_token")
 
+  // 1. Allow static assets, API, and the Coming Soon page itself
+  const isStaticAsset = pathname.startsWith('/_next') || 
+                        pathname.startsWith('/api') || 
+                        pathname.includes('favicon.ico') ||
+                        pathname.includes('.') // common check for files
+  
+  if (isStaticAsset || pathname === '/coming-soon') {
+    return NextResponse.next()
+  }
+
+  // 2. check if it's a website route that should be blocked
+  // These are routes NOT starting with /admin, /provider, /auth, /master
+  const isProtectedRoute = pathname.startsWith("/admin") || 
+                           pathname.startsWith("/provider") || 
+                           pathname.startsWith("/auth") || 
+                           pathname.startsWith("/master") ||
+                           pathname.startsWith("/my-account") ||
+                           pathname === "/suspended"
+
+  if (!isProtectedRoute) {
+    // This is a website route (e.g. /, /listing, /[category]) - Redirect to Coming Soon
+    return NextResponse.redirect(new URL('/coming-soon', url))
+  }
+
+  // 3. Existing Auth logic for Protected Routes
+  const hasToken = request.cookies.has("access_token")
   let tokenValid = false
   let role = null
 
@@ -107,10 +132,13 @@ export async function proxy(request) {
 
 export const config = {
   matcher: [
-    "/admin/:path*",
-    "/provider/:path*",
-    "/my-account/:path*",
-    "/auth/:path*",
-    "/master/:path*"
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }

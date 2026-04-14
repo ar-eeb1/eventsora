@@ -50,6 +50,6 @@ export async function POST(request) {
         return response(true, 200, 'Registration Success, Please verify your email')
 
     } catch (error) {
-        catchError(error)
+        return catchError(error)
     }
 }

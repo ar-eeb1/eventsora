@@ -30,16 +30,16 @@ export async function PUT(request) {
             return response(false, 404, 'Booking not found or access denied.');
         }
 
-        // Logic: If trying to confirm booking, check if payment is already paid
-        if (newBookingStatus === 'confirmed' && booking.paymentStatus !== 'paid') {
-            return response(false, 400, 'Cannot confirm booking until payment is paid.');
+        // Logic: If trying to confirm booking, check if payment is already paid or partially-paid
+        if (newBookingStatus === 'confirmed' && !['paid', 'partially-paid'].includes(booking.paymentStatus)) {
+            return response(false, 400, 'Cannot confirm booking until payment is received (Full or Partial).');
         }
 
         booking.bookingStatus = newBookingStatus;
         await booking.save();
 
-        // When confirmed, mark all booked dates in the Calendar as 'booked'
-        if (newBookingStatus === 'confirmed') {
+        // When confirmed or awaiting-payment, mark all booked dates in the Calendar as 'booked'
+        if (['confirmed', 'awaiting-payment'].includes(newBookingStatus)) {
             const calendarUpserts = [];
 
             for (const item of booking.listings) {

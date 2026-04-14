@@ -102,28 +102,30 @@ export async function POST(request) {
 
             createdBookings.push(newBooking);
 
-            // Sync with Calendar
-            try {
-                const calendarPromises = providerListings.flatMap(item => {
-                    if (item.bookingDate && item.bookingDate.length > 0) {
-                        return item.bookingDate.map(bDate => {
-                            const filter = {
-                                listingId: item.listingId,
-                                variantId: item.variantId || null,
-                                date: new Date(bDate)
-                            };
-                            return CalendarModel.findOneAndUpdate(
-                                filter,
-                                { $set: { dateStatus: 'booked' } },
-                                { upsert: true, new: true, setDefaultsOnInsert: true }
-                            );
-                        });
-                    }
-                    return [];
-                });
-                await Promise.all(calendarPromises);
-            } catch (calendarError) {
-                console.error('Calendar sync error:', calendarError);
+            // Sync with Calendar only if confirmed or awaiting-payment
+            if (['confirmed', 'awaiting-payment'].includes(newBooking.bookingStatus)) {
+                try {
+                    const calendarPromises = providerListings.flatMap(item => {
+                        if (item.bookingDate && item.bookingDate.length > 0) {
+                            return item.bookingDate.map(bDate => {
+                                const filter = {
+                                    listingId: item.listingId,
+                                    variantId: item.variantId || null,
+                                    date: new Date(bDate)
+                                };
+                                return CalendarModel.findOneAndUpdate(
+                                    filter,
+                                    { $set: { dateStatus: 'booked' } },
+                                    { upsert: true, new: true, setDefaultsOnInsert: true }
+                                );
+                            });
+                        }
+                        return [];
+                    });
+                    await Promise.all(calendarPromises);
+                } catch (calendarError) {
+                    console.error('Calendar sync error:', calendarError);
+                }
             }
 
             // Send Email to this Provider
@@ -167,7 +169,9 @@ export async function POST(request) {
             for (const b of createdBookings) {
                 const mailData = {
                     booking_id: b.booking_id,
-                    bookingUrl: `${baseUrl}/booking-details/${b._id}`
+                    bookingUrl: `${baseUrl}/booking-details/${b._id}`,
+                    bookingStatus: b.bookingStatus,
+                    paymentStatus: b.paymentStatus,
                 }
                 await sendMail(`Your booking ${b.booking_id} has been placed successfully`, email, bookingNotification(mailData))
             }

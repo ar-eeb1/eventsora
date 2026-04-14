@@ -40,7 +40,7 @@ const Footer = () => {
           <ul>
             <li className='md:mb-2 text-sm text-white'><Link href={''}>Home</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href={''}>Shop</Link></li>
-            <li className='md:mb-2 text-sm text-white'><Link href='/about-us'>About</Link></li>
+            <li className='md:mb-2 text-sm text-white'><Link href='/about'>About</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href={''}>Register</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href={''}>Login</Link></li>
           </ul>

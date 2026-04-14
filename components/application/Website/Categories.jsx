@@ -56,7 +56,7 @@ const Categories = () => {
                                                 .map(sub => (
                                                     <li key={sub._id} className='text-sm font-light'>
                                                         <NavigationMenuLink asChild>
-                                                            <Link href=''>
+                                                            <Link href={WEBSITE_CATEGORY(`${cat.slug}?subcategory=${sub.slug}`)}>
                                                                 {sub.subcategory}
                                                             </Link>
                                                         </NavigationMenuLink>

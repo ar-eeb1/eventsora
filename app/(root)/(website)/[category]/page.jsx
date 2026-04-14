@@ -109,7 +109,7 @@ const page = () => {
                             <ButtonLoading type='button' loading={isFetching} text={'Load more'} onClick={fetchNextPage} />
                             :
                             <>
-                                {!isFetching && <span>No More Listing</span>}
+                                {!isFetching && <span>{"You're all caught up"}</span>}
                             </>
                         }
                     </div>

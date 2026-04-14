@@ -2,7 +2,9 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import ListingBox from './ListingBox'
-import axios from 'axios'
+import { connectDB } from '@/lib/databaseConnection'
+import ListingModel from '@/models/Listing.model'
+import CategoryModel from '@/models/Category.model'
 import { Playfair_Display } from 'next/font/google'
 
 const playfair = Playfair_Display({
@@ -14,11 +16,42 @@ const playfair = Playfair_Display({
 import HorizontalScrollContainer from './HorizontalScrollContainer'
 
 const AddHomeListing = async () => {
+    await connectDB()
 
-    const { data: listingData } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/website/getListing?category=venues`)
-    const { data: carData } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/website/getListing?category=services`)
+    const getListingsByCategory = async (slug) => {
+        try {
+            const category = await CategoryModel.findOne({
+                slug: slug.toLowerCase(),
+                deletedAt: null,
+            }).select('_id');
 
-    if (!listingData) return <div>No Listing Found</div>
+            if (!category) return { success: false, data: [] }
+
+            const listings = await ListingModel.find({
+                category: category._id,
+                deletedAt: null,
+                status: 'approved',
+            })
+                .sort({ createdAt: -1 })
+                .populate('media', '_id secure_url')
+                .populate('category', '_id category slug')
+                .populate('city', '_id city')
+                .populate('locality', '_id locality')
+                .limit(20)
+                .lean();
+
+            return { success: true, data: listings }
+        } catch (error) {
+            console.error(`Error fetching listings for ${slug}:`, error)
+            return { success: false, data: [] }
+        }
+    }
+
+    const listingData = await getListingsByCategory('venues')
+    const carData = await getListingsByCategory('services')
+
+    if (!listingData?.data?.length && !carData?.data?.length) return null
+
     return (
         <section className='xl:px-16 lg:px-10 md:px-6 px-6'>
             <div className='my-5'>

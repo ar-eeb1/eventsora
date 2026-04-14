@@ -59,8 +59,8 @@ export async function POST(request) {
             listings
         });
 
-        // Sync with Calendar if booking Status is not cancelled
-        if (bookingStatus !== 'cancelled') {
+        // Sync with Calendar only if status is confirmed or awaiting-payment
+        if (['confirmed', 'awaiting-payment'].includes(bookingStatus)) {
             try {
                 const calendarPromises = listings.flatMap(item => {
                     if (item.bookingDate && item.bookingDate.length > 0) {
