@@ -6,6 +6,9 @@ import { connectDB } from '@/lib/databaseConnection'
 import ListingModel from '@/models/Listing.model'
 import CategoryModel from '@/models/Category.model'
 import { Playfair_Display } from 'next/font/google'
+import MediaModel from '@/models/Media.model'
+import LocalityModel from '@/models/Locality.model'
+import HorizontalScrollContainer from './HorizontalScrollContainer'
 
 const playfair = Playfair_Display({
     weight: ['400', '700'],
@@ -13,7 +16,7 @@ const playfair = Playfair_Display({
     subsets: ['latin'],
 })
 
-import HorizontalScrollContainer from './HorizontalScrollContainer'
+
 
 const AddHomeListing = async () => {
     await connectDB()

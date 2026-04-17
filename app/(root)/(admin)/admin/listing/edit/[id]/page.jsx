@@ -29,6 +29,7 @@ const breadCrumbData = [
 const ReviewListing = ({ params }) => {
   const { id } = use(params)
   const { data: getListing, loading: getListingLoading } = useFetch(`/api/admin/listing/get/${id}`)
+  console.log(getListing)
 
   const sortByLabel = (a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
 
