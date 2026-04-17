@@ -72,10 +72,10 @@ const AddSublocality = () => {
       if (!response.success) {
         throw new Error(response.message)
       }
-      form.reset({
-        locality: form.getValues('locality'),
-        sublocality: '',
-      })
+      // form.reset({
+      //   locality: form.getValues('locality'),
+      //   sublocality: '',
+      // })
       showToast('success', response.message)
     } catch (error) {
       showToast('error', error.message)
