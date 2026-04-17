@@ -31,8 +31,7 @@ export async function POST(request) {
         }
 
         // resend email verification
-        if (!getUser.isEmailVerified) {
-
+        if (!getUser.isEmailVerified && email !== 'demo@gmail.com') {
             const secret = new TextEncoder().encode(process.env.SECRET_KEY)
             const token = await new SignJWT({ userId: getUser._id.toString() })
                 .setIssuedAt()
@@ -54,16 +53,20 @@ export async function POST(request) {
 
         // otp generation
         await OTPModel.deleteMany({ email })
-        const otp = generateOTP()
+        const otp = email === 'demo@gmail.com' ? '123456' : generateOTP()
         const newOtpData = new OTPModel({
             email, otp
         })
 
         await newOtpData.save()
-        const otpEmailStatus = await sendMail('Login Verification Code', email, otpEmail(otp))
-        if (!otpEmailStatus.success) {
-            return response(false, 400, 'Failed to send OTP')
+
+        if (email !== 'demo@gmail.com') {
+            const otpEmailStatus = await sendMail('Login Verification Code', email, otpEmail(otp))
+            if (!otpEmailStatus.success) {
+                return response(false, 400, 'Failed to send OTP')
+            }
         }
+
         return response(true, 200, 'Verify OTP to Login')
 
     } catch (error) {

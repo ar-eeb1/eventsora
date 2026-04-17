@@ -97,8 +97,8 @@ const page = () => {
 
                     <div className='grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 lg:gap-4 gap-5 mt-5'>
                         {data && data.pages.map(page => (
-                            page.listings.map(listing => (
-                                <ListingBox listing={listing} />
+                            page.listings.map((listing, index) => (
+                                <ListingBox key={index} listing={listing} />
                             ))
                         ))}
                     </div>

@@ -4,6 +4,10 @@ import { connectDB } from '@/lib/databaseConnection'
 import ListingModel from '@/models/Listing.model'
 import ListingVariantModel from '@/models/ListingVariant.model'
 import reviewModel from '@/models/Review.model'
+import MediaModel from '@/models/Media.model'
+import UserModel from '@/models/User.model'
+import CityModel from '@/models/City.model'
+import LocalityModel from '@/models/Locality.model'
 
 export async function generateMetadata({ params }) {
     const { slug } = await params;
@@ -74,10 +78,10 @@ const ListingPage = async ({ params, searchParams }) => {
 
         return (
             <ListingDetails
-                listing={getListing}
-                variants={variant}
-                startingPrice={getPrice}
-                capacity={getCapacity}
+                listing={JSON.parse(JSON.stringify(getListing))}
+                variants={JSON.parse(JSON.stringify(variant))}
+                startingPrice={JSON.parse(JSON.stringify(getPrice))}
+                capacity={JSON.parse(JSON.stringify(getCapacity))}
                 reviewCount={review}
             />
         )
