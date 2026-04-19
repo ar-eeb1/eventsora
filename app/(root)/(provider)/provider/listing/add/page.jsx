@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
+import { Checkbox } from '@/components/ui/checkbox'
 import SublocalityModel from '@/models/Sublocality.model'
 import { PROVIDER_DASHBOARD, PROVIDER_LISTING_SHOW } from '@/routes/ProviderPanelRoute'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -49,6 +50,7 @@ const AddListing = () => {
     sublocality: true,
     address: true,
     capacity: true,
+    inquirePrice: true,
   })
 
   const form = useForm({
@@ -67,6 +69,7 @@ const AddListing = () => {
       sublocality: undefined,
       address: '',
       capacity: undefined,
+      inquirePrice: false,
     }
   })
 
@@ -398,6 +401,26 @@ const AddListing = () => {
                           </div>
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    {/* INQUIRE PRICE */}
+                    <FormField control={form.control} name="inquirePrice" render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm bg-primary/5 border-primary/20">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-sm font-semibold text-primary cursor-pointer">
+                            Inquire Price
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            If checked, users will see "Inquire dates" instead of booking buttons and must message you for price.
+                          </p>
+                        </div>
                       </FormItem>
                     )} />
 

@@ -30,11 +30,13 @@ export async function POST(request) {
                 sublocality: true,
                 address: true,
                 capacity: true,
+                inquirePrice: true,
             })
             .partial({
                 locality: true,
                 sublocality: true,
                 capacity: true,
+                inquirePrice: true,
             });
             
         const validate = schema.safeParse(payload)

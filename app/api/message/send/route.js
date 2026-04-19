@@ -13,7 +13,7 @@ export async function POST(request) {
             return response(false, 403, 'Unauthorized')
         }
 
-        const { conversationId, text } = await request.json()
+        const { conversationId, text, isQuote, quotePrice, quoteListingId, quoteVariantId, quoteDate } = await request.json()
         if (!isValidObjectId(conversationId)) {
             return response(false, 400, 'Invalid Conversation ID')
         }
@@ -29,6 +29,11 @@ export async function POST(request) {
             conversationId,
             sender: auth.userId,
             text,
+            isQuote: isQuote || false,
+            quotePrice: quotePrice || null,
+            quoteListingId: quoteListingId || null,
+            quoteVariantId: quoteVariantId || null,
+            quoteDate: quoteDate || null,
             readBy: []
         })
 

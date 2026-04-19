@@ -336,8 +336,8 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                                     top_rated: 'bg-emerald-100 text-emerald-700 border-emerald-200'
                                 }
                                 return (
-                                    <span 
-                                        key={tag} 
+                                    <span
+                                        key={tag}
                                         className={`text-[12px] font-bold px-3 py-1 rounded-full border shadow-sm ${styles[tag] || 'bg-gray-100 text-gray-700 border-gray-200'}`}
                                     >
                                         {labels[tag] || tag.replace(/_/g, ' ')}
@@ -441,28 +441,40 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                     }
 
                     <div className='gap-4 flex flex-col md:mt-10 mt-5 md:block '>
-                        {!isAddedIntoBooking ?
+                        {listing.inquirePrice ? (
                             <ButtonLoading
                                 type='button'
-                                text={selectedDates.length === 0 ? 'Select Dates' : 'Add into Booking'}
-                                onClick={handleAddToBooking}
+                                onClick={handleMessageProvider}
+                                loading={isLoading}
+                                text='Message Provider'
                                 className='md:w-1/2 rounded-full py-6 text-md text-white'
-                                disabled={selectedDates.length === 0}
                             />
-                            :
-                            <Button type='button' className='md:w-1/2 rounded-full py-6 text-md text-white'>
-                                <Link href={WEBSITE_BOOKINGS}>
-                                    View My Bookings
-                                </Link>
-                            </Button>
-                        }
-                        <ButtonLoading
-                            type='button'
-                            onClick={handleMessageProvider}
-                            loading={isLoading} // Check state name casing (isloading vs isLoading)
-                            text='Message Provider'
-                            className='md:w-1/2 rounded-full py-6 text-md text-black bg-white cursor-pointer'
-                        />
+                        ) : (
+                            <>
+                                {!isAddedIntoBooking ?
+                                    <ButtonLoading
+                                        type='button'
+                                        text={selectedDates.length === 0 ? 'Select Dates' : 'Add into Booking'}
+                                        onClick={handleAddToBooking}
+                                        className='md:w-1/2 rounded-full py-6 text-md text-white'
+                                        disabled={selectedDates.length === 0}
+                                    />
+                                    :
+                                    <Button type='button' className='md:w-1/2 rounded-full py-6 text-md text-white'>
+                                        <Link href={WEBSITE_BOOKINGS}>
+                                            View My Bookings
+                                        </Link>
+                                    </Button>
+                                }
+                                <ButtonLoading
+                                    type='button'
+                                    onClick={handleMessageProvider}
+                                    loading={isLoading}
+                                    text='Message Provider'
+                                    className='md:w-1/2 rounded-full py-6 text-md text-black bg-white cursor-pointer'
+                                />
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

@@ -25,6 +25,15 @@ export async function GET(request, { params }) {
             .sort({ createdAt: 1 })
             .populate('sender', 'name email profileImage')
             .populate('readBy', 'name')
+            .populate({
+                path: 'quoteListingId',
+                populate: [
+                    { path: 'category', select: 'category' },
+                    { path: 'subcategory', select: 'subcategory' },
+                    { path: 'media' }
+                ]
+            })
+            .populate('quoteVariantId')
 
         return response(true, 200, 'Message fetched', messages)
     } catch (error) {

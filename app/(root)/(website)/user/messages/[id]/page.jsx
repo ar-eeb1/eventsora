@@ -9,15 +9,25 @@ import ButtonLoading from '@/components/application/ButtonLoading'
 import img from '@/public/assets/profile.png' // Default image
 import Image from 'next/image'
 import Link from 'next/link'
+import { useDispatch } from 'react-redux'
+import { addIntoBooking } from '@/store/reducer/bookingReducer'
+import { WEBSITE_BOOKINGS } from '@/routes/WebsiteRoute'
+import { useRouter } from 'next/navigation'
+import { IoPricetagOutline } from 'react-icons/io5'
 
 
 const ChatPage = () => {
     const { id } = useParams()
     const { auth: user } = useSelector(state => state.authStore)
 
+    const router = useRouter()
+    const dispatch = useDispatch()
     const [messages, setMessages] = useState([])
     const [newMessage, setNewMessage] = useState('')
     const [sending, setSending] = useState(false)
+    const [isQuoteMode, setIsQuoteMode] = useState(false)
+    const [quotePrice, setQuotePrice] = useState('')
+    const [quoteDate, setQuoteDate] = useState('')
     const scrollRef = useRef()
 
     // auto scroll
@@ -56,15 +66,24 @@ const ChatPage = () => {
         if (!newMessage.trim()) return
 
         setSending(true)
+        const currentConv = conversationData?.data?.find(c => c._id === id)
+
         try {
             const { data } = await axios.post(`/api/message/send`, {
                 conversationId: id,
-                text: newMessage
+                text: isQuoteMode ? `Price Quotation: Rs. ${quotePrice} for ${quoteDate} - ${newMessage}` : newMessage,
+                isQuote: isQuoteMode,
+                quotePrice: isQuoteMode ? Number(quotePrice) : null,
+                quoteListingId: currentConv?.listingId?._id || null,
+                quoteDate: isQuoteMode ? quoteDate : null
             })
 
             if (data.success) {
                 setMessages([...messages, data.data])
                 setNewMessage('')
+                setQuotePrice('')
+                setQuoteDate('')
+                setIsQuoteMode(false)
             }
 
         } catch (error) {
@@ -72,6 +91,35 @@ const ChatPage = () => {
         } finally {
             setSending(false)
         }
+    }
+
+    const handleBookNow = (msg) => {
+        const listing = msg.quoteListingId
+        const variant = msg.quoteVariantId
+
+        if (!listing) return
+
+        const bookingItem = {
+            listingId: listing._id,
+            listingName: listing.name,
+            category: listing.category?.category || '',
+            subcategory: listing.subcategory?.subcategory || '',
+            variantPrice: Number(msg.quotePrice) || 0,
+            startingPrice: Number(msg.quotePrice) || 0,
+            price: Number(msg.quotePrice) || 0,
+            variantId: variant?._id || null,
+            variantTitle: variant?.title || 'Quoted Price',
+            bookingDate: msg.quoteDate ? [msg.quoteDate] : [],
+            thumbnail: listing.media?.[0],
+            quantity: variant?.minPersons || 1,
+            pricingType: variant?.pricingType || 'fixed',
+            slug: listing.slug,
+            discount: 0
+        }
+
+        dispatch(addIntoBooking(bookingItem))
+        showToast('success', 'Added to booking with negotiated price!')
+        router.push(WEBSITE_BOOKINGS)
     }
 
     const { data: conversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
@@ -156,6 +204,30 @@ const ChatPage = () => {
                                     ? 'bg-primary text-white rounded-br-none'
                                     : 'bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-bl-none'
                                     }`}>
+                                    {msg.isQuote ? (
+                                        <div className={`p-4 rounded-xl mb-3 border ${isMyMessage ? 'bg-white/10 border-white/20' : 'bg-primary/5 border-primary/20'}`}>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <IoPricetagOutline className={`text-xl ${isMyMessage ? 'text-white' : 'text-primary'}`} />
+                                                <span className={`font-bold text-xs uppercase ${isMyMessage ? 'text-white' : 'text-primary'}`}>Price Quotation</span>
+                                            </div>
+                                            <p className={`text-3xl font-black mb-1 ${isMyMessage ? 'text-white' : 'text-primary'}`}>
+                                                {Number(msg.quotePrice).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
+                                            </p>
+                                            {msg.quoteDate && (
+                                                <p className={`text-xs font-semibold mb-4 uppercase ${isMyMessage ? 'text-white/80' : 'text-gray-500'}`}>
+                                                    For Date: <span className={isMyMessage ? 'text-white underline' : 'text-primary underline'}>{msg.quoteDate}</span>
+                                                </p>
+                                            )}
+                                            {!isMyMessage && (
+                                                <button 
+                                                    onClick={() => handleBookNow(msg)}
+                                                    className="w-full bg-primary text-white py-3 rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-md hover:shadow-lg transform active:scale-95"
+                                                >
+                                                    Book Now
+                                                </button>
+                                            )}
+                                        </div>
+                                    ) : null}
                                     <p>{msg.text}</p>
                                     <span className={`text-xs block mt-1 text-right ${isMyMessage ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
                                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -169,21 +241,65 @@ const ChatPage = () => {
                     })}
                     <div ref={scrollRef} />
                 </div>
-                <form onSubmit={handleSendMessage} className="flex gap-2 items-center p-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700">
-                    <input
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type a message..."
-                        className="flex-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    />
-                    <ButtonLoading
-                        loading={sending}
-                        type="submit"
-                        text="Send"
-                        className="bg-primary text-white px-8 py-2.5 rounded-lg hover:bg-primary/90 font-medium transition-colors"
-                    />
-                </form>
+                <div className="p-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700">
+                    {isQuoteMode && (
+                        <div className="mb-3 p-3 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-3 animate-in slide-in-from-bottom-2">
+                            <div className="flex-1">
+                                <label className="text-xs font-bold text-primary uppercase mb-1 block">Quotation Amount (PKR)</label>
+                                <input
+                                    type="number"
+                                    value={quotePrice}
+                                    onChange={(e) => setQuotePrice(e.target.value)}
+                                    placeholder="Enter price..."
+                                    className="w-full bg-transparent border-none p-0 text-lg font-bold text-primary focus:ring-0 placeholder:text-primary/30"
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="flex-1 border-l border-primary/20 pl-3">
+                                <label className="text-xs font-bold text-primary uppercase mb-1 block">For Date</label>
+                                <input
+                                    type="date"
+                                    value={quoteDate}
+                                    onChange={(e) => setQuoteDate(e.target.value)}
+                                    className="w-full bg-transparent border-none p-0 text-sm font-semibold text-primary focus:ring-0"
+                                />
+                            </div>
+                            <button 
+                                type="button"
+                                onClick={() => setIsQuoteMode(false)}
+                                className="p-2 hover:bg-primary/10 rounded-full text-primary transition-colors"
+                            >
+                                <IoClose size={20} />
+                            </button>
+                        </div>
+                    )}
+                    <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
+                        {conversationData?.data?.find(c => c._id === id)?.listingId?.userId === user?._id && (
+                            <button
+                                type="button"
+                                onClick={() => setIsQuoteMode(!isQuoteMode)}
+                                className={`p-2.5 rounded-lg border transition-all ${isQuoteMode ? 'bg-primary text-white border-primary' : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'}`}
+                                title="Send Price Quote"
+                            >
+                                <IoPricetagOutline size={20} />
+                            </button>
+                        )}
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder={isQuoteMode ? "Add a note to your quote..." : "Type a message..."}
+                            className="flex-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <ButtonLoading
+                            loading={sending}
+                            type="submit"
+                            text="Send"
+                            className="bg-primary text-white px-8 py-2.5 rounded-lg hover:bg-primary/90 font-medium transition-colors"
+                            disabled={isQuoteMode && !quotePrice}
+                        />
+                    </form>
+                </div>
             </div>
 
         </div >

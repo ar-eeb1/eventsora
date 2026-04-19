@@ -9,6 +9,7 @@ import ButtonLoading from '@/components/application/ButtonLoading'
 import img from '@/public/assets/profile.png' // Default image
 import Image from 'next/image'
 import Link from 'next/link'
+import { IoPricetagOutline, IoClose } from 'react-icons/io5'
 
 
 const ProviderChatPage = () => {
@@ -18,6 +19,9 @@ const ProviderChatPage = () => {
     const [messages, setMessages] = useState([])
     const [newMessage, setNewMessage] = useState('')
     const [sending, setSending] = useState(false)
+    const [isQuoteMode, setIsQuoteMode] = useState(false)
+    const [quotePrice, setQuotePrice] = useState('')
+    const [quoteDate, setQuoteDate] = useState('')
     const scrollRef = useRef()
 
     // auto scroll
@@ -56,15 +60,24 @@ const ProviderChatPage = () => {
         if (!newMessage.trim()) return
 
         setSending(true)
+        const currentConv = conversationData?.data?.find(c => c._id === id)
+        
         try {
             const { data } = await axios.post(`/api/message/send`, {
                 conversationId: id,
-                text: newMessage
+                text: isQuoteMode ? `Price Quotation: Rs. ${quotePrice} for ${quoteDate} - ${newMessage}` : newMessage,
+                isQuote: isQuoteMode,
+                quotePrice: isQuoteMode ? Number(quotePrice) : null,
+                quoteListingId: currentConv?.listingId?._id || null,
+                quoteDate: isQuoteMode ? quoteDate : null
             })
 
             if (data.success) {
                 setMessages([...messages, data.data])
                 setNewMessage('')
+                setQuotePrice('')
+                setQuoteDate('')
+                setIsQuoteMode(false)
             }
 
         } catch (error) {
@@ -135,6 +148,20 @@ const ProviderChatPage = () => {
                                     ? 'bg-primary text-white rounded-br-none'
                                     : 'bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-bl-none'
                                     }`}>
+                                    {msg.isQuote ? (
+                                        <div className="bg-white/10 p-3 rounded-md border border-white/20 mb-2">
+                                            <div className="flex items-center gap-2 text-white mb-1">
+                                                <IoPricetagOutline className="text-xl" />
+                                                <span className="font-bold text-sm uppercase">Price Quotation</span>
+                                            </div>
+                                            <p className="text-2xl font-bold">{Number(msg.quotePrice).toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</p>
+                                            {msg.quoteDate && (
+                                                <div className="flex items-center gap-1 text-xs text-white/80 mt-1 uppercase font-semibold">
+                                                    <span className="opacity-70">On:</span> {msg.quoteDate}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : null}
                                     <p>{msg.text}</p>
                                     <span className={`text-xs block mt-1 text-right ${isMyMessage ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
                                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -148,21 +175,62 @@ const ProviderChatPage = () => {
                     })}
                     <div ref={scrollRef} />
                 </div>
-                <form onSubmit={handleSendMessage} className="flex gap-2 items-center p-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700">
-                    <input
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type a message..."
-                        className="flex-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    />
-                    <ButtonLoading
-                        loading={sending}
-                        type="submit"
-                        text="Send"
-                        className="bg-primary text-white px-8 py-2.5 rounded-lg hover:bg-primary/90 font-medium transition-colors"
-                    />
-                </form>
+                <div className="p-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700">
+                    {isQuoteMode && (
+                        <div className="mb-3 p-3 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-3 animate-in slide-in-from-bottom-2">
+                            <div className="flex-1">
+                                <label className="text-xs font-bold text-primary uppercase mb-1 block">Quotation Amount (PKR)</label>
+                                <input
+                                    type="number"
+                                    value={quotePrice}
+                                    onChange={(e) => setQuotePrice(e.target.value)}
+                                    placeholder="Enter price..."
+                                    className="w-full bg-transparent border-none p-0 text-lg font-bold text-primary focus:ring-0 placeholder:text-primary/30"
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="flex-1 border-l border-primary/20 pl-3">
+                                <label className="text-xs font-bold text-primary uppercase mb-1 block">For Date</label>
+                                <input
+                                    type="date"
+                                    value={quoteDate}
+                                    onChange={(e) => setQuoteDate(e.target.value)}
+                                    className="w-full bg-transparent border-none p-0 text-sm font-semibold text-primary focus:ring-0"
+                                />
+                            </div>
+                            <button 
+                                onClick={() => setIsQuoteMode(false)}
+                                className="p-2 hover:bg-primary/10 rounded-full text-primary transition-colors"
+                            >
+                                <IoClose size={20} />
+                            </button>
+                        </div>
+                    )}
+                    <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
+                        <button
+                            type="button"
+                            onClick={() => setIsQuoteMode(!isQuoteMode)}
+                            className={`p-2.5 rounded-lg border transition-all ${isQuoteMode ? 'bg-primary text-white border-primary' : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'}`}
+                            title="Send Price Quote"
+                        >
+                            <IoPricetagOutline size={20} />
+                        </button>
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder={isQuoteMode ? "Add a note to your quote..." : "Type a message..."}
+                            className="flex-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <ButtonLoading
+                            loading={sending}
+                            type="submit"
+                            text="Send"
+                            className="bg-primary text-white px-8 py-2.5 rounded-lg hover:bg-primary/90 font-medium transition-colors"
+                            disabled={isQuoteMode && !quotePrice}
+                        />
+                    </form>
+                </div>
             </div>
 
         </div >

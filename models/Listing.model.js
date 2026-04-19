@@ -121,6 +121,10 @@ const listingSchema = new mongoose.Schema({
             lowercase: true
         }
     ],
+    inquirePrice: {
+        type: Boolean,
+        default: false
+    },
 
 
 }, { timestamps: true })
