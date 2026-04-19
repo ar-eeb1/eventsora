@@ -178,6 +178,7 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
                 showHeader={true}
                 compact={false}
                 highlightToday={true}
+                hidePriceOnBooked={true}
             />
 
             {/* Selected dates summary */}

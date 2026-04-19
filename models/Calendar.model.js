@@ -12,7 +12,7 @@ const CalendarSchema = new mongoose.Schema(
         date: {
             type: Date,
             required: true,
-            index: true,
+            index: { expires: '31d' }, // Automatically delete entries 31 days after the date
         },
         dateStatus: {
             type: String,

@@ -82,7 +82,7 @@ const statusConfig = {
 }
 
 // Booking detail popup shown when clicking a calendar cell
-const BookingDetailPopup = ({ dateKey, data, onClose }) => {
+const BookingDetailPopup = ({ dateKey, data, onClose, hidePriceOnBooked }) => {
     const ref = useRef(null)
 
     useEffect(() => {
@@ -133,7 +133,7 @@ const BookingDetailPopup = ({ dateKey, data, onClose }) => {
                 {/* Body */}
                 <div className="px-5 py-4 space-y-3">
                     {/* Price */}
-                    {data?.price > 0 && (
+                    {data?.price > 0 && (data.status !== 'booked' || !hidePriceOnBooked) && (
                         <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
                             <span className="text-sm text-gray-500 dark:text-gray-400">Price</span>
                             <span className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -236,6 +236,9 @@ const Calendar = ({
 
     // Callbacks
     onDateClick,
+
+    // Custom UI Logic
+    hidePriceOnBooked = false,
 
     // Rest props
     ...props
@@ -359,6 +362,7 @@ const Calendar = ({
                     dateKey={popup.dateKey}
                     data={popup.data}
                     onClose={() => setPopup(null)}
+                    hidePriceOnBooked={hidePriceOnBooked}
                 />
             )}
 
@@ -457,7 +461,7 @@ const Calendar = ({
                             if (dateData?.status === 'available' && !isSelected && !isPast && !isDisabled) {
                                 cellClass = cn(cellClass, 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800')
                             }
-
+                            
                             return (
                                 <div
                                     key={day}
@@ -507,7 +511,7 @@ const Calendar = ({
                                             </div>
                                         )}
 
-                                        {showPrice && dateData?.price > 0 && !compact && (
+                                        {showPrice && dateData?.price > 0 && !compact && (dateData.status !== 'booked' || !hidePriceOnBooked) && (
                                             <div className="font-semibold text-sm text-gray-900 dark:text-white">
                                                 {dateData.price.toLocaleString('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 })}
                                             </div>
