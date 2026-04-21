@@ -52,6 +52,10 @@ const userSchema = new mongoose.Schema({
         default: null,
         index: true
     },
+    expireAt: {
+        type: Date,
+        default: null
+    }
 }, { timestamps: true })
 
 userSchema.pre('save', async function (next) {

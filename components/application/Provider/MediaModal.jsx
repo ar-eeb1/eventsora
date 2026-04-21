@@ -4,7 +4,7 @@ import { LastPage } from '@mui/icons-material'
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Loading from '../Loading'
 import { showToast } from '@/lib/showToast'
 import ModalMediaBlock from './ModalMediaBlock'
@@ -12,6 +12,15 @@ import ModalMediaBlock from './ModalMediaBlock'
 function MediaModal({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple }) {
 
     const [previouslySelected, setPreviouslySelected] = useState([])
+
+    // Fix: Radix UI Dialog sometimes fails to restore body scroll after closing.
+    // Forcibly reset overflow whenever the dialog transitions to closed.
+    useEffect(() => {
+        if (!open) {
+            document.body.style.overflow = ''
+            document.body.style.pointerEvents = ''
+        }
+    }, [open])
 
     const fetchMedia = async (page) => {
         const { data: response } = await axios.get(`/api/media?page=${page}&&limit=18&deleteType=SD`)

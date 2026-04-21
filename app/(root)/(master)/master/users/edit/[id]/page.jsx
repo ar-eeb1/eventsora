@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import React, { use, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { userRoleOptions } from '@/lib/utils'
+import { userExpireOptions, userRoleOptions } from '@/lib/utils'
 
 const breadCrumbData = [
     { href: MASTER_DASHBOARD, label: 'Dashboard' },
@@ -31,6 +31,7 @@ const EditUser = ({ params }) => {
     const formSchema = zSchema.pick({
         _id: true,
         role: true,
+        expire: true,
     })
 
     const form = useForm({
@@ -38,6 +39,7 @@ const EditUser = ({ params }) => {
         defaultValues: {
             _id: id,
             role: '',
+            expire: 'null',
         },
     })
 
@@ -49,6 +51,7 @@ const EditUser = ({ params }) => {
                 form.reset({
                     _id: user._id,
                     role: user.role,
+                    expire: user.expireAt ? 'is_set' : 'null', // Just a placeholder or logic to show it's set
                 })
             }
         } catch (error) {
@@ -123,6 +126,27 @@ const EditUser = ({ params }) => {
                                                     selected={field.value}
                                                     setSelected={(val) => field.onChange(val)}
                                                     placeholder="Select role"
+                                                />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            {/* Expire */}
+                            <div className="mb-4">
+                                <FormField
+                                    control={form.control}
+                                    name="expire"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Expiry Date</FormLabel>
+                                            <FormControl>
+                                                <Select
+                                                    options={userExpireOptions}
+                                                    selected={field.value}
+                                                    setSelected={(val) => field.onChange(val)}
+                                                    placeholder="Expire in?"
                                                 />
                                             </FormControl>
                                         </FormItem>

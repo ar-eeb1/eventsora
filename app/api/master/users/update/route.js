@@ -16,6 +16,7 @@ export async function PUT(request) {
         const schema = zSchema.pick({
             _id: true,
             role: true,
+            expire: true,
         })
 
         const validate = schema.safeParse(payload)
@@ -23,7 +24,7 @@ export async function PUT(request) {
             return response(false, 400, 'Invalid or Missing fields.', validate.error)
         }
 
-        const { _id, role } = validate.data
+        const { _id, role, expire } = validate.data
 
         const getUser = await UserModel.findOne({ deletedAt: null, _id })
         if (!getUser) {
@@ -31,6 +32,16 @@ export async function PUT(request) {
         }
 
         getUser.role = role
+
+        if (expire && expire !== 'null') {
+            const days = parseInt(expire)
+            const expireAt = new Date()
+            expireAt.setDate(expireAt.getDate() + days)
+            getUser.expireAt = expireAt
+        } else if (expire === 'null') {
+            getUser.expireAt = null
+        }
+
         await getUser.save()
 
         return response(true, 200, 'User updated.')

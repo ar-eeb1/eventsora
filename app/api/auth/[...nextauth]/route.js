@@ -68,17 +68,26 @@ const handler = NextAuth({
             }
             return true
         },
-        async jwt({ token, user }) {
-            if (user) {
-                token.role = user.role
-                token.id = user.id
+        async jwt({ token, user: nextAuthUser }) {
+            if (nextAuthUser) {
+                token.role = nextAuthUser.role
+                token.id = nextAuthUser.id
             }
+            
+            // Periodically check for expiry in the JWT if not already present or periodically
+            if (token.id) {
+                await connectDB()
+                const dbUser = await UserModel.findById(token.id).select('expireAt')
+                token.isExpired = dbUser?.expireAt && new Date() > new Date(dbUser.expireAt)
+            }
+
             return token
         },
         async session({ session, token }) {
             if (session.user) {
                 session.user.role = token.role
                 session.user.id = token.id
+                session.user.isExpired = token.isExpired
             }
             return session
         }

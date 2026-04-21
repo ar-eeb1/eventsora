@@ -16,32 +16,39 @@ export default function NextAuthSync() {
     const isAuthenticated = useSelector(state => state.authStore.auth)
 
     useEffect(() => {
-        if (status === 'authenticated' && session?.user && !isAuthenticated) {
-            // NextAuth login succeeded and our backend updated MongoDB and cookies
-            // Now sync the frontend Redux state
-            const userData = {
-                _id: session.user.id,
-                name: session.user.name,
-                email: session.user.email,
-                role: session.user.role || 'user',
-                avatar: {
-                    url: session.user.image
+        if (status === 'authenticated' && session?.user) {
+            if (session.user.isExpired) {
+                router.push('/expire')
+                return
+            }
+
+            if (!isAuthenticated) {
+                // NextAuth login succeeded and our backend updated MongoDB and cookies
+                // Now sync the frontend Redux state
+                const userData = {
+                    _id: session.user.id,
+                    name: session.user.name,
+                    email: session.user.email,
+                    role: session.user.role || 'user',
+                    avatar: {
+                        url: session.user.image
+                    }
                 }
-            }
-            dispatch(login(userData))
+                dispatch(login(userData))
 
-            // Redirect based on role
-            const roleRoutes = {
-                user: USER_DASHBOARD,
-                provider: PROVIDER_DASHBOARD,
-                admin: ADMIN_DASHBOARD,
-                master: MASTER_DASHBOARD,
-                suspended: ''
-            }
+                // Redirect based on role
+                const roleRoutes = {
+                    user: USER_DASHBOARD,
+                    provider: PROVIDER_DASHBOARD,
+                    admin: ADMIN_DASHBOARD,
+                    master: MASTER_DASHBOARD,
+                    suspended: ''
+                }
 
-            router.push(roleRoutes[userData.role] || "/")
+                router.push(roleRoutes[userData.role] || "/")
+            }
         }
-    }, [session, status, dispatch, router])
+    }, [session, status, dispatch, router, isAuthenticated])
 
     return null
 }
