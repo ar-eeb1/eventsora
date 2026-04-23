@@ -6,7 +6,7 @@ import useFetch from '@/hooks/useFetch';
 import { PROVIDER_BOOKINGS_PENDING, PROVIDER_LISTING_SHOW } from '@/routes/ProviderPanelRoute';
 
 const CountOverview = () => {
-    const { data: countData, loading } = useFkretch('/api/provider/dashboard/count')
+    const { data: countData, loading } = useFetch('/api/provider/dashboard/count')
 
     const cardStyle = "group flex items-center justify-between p-4 rounded-xl border bg-white/70 dark:bg-gray-900/60 backdrop-blur-md border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1";
     const titleStyle = "text-sm font-medium text-gray-500 dark:text-gray-400";
