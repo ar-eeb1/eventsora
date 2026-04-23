@@ -9,7 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import Link from 'next/link'
 import { ProviderSidebar } from '@/lib/providerSidebarMenu'
 
-const AppSidebar = () => {
+const AppSidebar = ({ hasUnreadMessages }) => {
     const { toggleSidebar } = useSidebar()
     return (
         <Sidebar className='z-50 border-none '>
@@ -32,9 +32,12 @@ const AppSidebar = () => {
                                         asChild
                                         className='h-11 px-3 rounded-lg hover:bg-pink-50 hover:text-pink-700 data-[state=open]:bg-pink-50 data-[state=open]:text-pink-700 transition-all duration-200 group/button'
                                     >
-                                        <Link href={menu?.url} className='flex items-center gap-3 w-full'>
+                                        <Link href={menu?.url} className='flex items-center gap-3 w-full relative'>
                                             <menu.icon className='w-5 h-5  text-gray-500 group-hover/button:text-pink-600 transition-colors' />
                                             <span className='flex-1 text-sm font-medium'>{menu.title}</span>
+                                            {menu.title === 'Messages' && hasUnreadMessages && (
+                                                <span className="w-2 h-2 rounded-full bg-red-500 ml-auto" />
+                                            )}
                                             {menu.submenu && menu.submenu.length > 0 && (
                                                 <LucideChevronRight className='w-4 h-4 transition-all  duration-200 group-data-[state=open]/collapsible:rotate-90 text-gray-400 group-hover/button:text-pink-500' />
                                             )}

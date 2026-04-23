@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react'
 import Loading from '../Loading'
 import { showToast } from '@/lib/showToast'
 import ModalMediaBlock from './ModalMediaBlock'
+import ButtonLoading from '../ButtonLoading'
 
 function MediaModal({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple }) {
 
@@ -105,6 +106,12 @@ function MediaModal({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
                                             ))
                                         }
                                     </div>
+                                    {
+                                        hasNextPage &&
+                                        <div className='text-center mt-5'>
+                                            <ButtonLoading text='Load More' className='cursor-pointer mb-3' type='button' loading={isFetching} onClick={() => fetchNextPage()} />
+                                        </div>
+                                    }
                                 </>
                         }
                     </div>

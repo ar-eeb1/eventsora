@@ -60,7 +60,7 @@ const AddHomeListing = async () => {
             <div className='my-5'>
                 <div className='flex justify-between items-center mb-2'>
                     <h2 className={`lg:text-4xl md:text-4xl text-3xl font-bold text-pink-900 ${playfair.className}`}>Venues</h2>
-                    <Link href='' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
+                    <Link href={`/venues`} className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
                         View All
                         <ArrowRight size={20} />
                     </Link>
@@ -90,7 +90,7 @@ const AddHomeListing = async () => {
             {/* CARS */}
             <div className='my-5'>
                 <div className='flex justify-between items-center md:mb-2 md:mt-20 mt-10'>
-                    <h2 className={`lg:text-4xl md:text-4xl text-3xl font-bold text-pink-900 ${playfair.className}`}>Cars & Caterers</h2>
+                    <h2 className={`lg:text-4xl md:text-4xl text-3xl font-bold text-pink-900 ${playfair.className}`}>Services</h2>
                     <Link href='' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
                         View All
                         <ArrowRight size={20} />

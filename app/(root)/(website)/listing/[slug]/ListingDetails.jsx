@@ -26,6 +26,7 @@ import ListingReview from '@/components/application/Website/ListingReview'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { url } from 'zod'
 import PortfolioMedia from '@/components/application/Website/PortfolioMedia'
+import { marked } from 'marked'
 
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
@@ -362,7 +363,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         <span>{listing?.startingPrice.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</span>
                     </div>
 
-                    <div className='line-clamp-3' dangerouslySetInnerHTML={{ __html: decode(listing?.description) }}>
+                    <div className='line-clamp-3' dangerouslySetInnerHTML={{ __html: marked.parse(listing?.description || '', { breaks: true }) }}>
                     </div>
 
                     {
@@ -446,8 +447,8 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                                 type='button'
                                 onClick={handleMessageProvider}
                                 loading={isLoading}
-                                text='Message Provider'
-                                className='md:w-1/2 rounded-full py-6 text-md text-white'
+                                text={`Message ${listing.name}`}
+                                className='w-full rounded-full py-6 text-md text-white'
                             />
                         ) : (
                             <>
@@ -504,7 +505,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 <CardHeader className={'font-semibold text-2xl border-b border-pink-400 p-0 m-0 [.border-b]:pb-0'}>
                     <h2>Description</h2>
                 </CardHeader>
-                <div dangerouslySetInnerHTML={{ __html: encode(listing.description) }}></div>
+                <div dangerouslySetInnerHTML={{ __html: marked.parse(listing?.description || '', { breaks: true }) }}></div>
             </Card>
             {/* PORTFOLIO */}
             <Card className={'mb-10 p-4'}>
