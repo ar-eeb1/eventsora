@@ -22,6 +22,7 @@ import { set } from 'mongoose'
 import { Button } from '@/components/ui/button'
 import { is } from 'zod/v4/locales'
 import Loading from '@/components/application/Loading'
+import ListingDetailsSkeleton from '@/components/application/Website/ListingDetailsSkeleton'
 import ListingReview from '@/components/application/Website/ListingReview'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { url } from 'zod'
@@ -244,10 +245,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     return (
         <div className='lg:px-32 px-4 mt-10'>
             {
-                isListingLoading && <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm">
-                    {/* <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div> */}
-                    <Loading />
-                </div>
+                isListingLoading && <ListingDetailsSkeleton />
             }
 
             {/* Modal Overlay */}
@@ -442,7 +440,13 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                     }
 
                     <div className='gap-4 flex flex-col md:mt-10 mt-5 md:block '>
-                        {listing.inquirePrice ? (
+                        {!auth ? (
+                            <Button asChild className='w-full rounded-full py-6 text-md text-white'>
+                                <Link href={`${WEBSITE_LOGIN}?callback=${encodeURIComponent(`${WEBSITE_LISTING_DETAILS(listing.slug)}?serviceCode=${activeVariant?.serviceCode || ''}`)}`}>
+                                    Login to Message & Book
+                                </Link>
+                            </Button>
+                        ) : listing.inquirePrice ? (
                             <ButtonLoading
                                 type='button'
                                 onClick={handleMessageProvider}

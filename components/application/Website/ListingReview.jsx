@@ -152,19 +152,17 @@ const ListingReview = ({ listingId }) => {
                     {/* Auth CTA */}
                     <div className="md:w-1/2 w-full text-center md:text-end">
                         {!auth ? (
-                            <>
-                                <p className="mb-2">Please login to write a review</p>
-                                <Button asChild>
-                                    <Link href={`${WEBSITE_LOGIN}?callback=${currentUrl}`}>
-                                        Login
-                                    </Link>
-                                </Button>
-                            </>
+                            <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300">
+                                <Link href={`${WEBSITE_LOGIN}?callback=${encodeURIComponent(currentUrl)}`}>
+                                    Login to Write Review
+                                </Link>
+                            </Button>
                         ) : (
                             <Button
                                 type="button"
-                                variant="outline"
+                                variant={reviewOpen ? "secondary" : "outline"}
                                 onClick={() => setReviewOpen(!reviewOpen)}
+                                className="transition-all duration-300"
                             >
                                 {reviewOpen ? 'Close Review Form' : 'Write Review'}
                             </Button>

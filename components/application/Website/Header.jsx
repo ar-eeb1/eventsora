@@ -97,7 +97,7 @@ const Header = () => {
                         <Booking />
 
                         {!auth ? (
-                            <Link href={`${WEBSITE_LOGIN}?callback=${pathname}`}>
+                            <Link href={`${WEBSITE_LOGIN}?callback=${encodeURIComponent(pathname)}`}>
                                 <div className='flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-all'>
                                     <CircleUserRound className='text-white' size={20} />
                                     <span className='text-xs font-bold text-white hidden sm:block'>LOGIN</span>
