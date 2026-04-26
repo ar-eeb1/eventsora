@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
-import { listingStatus, tags } from '@/lib/utils'
+import { listingStatus, listingType, tags } from '@/lib/utils'
 import { zSchema } from '@/lib/zodSchema'
 import { ADMIN_DASHBOARD, ADMIN_LISTING_SHOW } from '@/routes/AdminPanelRoute'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -56,7 +56,8 @@ const ReviewListing = ({ params }) => {
     capacity: true,
     status: true,
     adminNote: true,
-    tags: true
+    tags: true,
+    listingType: true,
   })
 
   const form = useForm({
@@ -78,7 +79,8 @@ const ReviewListing = ({ params }) => {
       capacity: undefined,
       status: '',
       adminNote: undefined,
-      tags: []
+      tags: [],
+      listingType: '',
     }
   })
 
@@ -102,6 +104,7 @@ const ReviewListing = ({ params }) => {
         capacity: listing?.capacity,
         status: listing?.status,
         tags: listing?.tags || [],
+        listingType: listing?.listingType || '',
       })
 
       if (listing.media) {
@@ -130,6 +133,17 @@ const ReviewListing = ({ params }) => {
       value: tag
     }))
     setTagOptions(options)
+  }, [])
+
+  
+  // LISTING TYPE OPTIONS
+  const [listingTypeOptions, setListingTypeOptions] = useState([])
+  useEffect(() => {
+    const options = listingType.map(type => ({
+      label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      value: type
+    }))
+    setListingTypeOptions(options)
   }, [])
 
 
@@ -687,11 +701,38 @@ const ReviewListing = ({ params }) => {
                   )} />
                 </div>
 
+                {/* listing type Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b-2 border-primary/20">
+                    <div className="h-2 w-2 bg-primary rounded-full"></div>
+                    <h5 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Listing Type</h5>
+                  </div>
+                  <FormField control={form.control} name="listingType" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">Listing Type</FormLabel>
+                      <FormControl>
+                        <Select
+                          options={listingTypeOptions}
+                          selected={field.value}
+                          setSelected={field.onChange}
+                          isMulti={false}
+                          placeholder='Select listing type'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+
 
                 {/* approval section */}
 
                 {/* STATUS */}
-                <div className='bg-yellow-500 p-16 rounded-2xl'>
+                <div className='space-y-4'>
+                  <div className="flex items-center gap-2 pb-2 border-b-2 border-primary/20">
+                    <div className="h-2 w-2 bg-primary rounded-full"></div>
+                    <h5 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Listing Permissions</h5>
+                  </div>
                   <FormField control={form.control} name="status" render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium">Status<span className='text-red-500 ml-1'>*</span></FormLabel>

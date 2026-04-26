@@ -125,6 +125,10 @@ const listingSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    listingType: {
+        type: String,
+        default: null,
+    }
 
 
 }, { timestamps: true })

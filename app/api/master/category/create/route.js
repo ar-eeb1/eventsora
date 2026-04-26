@@ -23,6 +23,14 @@ export async function POST(request) {
         }
 
         const { category, slug } = validate.data
+        const existingCategory = await CategoryModel.findOne({
+            category,
+            slug
+        })
+
+        if (existingCategory) {
+            return response(false, 409, 'Category already Exists')
+        }
         const newCategory = new CategoryModel({
             category, slug
         })

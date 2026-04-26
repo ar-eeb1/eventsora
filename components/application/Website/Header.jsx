@@ -105,7 +105,7 @@ const Header = () => {
                             </Link>
                         ) : (
                             <Link href={USER_DASHBOARD}>
-                                <Avatar className='md:size-10 size-8 border border-white/20'>
+                                <Avatar className='md:size-10 size-8 border border-black'>
                                     <AvatarImage src={auth?.avatar?.url || profileIcon.src} />
                                 </Avatar>
                             </Link>

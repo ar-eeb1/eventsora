@@ -34,6 +34,7 @@ export async function PUT(request) {
                 address: true,
                 capacity: true,
                 inquirePrice: true,
+                listingType: true,
             })
             .partial({
                 locality: true,
@@ -61,7 +62,7 @@ export async function PUT(request) {
         getListing.subcategory = validatedData.subcategory
         getListing.startingPrice = validatedData.startingPrice
         getListing.media = validatedData.media
-        getListing.description = encode(validatedData.description)
+        getListing.description = validatedData.description
         getListing.country = validatedData.country
         getListing.state = validatedData.state
         getListing.city = validatedData.city
@@ -70,6 +71,7 @@ export async function PUT(request) {
         getListing.address = validatedData.address
         getListing.capacity = validatedData.capacity
         getListing.inquirePrice = validatedData.inquirePrice ?? false
+        getListing.listingType = validatedData.listingType || null
 
         await getListing.save()
 

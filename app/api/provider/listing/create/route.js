@@ -31,6 +31,7 @@ export async function POST(request) {
                 address: true,
                 capacity: true,
                 inquirePrice: true,
+                listingType: true,
             })
             .partial({
                 locality: true,

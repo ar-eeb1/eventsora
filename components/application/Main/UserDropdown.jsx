@@ -15,8 +15,8 @@ const UserDropdown = () => {
                 <div className='flex items-center scroll-auto justify-center gap-4 cursor-pointer'>
                     <ChevronDown className='hidden md:block' size={20} />
                     <p className='text-md hidden md:block'>{auth?.name?.toUpperCase()}</p>
-                    <Avatar className='flex items-center justify-center w-6 h-6 rounded-full '>
-                        <AvatarImage className='w-4 h-4 dark:filter dark:invert' src={user.src} />
+                    <Avatar className='flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border'>
+                        <AvatarImage className='w-6 h-6 dark:filter dark:invert' src={user.src} />
                     </Avatar>
                 </div>
             </DropdownMenuTrigger>

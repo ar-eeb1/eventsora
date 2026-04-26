@@ -186,12 +186,13 @@ const BookingDetails = () => {
                           <h4 className="font-semibold text-gray-900 dark:text-gray-100">{item.name}</h4>
                         </Link>
                         {item.variantTitle && (
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{item.variantTitle}</p>
+                          <p className="text-sm md:text-md text-gray-500 dark:text-gray-400">{item.variantTitle}</p>
                         )}
                         <div className="flex items-center gap-2 mt-1 text-md text-pink-600 dark:text-pink-400">
-                          <Calendar className="w-6 h-6" />
-                          <span>Booking Date :</span>
-                          {item.bookingDate.join(', ')}
+                          <Calendar className="lg:w-6 lg:h-6 w-5 h-5" />
+                          <span className='lg:text-sm text-xs font-medium'>Booking Date :
+                            {item.bookingDate.join(', ')}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center mt-2">
                           <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -210,7 +211,7 @@ const BookingDetails = () => {
               <div className="px-6 border-t dark:border-zinc-800 pt-4 space-y-2 pb-4 bg-gray-50/30 dark:bg-zinc-900/20">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg text-gray-900 dark:text-gray-100">Total Amount</span>
-                  <span className="font-extrabold text-2xl text-pink-600 dark:text-pink-400">
+                  <span className="font-extrabold lg:text-2xl text-xl text-pink-600 dark:text-pink-400">
                     {booking.totalAmount.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}
                   </span>
                 </div>
@@ -324,7 +325,7 @@ const BookingDetails = () => {
           </div>
         </div>
 
-        <div className="mt-12 text-center px-5 flex justify-center gap-4">
+        <div className="mt-12 text-center px-5 flex justify-center gap-4 md:flex-row flex-col">
           <Button variant="outline" asChild className="rounded-full px-8 dark:border-zinc-700 dark:hover:bg-zinc-800">
             <a href={PROVIDER_DASHBOARD}>Back to Dashboard</a>
           </Button>

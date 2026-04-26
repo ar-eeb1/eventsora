@@ -24,6 +24,12 @@ export async function POST(request) {
         }
 
         const { category, subcategory, slug } = validate.data
+        const existingSubategory = await SubcategoryModel.findOne({
+            subcategory, slug
+        })
+        if (existingSubategory) {
+            return response(false, 409, 'Subcategory Already exists')
+        }
         const newSubcategory = new SubcategoryModel({
             category, subcategory, slug
         })

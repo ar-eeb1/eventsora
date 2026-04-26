@@ -361,8 +361,9 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         <span>{listing?.startingPrice.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</span>
                     </div>
 
-                    <div className='line-clamp-3' dangerouslySetInnerHTML={{ __html: marked.parse(listing?.description || '', { breaks: true }) }}>
+                    <div className='line-clamp-3' dangerouslySetInnerHTML={{ __html: marked.parse(decode(listing?.description || ''), { breaks: true }) }}>
                     </div>
+
 
                     {
                         listing?.capacity?.length > 0 &&
@@ -509,7 +510,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 <CardHeader className={'font-semibold text-2xl border-b border-pink-400 p-0 m-0 [.border-b]:pb-0'}>
                     <h2>Description</h2>
                 </CardHeader>
-                <div dangerouslySetInnerHTML={{ __html: marked.parse(listing?.description || '', { breaks: true }) }}></div>
+                <div dangerouslySetInnerHTML={{ __html: marked.parse(decode(listing?.description || ''), { breaks: true }) }}></div>
             </Card>
             {/* PORTFOLIO */}
             <Card className={'mb-10 p-4'}>
