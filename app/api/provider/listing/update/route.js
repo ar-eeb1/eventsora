@@ -66,8 +66,8 @@ export async function PUT(request) {
         getListing.country = validatedData.country
         getListing.state = validatedData.state
         getListing.city = validatedData.city
-        getListing.locality = validatedData.locality
-        getListing.sublocality = validatedData.sublocality
+        getListing.locality = validatedData.locality || null
+        getListing.sublocality = validatedData.sublocality || null
         getListing.address = validatedData.address
         getListing.capacity = validatedData.capacity
         getListing.inquirePrice = validatedData.inquirePrice ?? false

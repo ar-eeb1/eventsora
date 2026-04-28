@@ -46,6 +46,9 @@ export async function POST(request) {
         }
 
         const listingData = validate.data
+        if (!listingData.locality) delete listingData.locality;
+        if (!listingData.sublocality) delete listingData.sublocality;
+
         const newListing = new ListingModel({
             ...listingData,
             startingPrice: Number(listingData.startingPrice),

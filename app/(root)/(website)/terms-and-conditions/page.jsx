@@ -62,6 +62,12 @@ const TermsAndConditions = () => (
                 Users agree to make payments only through the platform when booking a
                 service listed on Eventsora.
             </p>
+            <p>
+                Platform will charge 10% commission on each booking made through the platform. This commission will be deducted from the vendor's payment.
+            </p>
+            <p>
+                Platform will charge 5% service fee on each booking made through the platform. This service fee will be added to the vendor's payment.
+            </p>
 
             <h2 className='font-bold underline underline-offset-1'>5. Cancellation and Refunds</h2>
             <p>
