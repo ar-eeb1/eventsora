@@ -366,7 +366,7 @@ const ReviewListing = ({ params }) => {
 
 
   return (
-    <div className=" dark:from-gray-900 dark:to-gray-800 ">
+    <div key={id} className=" dark:from-gray-900 dark:to-gray-800 ">
       <div className="w-[calc(100%-1%)] mx-auto">
         <BreadCrumb breadCrumbData={breadCrumbData} />
 
@@ -616,7 +616,7 @@ const ReviewListing = ({ params }) => {
                   <div>
                     <FormLabel className='mb-3 block text-sm font-medium'>Description<span className='text-red-500 ml-1'>*</span></FormLabel>
                     <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/20">
-                      {!getListingLoading &&
+                      {!getListingLoading && getListing &&
                         <Editor onChange={editor} initialData={form.getValues('description')} />
                       }
                       <FormMessage />

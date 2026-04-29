@@ -15,7 +15,7 @@ export async function proxy(request) {
                         pathname.includes('favicon.ico') ||
                         pathname.includes('.') // common check for files
   
-  if (isStaticAsset || pathname === '/coming-soon') {
+  if (isStaticAsset) {
     return NextResponse.next()
   }
 
@@ -27,11 +27,6 @@ export async function proxy(request) {
                            pathname.startsWith("/master") ||
                            pathname.startsWith("/my-account") ||
                            pathname === "/suspended"
-
-  if (!isProtectedRoute) {
-    // This is a website route (e.g. /, /listing, /[category]) - Redirect to Coming Soon
-    return NextResponse.redirect(new URL('/coming-soon', url))
-  }
 
   // 3. Existing Auth logic for Protected Routes
   const hasToken = request.cookies.has("access_token")

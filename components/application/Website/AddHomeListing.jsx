@@ -51,9 +51,9 @@ const AddHomeListing = async () => {
     }
 
     const listingData = await getListingsByCategory('venues')
-    const carData = await getListingsByCategory('services')
+    const entertainmentData = await getListingsByCategory('entertainment')
 
-    if (!listingData?.data?.length && !carData?.data?.length) return null
+    if (!listingData?.data?.length && !entertainmentData?.data?.length) return null
 
     return (
         <section className='xl:px-16 lg:px-10 md:px-6 px-6'>
@@ -90,8 +90,8 @@ const AddHomeListing = async () => {
             {/* CARS */}
             <div className='my-5'>
                 <div className='flex justify-between items-center md:mb-2 md:mt-20 mt-10'>
-                    <h2 className={`lg:text-4xl md:text-4xl text-3xl font-bold text-pink-900 ${playfair.className}`}>Services</h2>
-                    <Link href='' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
+                    <h2 className={`lg:text-4xl md:text-4xl text-3xl font-bold text-pink-900 ${playfair.className}`}>Entertainment</h2>
+                    <Link href='/entertainment' className='flex items-center gap-2 underline underline-offset-4 lg:text-lg text-sm hover:translate-x-2 transition-all'>
                         View All
                         <ArrowRight size={20} />
                     </Link>
@@ -99,7 +99,7 @@ const AddHomeListing = async () => {
 
                 <HorizontalScrollContainer>
 
-                    {!carData.success && (
+                    {!entertainmentData.success && (
                         <div>
                             <span className="text-lg font-semibold text-gray-700">
                                 No Listing Found
@@ -107,8 +107,8 @@ const AddHomeListing = async () => {
                         </div>
                     )}
 
-                    {carData.success &&
-                        carData.data.map((cars) => (
+                    {entertainmentData.success &&
+                        entertainmentData.data.map((cars) => (
                             <div key={cars._id} className="shrink-0 w-72 grid">
                                 <ListingBox listing={cars} />
                             </div>

@@ -68,7 +68,7 @@ const Header = () => {
                                 <Link href={WEBSITE_CATEGORY('venues')}>Venues</Link>
                             </li>
                             <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
-                                <Link href={WEBSITE_HOME}>Caterers</Link>
+                                <Link href={WEBSITE_CATEGORY('entertainment')}>Entertainment</Link>
                             </li>
                             <li className='opacity-50 line-through cursor-not-allowed'>
                                 Shop

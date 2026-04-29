@@ -21,7 +21,7 @@ const Home = () => {
           <h1 className={`${playfair.className} lg:text-6xl md:text-6xl sm:text-5xl text-4xl text-pink-900 font-extrabold underline underline-offset-8 decoration-1 `}>Categories</h1>
         </div>
         <div className='flex items-center justify-center md:gap-10 gap-5 font-bold md:mt-10 mt-5 flex-wrap'>
-          <Link href={'/photographer'} className='flex flex-col items-center justify-center'>
+          {/* <Link href={'/photographer'} className='flex flex-col items-center justify-center'>
             <lord-icon
               src="https://cdn.lordicon.com/wsaaegar.json"
               trigger="loop"
@@ -31,9 +31,9 @@ const Home = () => {
             >
             </lord-icon>
             <span className=' uppercase'>Photographer</span>
-          </Link>
+          </Link> */}
 
-          <Link href={'/caterer'} className='flex flex-col items-center justify-center'>
+          {/* <Link href={'/caterer'} className='flex flex-col items-center justify-center'>
             <lord-icon
               src="https://cdn.lordicon.com/kixubvkn.json"
               trigger="loop"
@@ -43,7 +43,7 @@ const Home = () => {
             >
             </lord-icon>
             <span className=' uppercase'>Caterer</span>
-          </Link>
+          </Link> */}
 
 
           {/* <Link href={''} className='flex flex-col items-center justify-center'>

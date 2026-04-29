@@ -225,7 +225,7 @@ export async function GET(request) {
                     as: 'locality'
                 }
             },
-            { $unwind: '$locality' },
+            { $unwind: { path: '$locality', preserveNullAndEmptyArrays: true } },
 
             // Projection
             {
