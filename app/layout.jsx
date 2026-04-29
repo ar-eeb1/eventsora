@@ -1,5 +1,6 @@
 import { Poppins } from '@next/font/google';
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next"
 import { Kapakana } from '@next/font/google';
 import "./globals.css";
 import Script from 'next/script';
