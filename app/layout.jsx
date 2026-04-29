@@ -74,6 +74,7 @@ export default function RootLayout({ children }) {
             {children}
             <Toaster closeButton position="top-center" />
           </GlobalProvider>
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
