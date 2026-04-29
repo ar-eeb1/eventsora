@@ -26,6 +26,11 @@ export async function proxy(request) {
                            pathname.startsWith("/auth") || 
                            pathname.startsWith("/master") ||
                            pathname.startsWith("/my-account") ||
+                           pathname.startsWith("/user") ||
+                           pathname.startsWith("/booking") ||
+                           pathname.startsWith("/checkout") ||
+                           pathname.startsWith("/profile") ||
+                           pathname.startsWith("/my-bookings") ||
                            pathname === "/suspended"
 
   // 3. Existing Auth logic for Protected Routes
@@ -53,7 +58,7 @@ export async function proxy(request) {
     "/auth/register",
     "/auth/verify-email",
     "/auth/forgot-password",
-    "/auth/reset-password"
+    "/auth/reset-password",
   ]
 
   // If no valid token
@@ -62,8 +67,8 @@ export async function proxy(request) {
     const response = NextResponse.next()
     response.cookies.delete("access_token")
 
-    // Allow access to public paths
-    if (publicPaths.some(path => pathname.startsWith(path))) {
+    // Allow access to public paths (auth related) OR non-protected website routes
+    if (publicPaths.some(path => pathname.startsWith(path)) || !isProtectedRoute) {
       return response
     }
 
