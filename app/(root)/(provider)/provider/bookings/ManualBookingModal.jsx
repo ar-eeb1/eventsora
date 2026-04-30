@@ -173,17 +173,8 @@ export default function ManualBookingModal({ onSuccess }) {
             )} />
 
             <FormField control={form.control} name='timeSlot' render={({ field }) => (
-              <FormItem><FormLabel>Time Slot</FormLabel><FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Time Slot" /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    <SelectItem value="Morning (9 AM - 1 PM)">Morning (9 AM - 1 PM)</SelectItem>
-                    <SelectItem value="Afternoon (1 PM - 5 PM)">Afternoon (1 PM - 5 PM)</SelectItem>
-                    <SelectItem value="Evening (5 PM - 9 PM)">Evening (5 PM - 9 PM)</SelectItem>
-                    <SelectItem value="Night (9 PM - 1 AM)">Night (9 PM - 1 AM)</SelectItem>
-                    <SelectItem value="Full Day">Full Day</SelectItem>
-                  </SelectContent>
-                </Select>
+              <FormItem><FormLabel>Time Slot / Custom Time</FormLabel><FormControl>
+                <Input {...field} placeholder="e.g. 10:00 AM - 02:00 PM" />
               </FormControl><FormMessage /></FormItem>
             )} />
 
