@@ -37,7 +37,7 @@ const ProviderChatPage = () => {
 
     // Real-time messages with Pusher
     useEffect(() => {
-        if (!id) return
+        if (!id || !process.env.NEXT_PUBLIC_PUSHER_KEY) return
 
         const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
             cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,

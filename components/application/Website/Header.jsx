@@ -43,7 +43,7 @@ const Header = () => {
 
     // Real-time notification with Pusher
     useEffect(() => {
-        if (!auth?._id) return
+        if (!auth?._id || !process.env.NEXT_PUBLIC_PUSHER_KEY) return
 
         const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
             cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
