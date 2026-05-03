@@ -1,8 +1,10 @@
 'use client'
 import { WEBSITE_HOME, WEBSITE_LOGIN } from '@/routes/AdminPanelRoute'
 import Link from 'next/link'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import Pusher from 'pusher-js'
+import axios from 'axios'
 import logo from '@/public/assets/eventsoraWhite.png'
 import Image from 'next/image'
 import Categories from './Categories'
@@ -21,6 +23,51 @@ const Header = () => {
     const pathname = usePathname()
     const [isMobileMenu, setIsMobileMenu] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
+    const [hasUnread, setHasUnread] = useState(false)
+
+    // Initial check for unread messages
+    useEffect(() => {
+        if (!auth) return
+        const checkUnread = async () => {
+            try {
+                const { data } = await axios.get('/api/message/conversation/get')
+                if (data.success) {
+                    setHasUnread(data.data.some(c => !c.isRead))
+                }
+            } catch (err) {
+                console.error('Failed to check unread messages:', err)
+            }
+        }
+        checkUnread()
+    }, [auth])
+
+    // Real-time notification with Pusher
+    useEffect(() => {
+        if (!auth?._id) return
+
+        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+            cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+        })
+
+        const channel = pusher.subscribe(`user-${auth._id}`)
+        channel.bind('conversation-update', (data) => {
+            // If we are already on the messages page for this conversation, don't show dot?
+            // Actually, always show it if it's a new message event
+            setHasUnread(true)
+        })
+
+        return () => {
+            channel.unbind_all()
+            channel.unsubscribe()
+        }
+    }, [auth?._id])
+
+    // Clear dot if we navigate to messages
+    useEffect(() => {
+        if (pathname.includes('/messages')) {
+            setHasUnread(false)
+        }
+    }, [pathname])
 
     const toggleMobileMenu = useCallback(() => {
         setIsMobileMenu(prev => !prev)
@@ -90,8 +137,11 @@ const Header = () => {
                             <SearchIcon className='hover:text-pink-100 cursor-pointer text-white md:size-6 size-5' />
                         </button>
                         
-                        <Link href={WEBSITE_MESSAGES} className="p-1">
+                        <Link href={WEBSITE_MESSAGES} className="p-1 relative">
                             <ChatBubbleOutlineIcon className='text-white' sx={{ fontSize: { xs: 22, md: 24 } }} />
+                            {hasUnread && (
+                                <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-pink-900 animate-pulse" />
+                            )}
                         </Link>
 
                         <Booking />

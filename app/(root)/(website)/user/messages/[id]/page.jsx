@@ -216,9 +216,14 @@ const ChatPage = () => {
                                 />
                                 <div className="flex-1">
                                     <h3 className="font-semibold text-lg line-clamp-1">{listing.name || otherParticipant.name}</h3>
-                                    <p className={`text-sm ${conv.isRead ? 'text-gray-500' : 'text-primary font-medium'}`}>
-                                        {conv.lastMessage || 'No messages yet'}
-                                    </p>
+                                    <div className="flex justify-between items-center mt-1">
+                                        <p className={`text-xs flex-1 line-clamp-1 ${conv.isRead ? 'text-gray-500' : 'text-primary font-bold'}`}>
+                                            {conv.lastMessage || 'No messages yet'}
+                                        </p>
+                                        {!conv.isRead && (
+                                            <span className="w-2 h-2 bg-primary rounded-full ml-2 shrink-0 animate-pulse" />
+                                        )}
+                                    </div>
                                 </div>
                                 <span className="text-xs text-gray-400">
                                     {new Date(conv.updatedAt).toLocaleDateString()}
