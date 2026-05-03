@@ -13,7 +13,8 @@ import { useDispatch } from 'react-redux'
 import { addIntoBooking } from '@/store/reducer/bookingReducer'
 import { WEBSITE_BOOKINGS } from '@/routes/WebsiteRoute'
 import { useRouter } from 'next/navigation'
-import { IoPricetagOutline } from 'react-icons/io5'
+import { IoPricetagOutline, IoClose } from 'react-icons/io5'
+import Pusher from 'pusher-js'
 
 
 const ChatPage = () => {
@@ -38,14 +39,70 @@ const ChatPage = () => {
     // 1 FETCH OLD MESSAGES
     const { data: messageData, refetch } = useFetch(`/api/message/get/${id}`)
 
-    // Polling for new messages
+    // Real-time messages with Pusher
     useEffect(() => {
-        const interval = setInterval(() => {
-            refetch()
-        }, 3000)
+        if (!id) return
 
-        return () => clearInterval(interval)
-    }, [refetch])
+        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+            cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+        })
+
+        const channel = pusher.subscribe(`chat-${id}`)
+
+        // Listen for messages in current chat
+        channel.bind('new-message', (data) => {
+            setMessages((prev) => {
+                if (prev.find((msg) => msg._id === data._id)) return prev
+                return [...prev, data]
+            })
+
+            // Also update sidebar for current chat
+            setConversationData((prev) => {
+                if (!prev?.data) return prev
+                const updatedConversations = prev.data.map((conv) => {
+                    if (conv._id === id) {
+                        return {
+                            ...conv,
+                            lastMessage: data.text,
+                            updatedAt: data.createdAt,
+                            isRead: true
+                        }
+                    }
+                    return conv
+                })
+                updatedConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                return { ...prev, data: updatedConversations }
+            })
+        })
+
+        // Listen for sidebar updates (for all chats)
+        const userChannel = pusher.subscribe(`user-${user?._id}`)
+        userChannel.bind('conversation-update', (data) => {
+            setConversationData((prev) => {
+                if (!prev?.data) return prev
+                const updatedConversations = prev.data.map((conv) => {
+                    if (conv._id === data.conversationId) {
+                        return {
+                            ...conv,
+                            lastMessage: data.lastMessage,
+                            updatedAt: data.updatedAt,
+                            isRead: data.conversationId === id
+                        }
+                    }
+                    return conv
+                })
+                updatedConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                return { ...prev, data: updatedConversations }
+            })
+        })
+
+        return () => {
+            channel.unbind_all()
+            channel.unsubscribe()
+            userChannel.unbind_all()
+            userChannel.unsubscribe()
+        }
+    }, [id, user?._id])
 
     useEffect(() => {
         if (messageData?.success) {
@@ -122,7 +179,7 @@ const ChatPage = () => {
         router.push(WEBSITE_BOOKINGS)
     }
 
-    const { data: conversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
+    const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
 
     // Polling for conversation list
     useEffect(() => {
@@ -219,7 +276,7 @@ const ChatPage = () => {
                                                 </p>
                                             )}
                                             {!isMyMessage && (
-                                                <button 
+                                                <button
                                                     onClick={() => handleBookNow(msg)}
                                                     className="w-full bg-primary text-white py-3 rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-md hover:shadow-lg transform active:scale-95"
                                                 >
@@ -264,7 +321,7 @@ const ChatPage = () => {
                                     className="w-full bg-transparent border-none p-0 text-sm font-semibold text-primary focus:ring-0"
                                 />
                             </div>
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => setIsQuoteMode(false)}
                                 className="p-2 hover:bg-primary/10 rounded-full text-primary transition-colors"

@@ -73,7 +73,7 @@ const useFetch = (url, method = "GET", options = {}) => {
         setRefreshIndex(prev => prev + 1)
     }
 
-    return { data, loading, error, refetch }
+    return { data, setData, loading, error, refetch }
 }
 
 export default useFetch

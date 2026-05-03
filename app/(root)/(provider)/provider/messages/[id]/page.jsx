@@ -10,6 +10,9 @@ import img from '@/public/assets/profile.png' // Default image
 import Image from 'next/image'
 import Link from 'next/link'
 import { IoPricetagOutline, IoClose } from 'react-icons/io5'
+import Pusher from 'pusher-js'
+
+
 
 
 const ProviderChatPage = () => {
@@ -32,14 +35,71 @@ const ProviderChatPage = () => {
     // 1 FETCH OLD MESSAGES
     const { data: messageData, refetch } = useFetch(`/api/message/get/${id}`)
 
-    // Polling for new messages
+    // Real-time messages with Pusher
     useEffect(() => {
-        const interval = setInterval(() => {
-            refetch()
-        }, 3000)
+        if (!id) return
 
-        return () => clearInterval(interval)
-    }, [refetch])
+        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+            cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+        })
+
+        const channel = pusher.subscribe(`chat-${id}`)
+
+        // Listen for messages in current chat
+        channel.bind('new-message', (data) => {
+            setMessages((prev) => {
+                if (prev.find((msg) => msg._id === data._id)) return prev
+                return [...prev, data]
+            })
+
+            // Also update the current conversation's preview in the sidebar
+            setConversationData((prev) => {
+                if (!prev?.data) return prev
+                const updatedConversations = prev.data.map((conv) => {
+                    if (conv._id === id) {
+                        return {
+                            ...conv,
+                            lastMessage: data.text,
+                            updatedAt: data.createdAt,
+                            isRead: true
+                        }
+                    }
+                    return conv
+                })
+                updatedConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                return { ...prev, data: updatedConversations }
+            })
+        })
+
+        // Listen for sidebar updates (for all chats)
+        const userChannel = pusher.subscribe(`user-${user?._id}`)
+        userChannel.bind('conversation-update', (data) => {
+            setConversationData((prev) => {
+                if (!prev?.data) return prev
+                const updatedConversations = prev.data.map((conv) => {
+                    if (conv._id === data.conversationId) {
+                        return {
+                            ...conv,
+                            lastMessage: data.lastMessage,
+                            updatedAt: data.updatedAt,
+                            isRead: data.conversationId === id // Read if we are looking at it
+                        }
+                    }
+                    return conv
+                })
+                // Sort by last message time
+                updatedConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                return { ...prev, data: updatedConversations }
+            })
+        })
+
+        return () => {
+            channel.unbind_all()
+            channel.unsubscribe()
+            userChannel.unbind_all()
+            userChannel.unsubscribe()
+        }
+    }, [id, user?._id])
 
     useEffect(() => {
         if (messageData?.success) {
@@ -87,7 +147,7 @@ const ProviderChatPage = () => {
         }
     }
 
-    const { data: conversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
+    const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
 
     // Polling for conversation list
     useEffect(() => {
