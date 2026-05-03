@@ -384,7 +384,21 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                             ))}
                         </div>
                     }
-
+                    {/* PRICING TYPE & STARTING PRICE */}
+                    {
+                        activeVariant &&
+                        <div className='mt-5 gap-2'>
+                            <div className='flex gap-2'>
+                                <p className='font-bold uppercase'>Prices are calculated as:</p>
+                                <span className='uppercase'>
+                                    {activeVariant?.pricingType.replace('_', ' ')}
+                                </span>
+                            </div>
+                            <div className='flex items-center gap-2 mb-3 text-3xl'>
+                                <span>{activeVariant?.startingPrice.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</span>
+                            </div>
+                        </div>
+                    }
                     {/* Points Display */}
                     {activeVariant && activeVariant.points && activeVariant.points.length > 0 && (
                         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
@@ -406,21 +420,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                     )}
 
 
-                    {/* PRICING TYPE & STARTING PRICE */}
-                    {
-                        activeVariant &&
-                        <div className='mt-5 gap-2'>
-                            <div className='flex gap-2'>
-                                <p className='font-bold uppercase'>Prices are calculated as:</p>
-                                <span className='uppercase'>
-                                    {activeVariant?.pricingType.replace('_', ' ')}
-                                </span>
-                            </div>
-                            <div className='flex items-center gap-2 mb-3 text-3xl'>
-                                <span>{activeVariant?.startingPrice.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' })}</span>
-                            </div>
-                        </div>
-                    }
+
                     {
                         (activeVariant?.pricingType === 'per_person' || activeVariant?.pricingType === 'per_hour' || activeVariant?.pricingType === 'per_day') &&
                         (<div>

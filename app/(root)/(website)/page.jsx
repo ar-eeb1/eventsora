@@ -1,5 +1,7 @@
 import AddHomeListing from '@/components/application/Website/AddHomeListing'
 import React from 'react'
+
+export const revalidate = 0;
 import Link from 'next/link'
 import Hero from '@/components/application/Website/Hero'
 import { Playfair_Display } from 'next/font/google'
