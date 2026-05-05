@@ -2,6 +2,9 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import MessageModel from "@/models/Message.model";
+import UserModel from "@/models/User.model";
+import ListingModel from "@/models/Listing.model";
+import ListingVariantModel from "@/models/ListingVariant.model";
 import { isValidObjectId } from "mongoose";
 
 export async function GET(request, { params }) {

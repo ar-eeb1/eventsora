@@ -24,6 +24,7 @@ export async function PUT(request) {
                 startingPrice: true,
                 pricingType: true,
                 points: true,
+                availability: true,
             })
 
         const validate = schema.safeParse(payload)
@@ -45,6 +46,9 @@ export async function PUT(request) {
         getListingVariant.startingPrice = validatedData.startingPrice
         getListingVariant.pricingType = validatedData.pricingType
         getListingVariant.points = validatedData.points
+        getListingVariant.availability = validatedData.availability || {
+            monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true
+        }
 
         await getListingVariant.save()
 

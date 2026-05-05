@@ -9,6 +9,7 @@ import { Playfair_Display } from 'next/font/google'
 import MediaModel from '@/models/Media.model'
 import LocalityModel from '@/models/Locality.model'
 import HorizontalScrollContainer from './HorizontalScrollContainer'
+import CityModel from '@/models/City.model'
 
 const playfair = Playfair_Display({
     weight: ['400', '700'],

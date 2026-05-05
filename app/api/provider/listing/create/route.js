@@ -39,7 +39,7 @@ export async function POST(request) {
                 capacity: true,
                 inquirePrice: true,
             });
-            
+
         const validate = schema.safeParse(payload)
         if (!validate.success) {
             return response(false, 400, 'Invalid or Missing fields.', validate.error)

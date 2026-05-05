@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Calendar as CalendarIcon } from 'lucide-react'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
@@ -450,7 +451,6 @@ const EditListing = ({ params }) => {
                         </div>
                       </FormItem>
                     )} />
-
                     {/* CAPACITY - Conditional */}
                     {isVenueCategory && (
                       <FormField control={form.control} name="capacity" render={({ field }) => (

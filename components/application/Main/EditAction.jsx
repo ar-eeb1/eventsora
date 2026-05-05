@@ -5,7 +5,7 @@ import React from 'react'
 
 const EditAction = ({ href }) => {
   return (
-    <MenuItem key='edit' onClick={() => handleEdit()}>
+    <MenuItem key='edit'>
       <Link href={href}>
         <ListItemIcon>
           <Edit />

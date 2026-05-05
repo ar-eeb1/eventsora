@@ -28,6 +28,7 @@ const calendarFormSchema = z.object({
 const ProviderCalendar = ({ isPage = false }) => {
     const [selectedDates, setSelectedDates] = useState([])
     const [calendarData, setCalendarData] = useState({})
+    const [availability, setAvailability] = useState({})
     const [isLoadingCalendar, setIsLoadingCalendar] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -48,7 +49,7 @@ const ProviderCalendar = ({ isPage = false }) => {
     const { data: variantsResponse } = useFetch(listingId ? `/api/provider/variants-by-listing?listingId=${listingId}` : null)
 
     const listingOptions = listingsResponse?.data?.map(l => ({ label: l.name, value: l._id })) || []
-    const variantOptions = variantsResponse?.data?.length > 0 
+    const variantOptions = variantsResponse?.data?.length > 0
         ? variantsResponse.data.map(v => ({ label: v.title, value: v._id }))
         : []
     const hasVariants = variantsResponse?.data?.length > 0
@@ -77,7 +78,11 @@ const ProviderCalendar = ({ isPage = false }) => {
                 .then(({ data }) => {
                     if (data.success) {
                         const formattedData = {}
-                        data.data.forEach(item => {
+                        const cData = data.data.calendarData || []
+                        const avail = data.data.availability || {}
+                        setAvailability(avail)
+                        
+                        cData.forEach(item => {
                             const dateKey = new Date(item.date).toISOString().split('T')[0]
                             formattedData[dateKey] = {
                                 status: item.dateStatus,
@@ -88,6 +93,26 @@ const ProviderCalendar = ({ isPage = false }) => {
                                 paymentStatus: item.paymentStatus
                             }
                         })
+
+                        // Also inject permanent blocks based on availability rules
+                        // We do this by checking days that aren't already in formattedData
+                        // For the current view (roughly 3 months for safety)
+                        const start = new Date()
+                        start.setMonth(start.getMonth() - 1)
+                        for (let i = 0; i < 180; i++) {
+                            const d = new Date(start)
+                            d.setDate(d.getDate() + i)
+                            const dateKey = d.toISOString().split('T')[0]
+                            const dayName = d.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
+                            
+                            if (avail[dayName] === false && !formattedData[dateKey]) {
+                                formattedData[dateKey] = {
+                                    status: 'blocked',
+                                    price: 0
+                                }
+                            }
+                        }
+
                         setCalendarData(formattedData)
                     }
                 })

@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { pricingType } from '@/lib/utils'
@@ -39,6 +41,7 @@ const EditListing = ({ params }) => {
     startingPrice: true,
     pricingType: true,
     points: true,
+    availability: true,
   })
 
   const form = useForm({
@@ -51,6 +54,9 @@ const EditListing = ({ params }) => {
       startingPrice: '',
       pricingType: '',
       points: [],
+      availability: {
+        monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true
+      },
     }
   })
 
@@ -89,6 +95,9 @@ const EditListing = ({ params }) => {
         startingPrice: listing?.startingPrice,
         pricingType: listing?.pricingType,
         points: listing?.points || [],
+        availability: listing?.availability || {
+          monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true
+        },
       })
 
     }
@@ -299,6 +308,46 @@ const EditListing = ({ params }) => {
                   </div>
                 </div>
 
+
+                {/* WEEKLY AVAILABILITY */}
+                <div className="md:col-span-2 space-y-4 bg-primary/5 dark:bg-primary/10 p-6 rounded-xl border border-primary/20">
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon className="w-4 h-4 text-primary" />
+                    <h6 className="text-sm font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider">Default Weekly Availability</h6>
+                  </div>
+                  <p className="text-xs text-gray-500">Uncheck days where this variant is permanently unavailable (e.g. hall closed on Mondays).</p>
+                  
+                  <div className="flex flex-wrap gap-x-6 gap-y-4 mt-2">
+                    {[
+                      { id: 'monday', label: 'Mon' },
+                      { id: 'tuesday', label: 'Tue' },
+                      { id: 'wednesday', label: 'Wed' },
+                      { id: 'thursday', label: 'Thu' },
+                      { id: 'friday', label: 'Fri' },
+                      { id: 'saturday', label: 'Sat' },
+                      { id: 'sunday', label: 'Sun' },
+                    ].map((day) => (
+                      <FormField
+                        key={day.id}
+                        control={form.control}
+                        name={`availability.${day.id}`}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel className="text-sm font-medium cursor-pointer">
+                              {day.label}
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
 
                 {/* Submit Button */}
                 <div className='pt-6 border-t flex justify-end gap-4'>

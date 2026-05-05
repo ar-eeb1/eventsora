@@ -31,6 +31,8 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import CalendarModel from "@/models/Calendar.model";
+import ListingModel from "@/models/Listing.model";
+import ListingVariantModel from "@/models/ListingVariant.model";
 
 export async function GET(request) {
     try {
@@ -51,11 +53,20 @@ export async function GET(request) {
         if (listingId) query.listingId = listingId;
         if (variantId) query.variantId = variantId;
 
-        const calendarData = await CalendarModel.find(query)
-            .sort({ date: 1 })
-            .lean();
+        const [calendarData, listing, variant] = await Promise.all([
+            CalendarModel.find(query).sort({ date: 1 }).lean(),
+            ListingModel.findById(listingId).select('availability').lean(),
+            variantId ? ListingVariantModel.findById(variantId).select('availability').lean() : null
+        ]);
 
-        return response(true, 200, 'Calendar data fetched successfully.', calendarData);
+        const availability = (variantId ? variant?.availability : listing?.availability) || {
+            monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true
+        };
+
+        return response(true, 200, 'Calendar data fetched successfully.', {
+            calendarData,
+            availability
+        });
 
     } catch (error) {
         return catchError(error);

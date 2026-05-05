@@ -5,6 +5,7 @@ import { showToast } from '@/lib/showToast'
 
 const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates = [], disabledDates = [], maxSelectable = 1 }) => {
     const [calendarData, setCalendarData] = useState({})
+    const [availability, setAvailability] = useState({})
     const [isLoading, setIsLoading] = useState(true)
     const [selected, setSelected] = useState(selectedDates || [])
 
@@ -22,8 +23,11 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
             if (result.success) {
                 // Transform the API data to match the Calendar component format
                 const transformedData = {}
+                const data = result.data.calendarData || []
+                const avail = result.data.availability || {}
+                setAvailability(avail)
 
-                result.data.forEach(item => {
+                data.forEach(item => {
                     const date = new Date(item.date)
                     const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
@@ -35,6 +39,22 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
                         price: item.price || null
                     }
                 })
+
+                // Inject permanent blocks
+                const start = new Date()
+                for (let i = 0; i < 180; i++) {
+                    const d = new Date(start)
+                    d.setDate(d.getDate() + i)
+                    const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+                    const dayName = d.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
+                    
+                    if (avail[dayName] === false && !transformedData[dateKey]) {
+                        transformedData[dateKey] = {
+                            status: 'blocked',
+                            price: null
+                        }
+                    }
+                }
 
                 setCalendarData(transformedData)
             } else {
@@ -83,9 +103,7 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
 
         // Filter out disabled dates and dates that are not 'available'
         const validDates = dates.filter(dateKey => {
-            const dateData = calendarData[dateKey]
-            const status = dateData?.status || 'available'
-
+            const status = getDateStatus(dateKey)
             return !disabledDates.includes(dateKey) && status === 'available'
         })
 
@@ -119,6 +137,13 @@ const UserCalendar = ({ listingId, variantId = null, onDateSelect, selectedDates
 
     // Get status for a specific date
     const getDateStatus = (dateKey) => {
+        // First check weekly availability boolean
+        const date = new Date(dateKey)
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
+        if (availability[dayName] === false) {
+            return 'blocked'
+        }
+
         const dateData = calendarData[dateKey]
         // If date doesn't exist in calendarData, treat it as 'available'
         return dateData?.status || 'available'

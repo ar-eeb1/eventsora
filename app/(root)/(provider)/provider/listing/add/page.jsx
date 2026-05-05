@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Calendar as CalendarIcon } from 'lucide-react'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
@@ -403,7 +404,6 @@ const AddListing = () => {
                         <FormMessage />
                       </FormItem>
                     )} />
-
                     {/* INQUIRE PRICE */}
                     <FormField control={form.control} name="inquirePrice" render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm bg-primary/5 border-primary/20">
@@ -423,7 +423,6 @@ const AddListing = () => {
                         </div>
                       </FormItem>
                     )} />
-
                     {/* CAPACITY - Conditional */}
                     {isVenueCategory && (
                       <FormField control={form.control} name="capacity" render={({ field }) => (

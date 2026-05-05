@@ -3,6 +3,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import CalendarModel from "@/models/Calendar.model";
 import ListingModel from "@/models/Listing.model";
+import ListingVariantModel from "@/models/ListingVariant.model";
 import { zSchema } from "@/lib/zodSchema";
 
 export async function GET(request) {
@@ -40,9 +41,14 @@ export async function GET(request) {
         }
 
         // Fetch calendar entries
-        let calendarData = await CalendarModel.find(query)
-            .sort({ date: 1 })
-            .lean();
+        const [calendarData, variant] = await Promise.all([
+            CalendarModel.find(query).sort({ date: 1 }).lean(),
+            variantId ? ListingVariantModel.findById(variantId).select('availability').lean() : null
+        ]);
+
+        const availability = (variantId ? variant?.availability : listing?.availability) || {
+            monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true
+        };
 
         // Fetch bookings matching this listing/variant
         const mongoose = require('mongoose');
@@ -105,7 +111,10 @@ export async function GET(request) {
             return entry;
         });
 
-        return response(true, 200, 'Calendar data fetched successfully.', calendarData);
+        return response(true, 200, 'Calendar data fetched successfully.', {
+            calendarData,
+            availability
+        });
 
     } catch (error) {
         return catchError(error);

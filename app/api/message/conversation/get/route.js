@@ -2,6 +2,8 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import ConversationModel from "@/models/Conversation.model";
+import UserModel from "@/models/User.model";
+import ListingModel from "@/models/Listing.model";
 
 export async function GET(request) {
     try {
