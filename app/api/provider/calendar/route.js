@@ -41,7 +41,7 @@ export async function GET(request) {
         }
 
         // Fetch calendar entries
-        const [calendarData, variant] = await Promise.all([
+        let [calendarData, variant] = await Promise.all([
             CalendarModel.find(query).sort({ date: 1 }).lean(),
             variantId ? ListingVariantModel.findById(variantId).select('availability').lean() : null
         ]);
