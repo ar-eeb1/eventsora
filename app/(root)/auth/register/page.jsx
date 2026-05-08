@@ -25,6 +25,7 @@ import axios from 'axios'
 import { showToast } from '@/lib/showToast'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
+import { Button } from '@/components/ui/button'
 
 const RegisterPage = () => {
     const router = useRouter()
@@ -76,6 +77,8 @@ const RegisterPage = () => {
             setLoading(false)
         }
     }
+
+    const [isTndChecked, setIsTndChecked] = useState(false)
     return (
         <div className=''>
             <Card className='border-none shadow-xl md:w-[450px] w-[350px]'>
@@ -85,7 +88,7 @@ const RegisterPage = () => {
                             <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-64'></Image>
                         </div>
                         <div className='text-center relative -top-5'>
-                            <h1 className='text-2xl font-semibold mb-5'>{isProvider ? 'Provider Signup' : 'Create a new account'}</h1>
+                            <h1 className='text-2xl font-semibold mb-5'>{isProvider ? 'Sign Up as Provider' : 'Create a new account'}</h1>
                         </div>
                     </div>
                     <div>
@@ -174,7 +177,17 @@ const RegisterPage = () => {
                                     />
                                 </div>
                                 <div className='mb-5'>
-                                    <ButtonLoading type='submit' text='SIGN UP' className='w-full' loading={loading} />
+                                    <div className='flex items-center gap-2 mb-3'>
+                                        <input type='checkbox' onClick={() => setIsTndChecked(!isTndChecked)} className='h-4 w-4' />
+                                        <span className='text-sm text-muted-foreground'>I agree to the <Link target='blank' href="/terms-and-conditions" className="underline hover:text-primary cursor-pointer">Terms and Conditions</Link>
+                                        </span>
+                                    </div>
+                                    {
+                                        isTndChecked ?
+                                            <ButtonLoading type='submit' text='SIGN UP' className='w-full' loading={loading} />
+                                            :
+                                            <Button className={'w-full'} disabled>SIGN UP</Button>
+                                    }
                                 </div>
                                 {/* {!isProvider && (
                                     <>
@@ -208,13 +221,13 @@ const RegisterPage = () => {
                                         <span className='underline underline-offset-3 '>LOGIN</span>
                                     </Link>
                                 </div>
-                                {/* <div className='text-center mt-3'>
+                                <div className='text-center mt-3'>
                                     {isProvider ?
                                         <Link href='/auth/register' className='text-sm text-pink-500 hover:underline'>Join as a Customer</Link>
                                         :
                                         <Link href='/auth/register?role=provider' className='text-sm text-pink-500 hover:underline'>Join as a Provider</Link>
                                     }
-                                </div> */}
+                                </div>
                             </form>
                         </Form>
                     </div>

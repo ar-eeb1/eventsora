@@ -15,3 +15,8 @@ export const WEBSITE_BOOKING_DETAILS = (booking_id) => `/booking-details/${booki
 export const USER_DASHBOARD = '/my-account'
 export const USER_PROFILE = '/profile'
 export const USER_BOOKINGS = '/my-bookings'
+
+export const TERMS_AND_CONDITIONS = '/terms-and-conditions'
+export const PRIVACY_POLICY = '/privacy-policy'
+export const REFUND_POLICY = '/refund-policy'
+export const CANCELATION_POLICY = '/cancelation-policy'

@@ -61,7 +61,7 @@ const BookingDetails = () => {
     { label: 'BANK', value: 'United Bank Limited', icon: <Landmark className="w-5 h-5 text-pink-500" /> },
     { label: 'A/C', value: '337815072', icon: <Hash className="w-5 h-5 text-pink-500" />, copyable: true },
     { label: 'IBAN', value: 'PK19UNIL0109000337815072', icon: <Landmark className="w-5 h-5 text-pink-500" />, copyable: true },
-    { label: 'TITLE', value: 'Eventsora Ltd', icon: <User className="w-5 h-5 text-pink-500" /> },
+    { label: 'TITLE', value: 'Areeb Amir', icon: <User className="w-5 h-5 text-pink-500" /> },
   ]
 
   if (loading) {

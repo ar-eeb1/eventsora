@@ -5,6 +5,7 @@ import { numberToIndianWords } from '@/lib/numberToWords'
 import Select from '@/components/application/Main/Select'
 import Editor from '@/components/application/Provider/Editor'
 import MediaModal from '@/components/application/Provider/MediaModal'
+import UploadMedia from '@/components/application/Provider/UploadMedia'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -338,6 +339,7 @@ const AddListing = () => {
                         <FormLabel className="text-sm font-medium">Slug<span className='text-red-500 ml-1'>*</span></FormLabel>
                         <FormControl>
                           <Input
+                            disabled  
                             type='text'
                             placeholder='auto-generated-slug'
                             className="h-11 bg-gray-50 dark:bg-gray-800/50 transition-all duration-200"
@@ -610,13 +612,16 @@ const AddListing = () => {
                         ))}
                       </div>
                     )}
-                    <Button
-                      type='button'
-                      onClick={() => setOpen(true)}
-                      className='h-12 px-8 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105'
-                    >
-                      {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
-                    </Button>
+                    <div className='flex justify-center items-center gap-4'>
+                      <Button
+                        type='button'
+                        onClick={() => setOpen(true)}
+                        className='h-9 px-8 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105'
+                      >
+                        {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
+                      </Button>
+                      <UploadMedia />
+                    </div>
                     {selectedMedia.length > 0 && (
                       <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                         {selectedMedia.length} {selectedMedia.length === 1 ? 'image' : 'images'} selected

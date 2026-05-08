@@ -11,7 +11,7 @@ import { useSearchParams } from 'next/navigation'
 import ManualBookingModal from './ManualBookingModal'
 import ReceivePaymentAction from './ReceivePaymentAction'
 
-const breadCrumbData = [
+const breadCrumbData = [    
     { href: PROVIDER_DASHBOARD, label: 'Dashboard' },
     { href: '', label: 'Bookings' },
 ]

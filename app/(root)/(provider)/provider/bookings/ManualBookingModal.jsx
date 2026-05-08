@@ -30,7 +30,7 @@ const manualBookingSchema = z.object({
   variantId: z.string().optional()
 })
 
-export default function ManualBookingModal({ onSuccess }) {
+export default function ManualBookingModal({ onSuccess, children }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [variants, setVariants] = useState([])
@@ -121,9 +121,9 @@ export default function ManualBookingModal({ onSuccess }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} className=''>
       <DialogTrigger asChild>
-        <Button>New Booking</Button>
+        {children || <Button>New Booking</Button>}
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
