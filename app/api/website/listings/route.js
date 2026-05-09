@@ -4,6 +4,7 @@ import CategoryModel from "@/models/Category.model";
 import ListingModel from "@/models/Listing.model";
 import SubcategoryModel from "@/models/Subcategory.model";
 import CalendarModel from "@/models/Calendar.model";
+import SearchLogModel from "@/models/SearchLog.model";
 import mongoose from "mongoose";
 
 export async function GET(request) {
@@ -254,6 +255,22 @@ export async function GET(request) {
         if (listings.length > limit) {
             nextPage = page + 1
             listings.pop() // remove extra items
+        }
+
+        // Save search log if a search query was provided
+        if (search && search.trim().length > 0) {
+            try {
+                const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null
+                await SearchLogModel.create({
+                    query: search.trim().toLowerCase(),
+                    category: categorySlug || null,
+                    subcategory: subcategorySlug || null,
+                    resultsCount: listings.length,
+                    ip,
+                })
+            } catch (_) {
+                // Don't fail the main request if logging fails
+            }
         }
 
         return response(true, 200, 'Listing Data Found', { listings, nextPage })

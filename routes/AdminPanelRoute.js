@@ -24,4 +24,6 @@ export const ADMIN_BOOKINGS_REFUNDED = '/admin/bookings?paymentStatus=refunded'
 
 export const ADMIN_BOOKINGS_DETAILS = (booking_id) => booking_id ? `/admin/bookings/details/${booking_id}` : ''
 
+export const ADMIN_SEARCHES = '/admin/searches'
+
 
