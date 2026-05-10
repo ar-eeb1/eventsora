@@ -125,13 +125,13 @@ export default function ManualBookingModal({ onSuccess, children }) {
       <DialogTrigger asChild>
         {children || <Button>New Booking</Button>}
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>Create Manual Booking</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4 mt-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
 
             <FormField control={form.control} name='name' render={({ field }) => (
               <FormItem><FormLabel>Client Name</FormLabel><FormControl>
@@ -259,7 +259,7 @@ export default function ManualBookingModal({ onSuccess, children }) {
               </FormControl><FormMessage /></FormItem>
             )} />
 
-            <div className="col-span-2 flex justify-end gap-3 mt-4">
+            <div className="col-span-full flex justify-end gap-3 mt-4">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <ButtonLoading type="submit" loading={loading} text="Create Booking" />
             </div>
