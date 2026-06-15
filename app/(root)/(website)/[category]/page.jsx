@@ -95,28 +95,28 @@ const page = () => {
                     {isFetching && <div className='text-center my-auto '>Loading...</div>}
                     {error && <div className='w-screen h-screen items-center justify-center flex '>{error.message}</div>}
 
-                    <div className='grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 lg:gap-4 gap-5 mt-5'>
-                        {data && data.pages.map(page => (
-                            page.listings.map((listing, index) => (
-                                <ListingBox key={index} listing={listing} />
-                            ))
-                        ))}
-                    </div>
-
-                    {/* LOAD MORE */}
-                    <div className='flex justify-center mt-10'>
-                        {hasNextPage ?
-                            <ButtonLoading type='button' loading={isFetching} text={'Load more'} onClick={fetchNextPage} />
-                            :
-                            <>
-                                {!isFetching && <span>{"You're all caught up"}</span>}
-                            </>
-                        }
-                    </div>
-
-                </div>
-            </section>
+    <div className='grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 lg:gap-4 gap-5 mt-5'>
+            {data && data.pages.map(page => (
+                page.listings.map((listing, index) => (
+                    <ListingBox key={index} listing={listing} />
+                ))
+            ))}
         </div>
+
+        {/* LOAD MORE */}
+        <div className='flex justify-center mt-10'>
+            {hasNextPage ?
+                <ButtonLoading type='button' loading={isFetching} text={'Load more'} onClick={fetchNextPage} />
+                :
+                <>
+                    {!isFetching && <span>{"You're all caught up"}</span>}
+                </>
+            }
+        </div>
+
+    </div>
+            </section >
+        </div >
     )
 }
 
