@@ -17,9 +17,20 @@ function MediaModal({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
     // Fix: Radix UI Dialog sometimes fails to restore body scroll after closing.
     // Forcibly reset overflow whenever the dialog transitions to closed.
     useEffect(() => {
-        if (!open) {
+        const cleanupScroll = () => {
             document.body.style.overflow = ''
             document.body.style.pointerEvents = ''
+            document.body.removeAttribute('data-scroll-locked')
+        }
+        
+        if (!open) {
+            cleanupScroll()
+        } else {
+            setPreviouslySelected(selectedMedia)
+        }
+
+        return () => {
+            cleanupScroll()
         }
     }, [open])
 
@@ -58,7 +69,13 @@ function MediaModal({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
     return (
         <Dialog
             open={open}
-            onOpenChange={() => setOpen(!open)}
+            onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                    handleClose()
+                } else {
+                    setOpen(true)
+                }
+            }}
         >
             <DialogContent onInteractOutside={(e) => e.preventDefault()}
                 className='sm:max-w-[80%] h-screen p-0 py-10 bg-transparent border-0 shadow-none'

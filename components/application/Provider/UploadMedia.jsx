@@ -75,7 +75,7 @@ import { Upload, X, File, Image, Video } from 'lucide-react'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 
-const UploadMedia = ({ isMultiple, queryClient }) => {
+const UploadMedia = ({ isMultiple, queryClient, onUploadSuccess }) => {
     const [showCustomUI, setShowCustomUI] = useState(false)
 
     const handleOnError = (error) => {
@@ -97,7 +97,13 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
                 if (!mediaUploadResponse.success) {
                     throw new Error(mediaUploadResponse.message)
                 }
-                queryClient.invalidateQueries(['media-data'])
+                if (queryClient) {
+                    queryClient.invalidateQueries(['media-data'])
+                    queryClient.invalidateQueries(['MediaModal'])
+                }
+                if (onUploadSuccess && mediaUploadResponse.data) {
+                    onUploadSuccess(mediaUploadResponse.data)
+                }
                 showToast('success', mediaUploadResponse.message)
                 setShowCustomUI(false)
             } catch (error) {
@@ -109,6 +115,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
     return (
         <>
             <Button
+                type="button"
                 onClick={() => setShowCustomUI(true)}
                 className="bg-pink-700 text-white cursor-pointer font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
             >
@@ -126,6 +133,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
                                 Upload Your Files
                             </h2>
                             <button
+                                type="button"
                                 onClick={() => setShowCustomUI(false)}
                                 className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all"
                             >
@@ -158,6 +166,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
                                 >
                                     {({ open }) => (
                                         <button
+                                            type="button"
                                             onClick={() => open()}
                                             className="group border-2 border-dashed cursor-pointer border-blue-300 hover:border-blue-500 rounded-xl p-8 transition-all hover:bg-blue-50"
                                         >
@@ -190,6 +199,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
                                 >
                                     {({ open }) => (
                                         <button
+                                            type="button"
                                             onClick={() => open()}
                                             className="group border-2 cursor-pointer border-dashed border-purple-300 hover:border-purple-500 rounded-xl p-8 transition-all hover:bg-purple-50"
                                         >
@@ -222,6 +232,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
                                 >
                                     {({ open }) => (
                                         <button
+                                            type="button"
                                             onClick={() => open()}
                                             className="group cursor-pointer border-2 border-dashed border-green-300 hover:border-green-500 rounded-xl p-8 transition-all hover:bg-green-50"
                                         >

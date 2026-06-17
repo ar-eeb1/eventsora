@@ -23,6 +23,8 @@ import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import slugify from 'slugify'
+import { X } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 
 const breadCrumbData = [
   { href: PROVIDER_DASHBOARD, label: 'Dashboard' },
@@ -37,6 +39,7 @@ const AddListing = () => {
   const [selectedMedia, setSelectedMedia] = useState([])
 
   const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
 
   const formSchema = zSchema.pick({
     name: true,
@@ -608,6 +611,15 @@ const AddListing = () => {
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                               <span className="text-white text-xs font-medium">#{index + 1}</span>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedMedia(prev => prev.filter(m => m._id !== media._id));
+                              }}
+                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -620,7 +632,14 @@ const AddListing = () => {
                       >
                         {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
                       </Button>
-                      <UploadMedia />
+                      <UploadMedia 
+                        isMultiple={true} 
+                        queryClient={queryClient} 
+                        onUploadSuccess={(newMedia) => {
+                          const formattedMedia = newMedia.map(m => ({ _id: m._id, url: m.secure_url }));
+                          setSelectedMedia(prev => [...prev, ...formattedMedia]);
+                        }}
+                      />
                     </div>
                     {selectedMedia.length > 0 && (
                       <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">

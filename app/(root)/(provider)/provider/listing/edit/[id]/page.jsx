@@ -20,6 +20,9 @@ import Image from 'next/image'
 import React, { use, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import slugify from 'slugify'
+import { X } from 'lucide-react'
+import UploadMedia from '@/components/application/Provider/UploadMedia'
+import { useQueryClient } from '@tanstack/react-query'
 
 const breadCrumbData = [
   { href: PROVIDER_DASHBOARD, label: 'Dashboard' },
@@ -30,6 +33,7 @@ const breadCrumbData = [
 const EditListing = ({ params }) => {
   const { id } = use(params)
   const { data: getListing, loading: getListingLoading } = useFetch(`/api/provider/listing/get/${id}`)
+  const queryClient = useQueryClient()
 
   const sortByLabel = (a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
 
@@ -636,17 +640,36 @@ const EditListing = ({ params }) => {
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                               <span className="text-white text-xs font-medium">#{index + 1}</span>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedMedia(prev => prev.filter(m => m._id !== media._id));
+                              }}
+                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
                           </div>
                         ))}
                       </div>
                     )}
-                    <Button
-                      type='button'
-                      onClick={() => setOpen(true)}
-                      className='h-12 px-8 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105'
-                    >
-                      {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
-                    </Button>
+                    <div className="flex justify-center gap-4">
+                      <Button
+                        type='button'
+                        onClick={() => setOpen(true)}
+                        className='h-12 px-8 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105'
+                      >
+                        {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
+                      </Button>
+                      <UploadMedia 
+                        isMultiple={true} 
+                        queryClient={queryClient} 
+                        onUploadSuccess={(newMedia) => {
+                          const formattedMedia = newMedia.map(m => ({ _id: m._id, url: m.secure_url }));
+                          setSelectedMedia(prev => [...prev, ...formattedMedia]);
+                        }}
+                      />
+                    </div>
                     {selectedMedia.length > 0 && (
                       <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                         {selectedMedia.length} {selectedMedia.length === 1 ? 'image' : 'images'} selected
