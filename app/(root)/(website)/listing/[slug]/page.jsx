@@ -9,25 +9,108 @@ import UserModel from '@/models/User.model'
 import CityModel from '@/models/City.model'
 import LocalityModel from '@/models/Locality.model'
 
+const DEFAULT_OG_IMAGE =
+    'https://res.cloudinary.com/dliahmplq/image/upload/v1776787244/Untitled_design_1_qfvqha.png'
+
+function stripForMeta(text) {
+    if (!text) return ''
+    return text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+}
+
+function getOgImageUrl(secureUrl) {
+    if (!secureUrl) return null
+    if (secureUrl.includes('/upload/')) {
+        return secureUrl.replace('/upload/', '/upload/w_1200,h_630,c_fill,q_auto,f_jpg/')
+    }
+    return secureUrl
+}
+
 export async function generateMetadata({ params }) {
-    const { slug } = await params;
+    const { slug } = await params
     const formattedName = slug
         .split('-')
         .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ');
+        .join(' ')
 
-    return {
+    const pageUrl = `https://www.eventsora.com/listing/${slug}`
+
+    const fallback = {
         title: formattedName,
-        description: `Find ${formattedName} on Eventsora, Book now`,
-        images: [
-            {
-                url: '/assets/page.png',
+        description: `Find ${formattedName} on Eventsora. Book now.`,
+        openGraph: {
+            title: formattedName,
+            description: `Find ${formattedName} on Eventsora. Book now.`,
+            url: pageUrl,
+            siteName: 'Eventsora',
+            type: 'website',
+            images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: 'Eventsora' }],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: formattedName,
+            description: `Find ${formattedName} on Eventsora. Book now.`,
+            images: [DEFAULT_OG_IMAGE],
+        },
+    }
+
+    try {
+        await connectDB()
+
+        const listing = await ListingModel.findOne({
+            deletedAt: null,
+            status: 'approved',
+            slug,
+        })
+            .populate('media', 'secure_url')
+            .populate('city', 'city')
+            .select('name description media city')
+            .lean()
+
+        if (!listing) return fallback
+
+        const cityName = listing.city?.city
+        const description = stripForMeta(listing.description)
+        const metaDescription = description
+            ? description.slice(0, 160)
+            : `Book ${listing.name}${cityName ? ` in ${cityName}` : ''} on Eventsora.`
+
+        const ogImages = (listing.media || [])
+            .slice(0, 3)
+            .map(m => getOgImageUrl(m.secure_url))
+            .filter(Boolean)
+            .map((url, i) => ({
+                url,
                 width: 1200,
                 height: 630,
-                alt: 'Eventsora',
+                alt: i === 0 ? listing.name : `${listing.name} - photo ${i + 1}`,
+            }))
+
+        if (ogImages.length === 0) {
+            ogImages.push({ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: listing.name })
+        }
+
+        return {
+            title: listing.name,
+            description: metaDescription,
+            openGraph: {
+                title: listing.name,
+                description: metaDescription,
+                url: pageUrl,
+                siteName: 'Eventsora',
+                type: 'website',
+                images: ogImages,
             },
-        ],
-    };
+            twitter: {
+                card: 'summary_large_image',
+                title: listing.name,
+                description: metaDescription,
+                images: ogImages.map(img => img.url),
+            },
+        }
+    } catch (error) {
+        console.error('Listing metadata error:', error)
+        return fallback
+    }
 }
 
 
