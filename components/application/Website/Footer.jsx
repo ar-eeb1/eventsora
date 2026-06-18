@@ -5,6 +5,8 @@ import React from 'react'
 import { Email, Facebook, Instagram, MapOutlined, PhoneOutlined } from '@mui/icons-material'
 import { WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER } from '@/routes/AdminPanelRoute'
 import { USER_DASHBOARD, WEBSITE_CATEGORY } from '@/routes/WebsiteRoute'
+import { Pin } from 'lucide-react'
+import { BsTiktok } from 'react-icons/bs'
 
 const Footer = () => {
   return (
@@ -58,14 +60,16 @@ const Footer = () => {
         </div>
 
         <div>
-          <h4 className='text-white text-sm md:text-xl md:font-bold uppercase mb-3 md:mb-5 gap1'>Contact</h4>
+          <h4 className='text-white text-sm md:text-xl md:font-bold uppercase mb-3 md:mb-5 gap-2'>Contact</h4>
           <ul className=''>
-            <li className='md:mb-2 text-sm text-white flex flex-row'><Link href='' ><MapOutlined />Karachi, Pakistan</Link></li>
-            <li className='md:mb-2 text-sm text-white flex flex-row'><Link href='' ><PhoneOutlined />+92-317-1232544</Link></li>
-            <li className='md:mb-2 text-sm text-white flex flex-row'><Link href='' ><Email />support@eventsora.com</Link></li>
+            <li className='gap-2 md:mb-2 text-sm text-white flex flex-row'><Pin />R-324 Shop #04, Pakistan</li>
+            <li className='gap-2 md:mb-2 text-sm text-white flex flex-row'><MapOutlined />Karachi, Pakistan</li>
+            <li className='gap-2 md:mb-2 text-sm text-white flex flex-row'><PhoneOutlined />+92-370-0182844</li>
+            <li className='gap-2 md:mb-2 text-sm text-white flex flex-row'><Email />admin@eventsora.com</li>
             <ul className='flex gap-4 '>
-              <li className='md:mb-2 text-sm text-white flex flex-row '><Link href=''><Instagram /></Link></li>
-              <li className='md:mb-2 text-sm text-white flex flex-row '><Link href=''><Facebook /></Link></li>
+              <li className='md:mb-2 text-sm text-white flex flex-row '><Link target='_blank' href='https://www.instagram.com/eventsora.pk/'><Instagram /></Link></li>
+              <li className='md:mb-2 text-sm text-white flex flex-row '><Link target='_blank' href='https://www.facebook.com/profile.php?id=61573845701383'><Facebook /></Link></li>
+              <li className='md:mb-2 text-sm text-white flex flex-row '><Link target='_blank' href='https://www.tiktok.com/@eventsora'><BsTiktok /></Link></li>
             </ul>
           </ul>
         </div>
