@@ -1,4 +1,3 @@
-
 import Image from 'next/image'
 import Link from 'next/link'
 import logo from '@/public/assets/eventsoraWhite.png'
@@ -53,6 +52,7 @@ const Footer = () => {
             <li className='md:mb-2 text-sm text-white'><Link href={WEBSITE_LOGIN}>Login</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href={USER_DASHBOARD}>My Account</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href='/privacy-policy'>Privacy Policy</Link></li>
+            <li className='md:mb-2 text-sm text-white'><Link href='/refund-policy'>Refund Policy</Link></li>
             <li className='md:mb-2 text-sm text-white'><Link href='/terms-and-conditions'>Terms & Condition</Link></li>
           </ul>
         </div>

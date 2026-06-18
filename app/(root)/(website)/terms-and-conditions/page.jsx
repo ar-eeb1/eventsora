@@ -1,149 +1,196 @@
-import React from 'react';
-import Head from 'next/head';
-import { Dot } from 'lucide-react';
-import { EMAIL_ADDRESS } from '@/lib/utils';
+import React from "react";
+import Head from "next/head";
+import {
+    FileText,
+    ShieldCheck,
+    Users,
+    CreditCard,
+    AlertTriangle,
+    Gavel,
+    Lock,
+    Mail,
+} from "lucide-react";
+import { EMAIL_ADDRESS } from "@/lib/utils";
+import { REFUND_POLICY } from "@/routes/WebsiteRoute";
 
-const TermsAndConditions = () => (
-    <>
-        <Head>
-            <title>Terms & Conditions - Eventsora</title>
-            <meta
-                name="description"
-                content="Read the terms and conditions for using Eventsora services."
-            />
-        </Head>
+const sections = [
+    {
+        icon: FileText,
+        title: "Platform Overview",
+        description:
+            "Eventsora is an online marketplace that connects customers with event service providers such as venues, photographers, decorators, and other event-related services. We do not directly provide those services, but we facilitate communication and booking between users and vendors.",
+    },
+    {
+        icon: Users,
+        title: "User Accounts",
+        description:
+            "To access certain features, users may need to create an account and provide accurate, complete, and up-to-date information. Eventsora reserves the right to suspend or terminate accounts that submit false information or violate platform rules.",
+    },
+    {
+        icon: ShieldCheck,
+        title: "Vendor Responsibilities",
+        description:
+            "Vendors are responsible for the quality, pricing accuracy, availability, and timely delivery of the services they offer on the platform.",
+    },
+    {
+        icon: CreditCard,
+        title: "Bookings & Payments",
+        description:
+            "Some bookings may require advance payment to confirm reservations. Users agree to make payments only through the platform, and Eventsora may charge a 5% service fee on bookings made via the platform.",
+    },
+    {
+        icon: AlertTriangle,
+        title: "Cancellation & Refunds",
+        description: (
+            <>
+                Cancellation and refund policies may vary by provider. Eventsora may assist in refund processing where applicable, but does not guarantee refunds in all situations. Check out{" "}
+                <a
+                    href={REFUND_POLICY}
+                    className="text-pink-600 underline hover:text-pink-700"
+                >
+                    Refund Policy
+                </a>
+                .
+            </>
+        ),
+    },
+    {
+        icon: Gavel,
+        title: "Prohibited Activities",
+        description:
+            "Users and vendors must not provide false information, attempt fraudulent bookings or payments, harass other users, or bypass platform payment systems.",
+    },
+    {
+        icon: Lock,
+        title: "Limitation of Liability",
+        description:
+            "Eventsora is not liable for damages, losses, or disputes arising from services provided by third-party vendors listed on the platform.",
+    },
+    {
+        icon: FileText,
+        title: "Intellectual Property",
+        description:
+            "All content, branding, design, and website material on Eventsora are the property of Eventsora and may not be copied or distributed without permission.",
+    },
+    {
+        icon: ShieldCheck,
+        title: "Privacy Policy",
+        description:
+            "Your privacy is important to us. Please review our Privacy Policy to understand how we collect, use, and protect your personal information.",
+    },
+    {
+        icon: FileText,
+        title: "Changes to Terms",
+        description:
+            "Eventsora reserves the right to update or modify these Terms and Conditions at any time. Continued use of the platform after updates are posted means you accept the revised terms.",
+    },
+];
 
-        <div className="prose mx-auto py-8 px-4 ml-10">
-            <h1 className='font-bold text-2xl'>Terms & Conditions</h1>
-            <p className='flex items-center gap-2'>
-                <Dot /> Welcome to Eventsora. By accessing or using our platform, you agree to
-                comply with and be bound by the following Terms and Conditions. Please
-                read them carefully before using our services.
-            </p>
+const TermsAndConditions = () => {
+    return (
+        <>
+            <Head>
+                <title>Terms & Conditions | Eventsora</title>
+                <meta
+                    name="description"
+                    content="Read the terms and conditions for using Eventsora services."
+                />
+            </Head>
 
-            <h2 className='font-bold underline underline-offset-1'>1. Platform Overview</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Eventsora is an online marketplace that connects customers with event
-                service providers such as venues, photographers, decorators, and other event-related services.
-            </p>
-            <p className='flex items-center gap-2'>
-                <Dot /> Eventsora does not directly provide these services. We only facilitate
-                communication and booking between users and service providers.
-            </p>
+            <div className="min-h-screen py-16 px-4">
+                <div className="max-w-7xl mx-auto">
+                    {/* Hero Section */}
+                    <div className="text-center mb-14">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-pink-100 mb-6">
+                            <FileText className="w-10 h-10 text-pink-600" />
+                        </div>
 
+                        <h1 className="text-5xl font-bold text-gray-900 mb-4">
+                            Terms & Conditions
+                        </h1>
 
-            <h2 className='font-bold underline underline-offset-1'>2. Your Listing will be shared publicly on our website</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Please make sure that you have the rights to share the content.
-            </p>
+                        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                            Please read these terms carefully before using Eventsora. By
+                            accessing our platform, you agree to follow the rules outlined
+                            below.
+                        </p>
 
+                        <div className="mt-6 inline-block px-4 py-2 rounded-full bg-pink-100 text-pink-700 text-sm font-medium">
+                            Last Updated: June 2026
+                        </div>
+                    </div>
 
-            <h2 className='font-bold underline underline-offset-1'>3. User Accounts</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> To access certain features of the platform, users may be required to
-                create an account. You agree to provide accurate and complete
-                information during registration.
-            </p>
-            <p className='flex items-center gap-2'>
-                <Dot /> Eventsora reserves the right to suspend or terminate accounts that
-                provide false information or violate our policies.
-            </p>
+                    {/* Intro Card */}
+                    <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 mb-10">
+                        <p className="text-gray-700 leading-relaxed text-lg">
+                            Welcome to <span className="font-semibold text-pink-600">Eventsora</span>.
+                            These Terms and Conditions explain the rules for using our
+                            platform, booking services, and interacting with vendors.
+                        </p>
+                    </div>
 
-            <h2 className='font-bold underline underline-offset-1'>4. Vendor Responsibilities</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Vendors listed on Eventsora are responsible for the services they
-                provide, including service quality, pricing accuracy, availability, and
-                timely delivery.
-            </p>
+                    {/* Policy Cards */}
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {sections.map((section, index) => {
+                            const Icon = section.icon;
 
-            <h2 className='font-bold underline underline-offset-1'>5. Bookings and Payments</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Some services may require advance payment to confirm a booking.
-                Payments made through the platform may be held temporarily and released
-                to the vendor after successful completion of the service.
-            </p>
-            <p className='flex items-center gap-2'>
-                <Dot /> Users agree to make payments only through the platform when booking a
-                service listed on Eventsora.
-            </p>
+                            return (
+                                <div
+                                    key={index}
+                                    className="bg-white rounded-2xl shadow-md border border-gray-100 p-8 hover:shadow-xl transition duration-300"
+                                >
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center">
+                                            <Icon className="w-6 h-6 text-pink-600" />
+                                        </div>
 
-            <p className='flex items-center gap-2'>
-                <Dot /> Platform will charge 5% service fee on each booking made through the platform. This service fee will be added to the vendor's payment.
-            </p>
+                                        <h2 className="text-2xl font-semibold text-gray-900">
+                                            {index + 1}. {section.title}
+                                        </h2>
+                                    </div>
 
-            <h2 className='font-bold underline underline-offset-1'>6. Cancellation and Refunds</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Cancellation and refund policies may vary depending on the service
-                provider. Users are encouraged to review vendor policies before making
-                a booking.
-            </p>
-            <p className='flex items-center gap-2'>
-                <Dot /> Eventsora may assist in refund processing where applicable but does not
-                guarantee refunds in all situations.
-            </p>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        {section.description}
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </div>
 
-            <h2 className='font-bold underline underline-offset-1'>7. Prohibited Activities</h2>
-            <p>Users and vendors must not:</p>
-            <ul >
-                <li className='flex items-center gap-2'>
-                    <Dot />Provide false or misleading information</li>
-                <li className='flex items-center gap-2'>
-                    <Dot />Attempt fraudulent bookings or payments</li>
-                <li className='flex items-center gap-2'>
-                    <Dot />Harass or abuse other users</li>
-                <li className='flex items-center gap-2'>
-                    <Dot />Attempt to bypass platform payment systems</li>
-            </ul>
+                    {/* Contact Card */}
+                    <div className="mt-10 bg-pink-300 rounded-3xl text-white p-10 text-center shadow-xl">
+                        <Mail className="w-12 h-12 mx-auto mb-4" />
 
-            <h2 className='font-bold underline underline-offset-1'>8. Limitation of Liability</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Eventsora is not liable for damages, losses, or disputes resulting from
-                services provided by third-party vendors listed on the platform.
-            </p>
+                        <h2 className="text-3xl font-bold mb-3">Need Help?</h2>
 
-            <h2 className='font-bold underline underline-offset-1'>9. Intellectual Property</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> All content on the Eventsora platform, including logos, branding,
-                design, and website content, is the property of Eventsora and may not
-                be copied, reproduced, or distributed without permission.
-            </p>
+                        <p className="text-pink-100 mb-6">
+                            If you have any questions about these Terms & Conditions,
+                            please contact our team.
+                        </p>
 
-            <h2 className='font-bold underline underline-offset-1'>10. Changes to Terms</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Eventsora reserves the right to update or modify these Terms and
-                Conditions at any time. Continued use of the platform after changes are
-                posted means you accept the updated terms.
-            </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <a
+                                href="https://wa.me/923700182844"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 bg-white text-pink-700 font-semibold px-6 py-3 rounded-xl hover:scale-105 transition"
+                            >
+                                Chat on WhatsApp
+                            </a>
 
-            <h2 className='font-bold underline underline-offset-1'>11. Privacy Policy</h2>
-            <p className='flex items-center gap-2'>
-                <Dot /> Eventsora is committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you use our platform.
-            </p>
-
-
-
-            <h2 className='font-bold underline underline-offset-1'>12. Contact Us</h2>
-            <p className='flex items-center gap-2'>
-                <Dot />
-                <span>
-                    If you have any questions regarding these Terms and Conditions, please
-                    contact us on WhatsApp:{' '}
-                    <a
-                        href='https://wa.me/923700182844'
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='text-green-600 underline'
-                    >
-                        Chat on WhatsApp
-                    </a>
-                </span>
-            </p>
-
-            <p className='flex items-center gap-2'>
-                <Dot /> Email: <a target='blank' className='text-blue-500 underline' href={`mailto:${EMAIL_ADDRESS}`}>{EMAIL_ADDRESS}</a>
-            </p>
-        </div>
-    </>
-);
+                            <a
+                                href={`mailto:${EMAIL_ADDRESS}`}
+                                className="inline-flex items-center gap-2 bg-white text-pink-700 font-semibold px-6 py-3 rounded-xl hover:scale-105 transition"
+                            >
+                                <Mail size={18} />
+                                {EMAIL_ADDRESS}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
 
 export default TermsAndConditions;
