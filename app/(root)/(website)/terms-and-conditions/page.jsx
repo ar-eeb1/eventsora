@@ -36,7 +36,7 @@ const sections = [
         icon: CreditCard,
         title: "Bookings & Payments",
         description:
-            "Some bookings may require advance payment to confirm reservations. Users agree to make payments only through the platform, and Eventsora may charge a 5% service fee on bookings made via the platform.",
+            "Some bookings may require advance payment to confirm reservations. Users agree to make payments only through the platform, and Eventsora may charge a 5%-10% service fee on bookings made via the platform.",
     },
     {
         icon: AlertTriangle,

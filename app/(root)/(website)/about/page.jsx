@@ -12,7 +12,7 @@ const About = () => {
 
       <p className="mb-4 text-gray-700 leading-relaxed">
         Eventsora is a modern event planning platform designed to simplify how people 
-        plan and manage events. Whether it’s a wedding, corporate gathering, birthday, 
+        plan and manage events. Whether it&quot;s a wedding, corporate gathering, birthday, 
         or even a casual picnic, Eventsora connects users with the right vendors in just a few clicks.
       </p>
 
