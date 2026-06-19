@@ -332,8 +332,8 @@ const EditListing = ({ params }) => {
 
 
   return (
-    <div className=" dark:from-gray-900 dark:to-gray-800 ">
-      <div className="w-[calc(100%-1%)] mx-auto">
+    <div className=" dark:from-gray-900 dark:to-gray-800">
+      <div className="w-[calc(100%-1%)] mx-auto ">
         <BreadCrumb breadCrumbData={breadCrumbData} />
 
         <Card className='rounded-xl shadow-lg border-0 overflow-hidden'>
@@ -661,9 +661,9 @@ const EditListing = ({ params }) => {
                       >
                         {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
                       </Button>
-                      <UploadMedia 
-                        isMultiple={true} 
-                        queryClient={queryClient} 
+                      <UploadMedia
+                        isMultiple={true}
+                        queryClient={queryClient}
                         onUploadSuccess={(newMedia) => {
                           const formattedMedia = newMedia.map(m => ({ _id: m._id, url: m.secure_url }));
                           setSelectedMedia(prev => [...prev, ...formattedMedia]);

@@ -5,7 +5,7 @@ import { BiMinus, BiPlus } from 'react-icons/bi'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import img from '@/public/assets/img-placeholder.png'
-import { IoStar, IoClose, IoAdd, IoRemove, IoLocationOutline } from 'react-icons/io5'
+import { IoStar, IoClose, IoAdd, IoRemove, IoLocationOutline, IoChevronBack, IoChevronForward } from 'react-icons/io5'
 import { decode, encode } from 'entities'
 import { BsFillPeopleFill } from 'react-icons/bs'
 import Link from 'next/link'
@@ -71,6 +71,24 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     const handleZoomOut = (e) => {
         e.stopPropagation()
         setZoom(prev => Math.max(prev - 0.5, 1)) // Min zoom 1x
+    }
+
+    const handlePrevImage = (e) => {
+        if (e) e.stopPropagation()
+        const index = listing?.media?.findIndex(m => m.secure_url === activeThumb)
+        if (index > 0) {
+            setActiveThumb(listing.media[index - 1].secure_url)
+            setZoom(1)
+        }
+    }
+
+    const handleNextImage = (e) => {
+        if (e) e.stopPropagation()
+        const index = listing?.media?.findIndex(m => m.secure_url === activeThumb)
+        if (index !== -1 && index < (listing?.media?.length || 0) - 1) {
+            setActiveThumb(listing.media[index + 1].secure_url)
+            setZoom(1)
+        }
     }
 
     const router = useRouter()
@@ -201,14 +219,16 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
     }
 
 
-    // Close on Escape key
+    // Key bindings for modal
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') setShowModal(false)
+            if (e.key === 'ArrowLeft') handlePrevImage()
+            if (e.key === 'ArrowRight') handleNextImage()
         }
         if (showModal) window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [showModal])
+    }, [showModal, activeThumb, listing?.media])
 
     const handleWheel = (e) => {
         // Prevent page scrolling when modal is open
@@ -239,8 +259,9 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
         }
     }, [activeVariant])
 
-
-
+    const currentIndex = listing?.media?.findIndex(m => m.secure_url === activeThumb) ?? -1;
+    const hasPrev = currentIndex > 0;
+    const hasNext = currentIndex !== -1 && currentIndex < (listing?.media?.length || 0) - 1;
 
     return (
         <div className='lg:px-32 px-4 mt-10'>
@@ -264,6 +285,23 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                         <button onClick={handleZoomIn} className="p-2 hover:bg-white/10 rounded-full transition-colors"><IoAdd size={30} /></button>
                         <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors"><IoClose size={30} /></button>
                     </div>
+
+                    {/* Navigation Arrows */}
+                    <button
+                        onClick={handlePrevImage}
+                        disabled={!hasPrev}
+                        className={`absolute left-5 top-1/2 -translate-y-1/2 p-2 text-white hover:bg-white/10 rounded-full transition-colors z-[101] ${!hasPrev ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        <IoChevronBack size={40} />
+                    </button>
+
+                    <button
+                        onClick={handleNextImage}
+                        disabled={!hasNext}
+                        className={`absolute right-5 top-1/2 -translate-y-1/2 p-2 text-white hover:bg-white/10 rounded-full transition-colors z-[101] ${!hasNext ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        <IoChevronForward size={40} />
+                    </button>
 
                     {/* Image Container */}
                     <div

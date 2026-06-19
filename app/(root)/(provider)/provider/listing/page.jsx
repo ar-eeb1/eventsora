@@ -33,7 +33,7 @@ const ShowListing = () => {
         <div className=''>
             <BreadCrumb breadCrumbData={breadCrumbData} />
 
-            <Card className='py-0 rounded shadow-sm gap-0'>
+            <Card className='py-0 rounded shadow-sm gap-0 overflow-auto'>
                 <CardHeader className='pt-3 px-3 border-b [.border-b]:pb-2'>
                     <div className='flex items-center justify-between'>
                         <h4 className='text-xl font-semibold'>Show Listings</h4>
