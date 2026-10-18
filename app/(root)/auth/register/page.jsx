@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import ButtonLoading from '@/components/application/ButtonLoading'
-import z, { email } from 'zod'
+import z from 'zod'
 import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import Link from 'next/link'
@@ -62,7 +62,7 @@ const RegisterPage = () => {
         try {
             setLoading(true)
             const payload = { ...values, role: isProvider ? 'provider' : 'user' }
-            const { data: registerResponse } = await axios.post('/api/auth/register', payload)
+            const { data: registerResponse } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, payload)
 
             if (!registerResponse.success) {
                 throw new Error(registerResponse.message)
@@ -72,7 +72,7 @@ const RegisterPage = () => {
             showToast('success', registerResponse.message)
             router.push('/auth/login')
         } catch (error) {
-            showToast('error', error.message)
+            showToast('error', error.response?.data?.message || error.message)
         } finally {
             setLoading(false)
         }
@@ -132,7 +132,7 @@ const RegisterPage = () => {
                                             <FormItem>
                                                 <FormLabel>Mobile Number</FormLabel>
                                                 <FormControl>
-                                                    <Input type='number' placeholder="03123456789" {...field} />
+                                                    <Input type='tel' placeholder="03123456789" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -178,7 +178,7 @@ const RegisterPage = () => {
                                 </div>
                                 <div className='mb-5'>
                                     <div className='flex items-center gap-2 mb-3'>
-                                        <input type='checkbox' onClick={() => setIsTndChecked(!isTndChecked)} className='h-4 w-4' />
+                                        <input type='checkbox' checked={isTndChecked} onChange={(e) => setIsTndChecked(e.target.checked)} className='h-4 w-4' />
                                         <span className='text-sm text-muted-foreground'>I agree to the <Link target='blank' href="/terms-and-conditions" className="underline hover:text-primary cursor-pointer">Terms and Conditions</Link>
                                         </span>
                                     </div>

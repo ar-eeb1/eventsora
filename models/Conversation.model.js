@@ -8,7 +8,12 @@ const conversationSchema = new mongoose.Schema({
     listingId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Listing',
-        required: true
+        default: null
+    },
+    productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        default: null
     },
     lastMessage: {
         type: String
@@ -22,6 +27,13 @@ const conversationSchema = new mongoose.Schema({
         default: false
     }
 }, { timestamps: true })
+
+conversationSchema.pre('validate', function (next) {
+    if ([this.listingId, this.productId].filter(Boolean).length !== 1) {
+        return next(new Error('A conversation must be linked to exactly one listing or product.'))
+    }
+    next()
+})
 
 // Force model reload
 const ConversationModel = mongoose.models.Conversation || mongoose.model('Conversation', conversationSchema, 'conversations')

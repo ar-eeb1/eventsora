@@ -5,14 +5,14 @@ export const revalidate = 0;
 import Link from 'next/link'
 import Hero from '@/components/application/Website/Hero'
 import { Playfair_Display } from 'next/font/google'
-
+import HowItWorks from '@/components/application/Website/HowItWorks'
+import VendorCTA from '@/components/application/Website/VendorCTA'
 
 const playfair = Playfair_Display({
   weight: ['400', '700'],
   display: 'swap',
   subsets: ['latin'],
 })
-
 
 const Home = () => {
   return (
@@ -94,6 +94,8 @@ const Home = () => {
 
       </div>
       <AddHomeListing />
+      <HowItWorks />
+      <VendorCTA />
     </div>
   )
 }

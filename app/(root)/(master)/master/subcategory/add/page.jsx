@@ -135,8 +135,7 @@ const AddSubcategory = () => {
                             <SelectItem value='loading' disable>
                               No Category Found
                             </SelectItem>
-                          ) : (
-                            categories.map(cat => (
+                          ) : ( categories.map(cat => (
                               <SelectItem key={cat._id} value={cat._id}>
                                 {cat.category}
                               </SelectItem>

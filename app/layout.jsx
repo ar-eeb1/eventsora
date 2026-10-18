@@ -1,12 +1,12 @@
-import { Poppins } from '@next/font/google';
 import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins, Kapakana } from 'next/font/google';
 import { Analytics } from "@vercel/analytics/next"
-import { Kapakana } from '@next/font/google';
 import "./globals.css";
 import Script from 'next/script';
 import { Toaster } from 'sonner';
 import GlobalProvider from '@/components/application/GlobalProvider';
 import ThemeProvider from '@/components/application/Website/ThemeProvider'
+import ShopArrivalTransition from '@/components/application/Shop/ShopArrivalTransition'
 
 
 const geistSans = Geist({
@@ -62,7 +62,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <Script src="https://cdn.lordicon.com/lordicon.js"></Script>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} ${poppins.className} antialiased`}>
+      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${poppins.className} antialiased`}>
         <ThemeProvider
           attribute='class'
           defaultTheme='light'
@@ -72,6 +72,7 @@ export default function RootLayout({ children }) {
 
           <GlobalProvider>
             {children}
+            <ShopArrivalTransition />
             <Toaster closeButton position="top-center" />
           </GlobalProvider>
           <Analytics />

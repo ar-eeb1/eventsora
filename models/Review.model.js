@@ -4,7 +4,12 @@ const reviewScehma = new mongoose.Schema({
     listing: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Listing',
-        required: true
+        index: true
+    },
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        index: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -33,6 +38,14 @@ const reviewScehma = new mongoose.Schema({
         index: true
     }
 }, { timestamps: true })
+
+reviewScehma.pre('validate', function (next) {
+    const targets = [this.listing, this.product].filter(Boolean)
+    if (targets.length !== 1) {
+        return next(new Error('A review must belong to exactly one listing or product.'))
+    }
+    next()
+})
 
 const reviewModel = mongoose.models.Review || mongoose.model('Review', reviewScehma, "reviews")
 export default reviewModel

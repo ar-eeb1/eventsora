@@ -7,7 +7,7 @@ import UserModel from "@/models/User.model";
 import ListingModel from "@/models/Listing.model";
 import ListingVariantModel from "@/models/ListingVariant.model";
 import { isValidObjectId } from "mongoose";
-import { pusherServer } from "@/lib/pusher";
+import { emitSocketEvent } from "@/lib/socket";
 
 export async function POST(request) {
     try {
@@ -48,41 +48,43 @@ export async function POST(request) {
             isRead: false
         })
 
-        // TRIGGER PUSHER EVENT
+        // Broadcast the populated message through the backend Socket.IO server.
         try {
-            if (pusherServer) {
-                const populatedMessage = await MessageModel.findById(newMessage._id)
-                    .populate('sender', 'name email profileImage')
-                    .populate({
-                        path: 'quoteListingId',
-                        populate: [
-                            { path: 'category', select: 'category' },
-                            { path: 'subcategory', select: 'subcategory' },
-                            { path: 'media' }
-                        ]
-                    })
-                    .populate('quoteVariantId')
+            const populatedMessage = await MessageModel.findById(newMessage._id)
+                .populate('sender', 'name email profileImage')
+                .populate({
+                    path: 'quoteListingId',
+                    populate: [
+                        { path: 'category', select: 'category' },
+                        { path: 'subcategory', select: 'subcategory' },
+                        { path: 'media' }
+                    ]
+                })
+                .populate('quoteVariantId')
 
-                await pusherServer.trigger(`chat-${conversationId}`, 'new-message', populatedMessage)
+            await emitSocketEvent('message:new', {
+                conversationId,
+                message: populatedMessage,
+            })
 
-                // TRIGGER SIDEBAR UPDATE FOR ALL PARTICIPANTS
-                const conversation = await ConversationModel.findById(conversationId)
-                if (conversation) {
-                    conversation.participants.forEach((participantId) => {
-                        // Send to everyone EXCEPT the sender (they already have the message)
-                        if (participantId.toString() !== auth.userId) {
-                            pusherServer.trigger(`user-${participantId}`, 'conversation-update', {
+            const conversation = await ConversationModel.findById(conversationId)
+            if (conversation) {
+                await Promise.all(conversation.participants.map(async (participantId) => {
+                    if (participantId.toString() !== auth.userId) {
+                        await emitSocketEvent('conversation:update', {
+                            userId: participantId.toString(),
+                            data: {
                                 conversationId,
                                 lastMessage: text,
                                 updatedAt: new Date(),
                                 isRead: false
-                            })
-                        }
-                    })
-                }
+                            }
+                        })
+                    }
+                }))
             }
         } catch (err) {
-            console.error('Pusher Trigger Error:', err)
+            console.error('Socket.IO broadcast error:', err)
         }
 
         return response(true, 200, 'Message Sent', newMessage)

@@ -34,6 +34,7 @@ export async function GET(request) {
         if (globalFilter) {
             matchQuery['$or'] = [
                 { "listingData.name": { $regex: globalFilter, $options: 'i' } },
+                { "productData.name": { $regex: globalFilter, $options: 'i' } },
                 { "userData.name": { $regex: globalFilter, $options: 'i' } },
                 { rating: { $regex: globalFilter, $options: 'i' } },
                 { title: { $regex: globalFilter, $options: 'i' } },
@@ -76,6 +77,19 @@ export async function GET(request) {
             },
             {
                 $lookup: {
+                    from: 'products',
+                    localField: 'product',
+                    foreignField: '_id',
+                    as: 'productData'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$productData', preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
                     from: 'users',
                     localField: 'user',
                     foreignField: '_id',
@@ -96,6 +110,7 @@ export async function GET(request) {
                     _id: 1,
                     user: '$userData.name',
                     listing: '$listingData.name',
+                    product: '$productData.name',
                     rating: 1,
                     review: 1,
                     title: 1,

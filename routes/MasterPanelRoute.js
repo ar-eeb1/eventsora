@@ -6,10 +6,19 @@ export const MASTER_CATEGORY_SHOW = '/master/category'
 export const MASTER_CATEGORY_ADD = '/master/category/add'
 export const MASTER_CATEGORY_EDIT = (id) => id ? `/master/category/edit/${id}` : ''
 
+export const MASTER_SHOP_CATEGORY_SHOW = '/master/shop-category'
+export const MASTER_SHOP_CATEGORY_ADD = '/master/shop-category/add'
+export const MASTER_SHOP_CATEGORY_EDIT = (id) => id ? `/master/shop-category/edit/${id}` : ''
+
 //sub category
 export const MASTER_SUB_CATEGORY_SHOW = '/master/subcategory'
 export const MASTER_SUB_CATEGORY_ADD = '/master/subcategory/add'
 export const MASTER_SUB_CATEGORY_EDIT = (id) => id ? `/master/subcategory/edit/${id}` : ''
+
+
+export const MASTER_SHOP_SUB_CATEGORY_SHOW = '/master/shop-subcategory'
+export const MASTER_SHOP_SUB_CATEGORY_ADD = '/master/shop-subcategory/add'
+export const MASTER_SHOP_SUB_CATEGORY_EDIT = (id) => id ? `/master/shop-subcategory/edit/${id}` : ''
 
 export const MASTER_TRASH = '/master/trash'
 

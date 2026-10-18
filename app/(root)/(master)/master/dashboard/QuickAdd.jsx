@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { Banknote, Calendar, CalendarCheck, Earth, Landmark, List, MenuIcon, Plus, User } from 'lucide-react';
 import React from 'react'
-import { MASTER_CATEGORY_ADD, MASTER_CITY_ADD, MASTER_COUNTRY_ADD, MASTER_LOCALITY_ADD, MASTER_LOCALITY_SHOW, MASTER_STATE_ADD, MASTER_SUB_CATEGORY_ADD, MASTER_SUBLOCALITY_ADD, MASTER_USER_SHOW } from '@/routes/MasterPanelRoute';
+import { MASTER_CATEGORY_ADD, MASTER_CITY_ADD, MASTER_COUNTRY_ADD, MASTER_LOCALITY_ADD, MASTER_LOCALITY_SHOW, MASTER_SHOP_CATEGORY_ADD, MASTER_STATE_ADD, MASTER_SUB_CATEGORY_ADD, MASTER_SUBLOCALITY_ADD, MASTER_USER_SHOW } from '@/routes/MasterPanelRoute';
 import { LocalSee, LocationCity } from '@mui/icons-material';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
@@ -10,34 +10,9 @@ import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
 const QuickAdd = () => {
     return (
         <div>
-            <h1 className='bg-pink-200 p-3 rounded-md mt-4 dark:bg-pink-900'>Shortcut</h1>
+            <h1 className='bg-pink-200 p-3 rounded-md mt-4 dark:bg-pink-900'>Location</h1>
             <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 sm:gap-10 gap-5 mt-4 lg:gap-5">
 
-                <Link href={MASTER_CATEGORY_ADD}>
-                    <div className="flex items-center justify-between p-4 rounded-xl border shadow-sm bg-linear-to-tr from-pink-100 via-pink-200 to-pink-100 dark:from-pink-900/40 dark:via-pink-800/40 dark:to-pink-900/40 transition-transform hover:scale-[1.02]">
-                        <div>
-                            <h4 className="flex justify-center items-center text-sm font-medium text-pink-900 dark:text-pink-200">
-                                New Category
-                            </h4>
-                        </div>
-                        <span className="w-12 h-12 flex items-center justify-center rounded-full bg-pink-200 text-pink-700 dark:bg-pink-800/50 dark:text-pink-200">
-                            <List size={20} />
-                        </span>
-                    </div>
-                </Link>
-
-                <Link href={MASTER_SUB_CATEGORY_ADD}>
-                    <div className="flex items-center justify-between p-4 rounded-xl border shadow-sm bg-linear-to-tr from-purple-100 via-purple-200 to-purple-100 dark:from-purple-900/40 dark:via-purple-800/40 dark:to-purple-900/40 transition-transform hover:scale-[1.02]">
-                        <div>
-                            <h4 className="flex justify-center items-center text-sm font-medium text-purple-900 dark:text-purple-200">
-                                New Subcategory
-                            </h4>
-                        </div>
-                        <span className="w-12 h-12 flex items-center justify-center rounded-fullbg-purple-200 text-purple-700dark:bg-purple-800/50 dark:text-purple-200">
-                            <Banknote size={20} />
-                        </span>
-                    </div>
-                </Link>
 
                 <Link href={MASTER_COUNTRY_ADD}>
                     <div className="flex items-center justify-between p-4 rounded-xl border shadow-sm bg-linear-to-tr from-rose-100 via-rose-200 to-rose-100 dark:from-rose-900/40 dark:via-rose-800/40 dark:to-rose-900/40 transition-transform hover:scale-[1.02]">
@@ -100,6 +75,66 @@ const QuickAdd = () => {
                         </div>
                         <span className="w-12 h-12 flex items-center justify-center rounded-full bg-green-200 text-green-700 dark:bg-green-800/50 dark:text-green-200">
                             <MapsHomeWorkIcon size={20} />
+                        </span>
+                    </div>
+                </Link>
+                <div />
+
+
+            </div>
+            <h1 className='bg-pink-200 p-3 rounded-md mt-4 dark:bg-pink-900'>Main Website</h1>
+            <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 sm:gap-10 gap-5 mt-4 lg:gap-5">
+                <Link href={MASTER_CATEGORY_ADD}>
+                    <div className="flex items-center justify-between p-4 rounded-xl border shadow-sm bg-linear-to-tr from-pink-100 via-pink-200 to-pink-100 dark:from-pink-900/40 dark:via-pink-800/40 dark:to-pink-900/40 transition-transform hover:scale-[1.02]">
+                        <div>
+                            <h4 className="flex justify-center items-center text-sm font-medium text-pink-900 dark:text-pink-200">
+                                New Category
+                            </h4>
+                        </div>
+                        <span className="w-12 h-12 flex items-center justify-center rounded-full bg-pink-200 text-pink-700 dark:bg-pink-800/50 dark:text-pink-200">
+                            <List size={20} />
+                        </span>
+                    </div>
+                </Link>
+
+                <Link href={MASTER_SUB_CATEGORY_ADD}>
+                    <div className="flex items-center justify-between p-4 rounded-xl border shadow-sm bg-linear-to-tr from-purple-100 via-purple-200 to-purple-100 dark:from-purple-900/40 dark:via-purple-800/40 dark:to-purple-900/40 transition-transform hover:scale-[1.02]">
+                        <div>
+                            <h4 className="flex justify-center items-center text-sm font-medium text-purple-900 dark:text-purple-200">
+                                New Subcategory
+                            </h4>
+                        </div>
+                        <span className="w-12 h-12 flex items-center justify-center rounded-fullbg-purple-200 text-purple-700dark:bg-purple-800/50 dark:text-purple-200">
+                            <Banknote size={20} />
+                        </span>
+                    </div>
+                </Link>
+
+            </div>
+            <h1 className='bg-pink-200 p-3 rounded-md mt-4 dark:bg-pink-900'>Shop</h1>
+            <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 sm:gap-10 gap-5 mt-4 lg:gap-5">
+                <Link href={MASTER_SHOP_CATEGORY_ADD}>
+                    <div className="flex items-center justify-between p-4 rounded-xl border shadow-sm bg-linear-to-tr from-pink-100 via-pink-200 to-pink-100 dark:from-pink-900/40 dark:via-pink-800/40 dark:to-pink-900/40 transition-transform hover:scale-[1.02]">
+                        <div>
+                            <h4 className="flex justify-center items-center text-sm font-medium text-pink-900 dark:text-pink-200">
+                                Add New Shop Category
+                            </h4>
+                        </div>
+                        <span className="w-12 h-12 flex items-center justify-center rounded-full bg-pink-200 text-pink-700 dark:bg-pink-800/50 dark:text-pink-200">
+                            <List size={20} />
+                        </span>
+                    </div>
+                </Link>
+
+                <Link href={''}>
+                    <div className="flex items-center justify-between p-4 rounded-xl border shadow-sm bg-linear-to-tr from-purple-100 via-purple-200 to-purple-100 dark:from-purple-900/40 dark:via-purple-800/40 dark:to-purple-900/40 transition-transform hover:scale-[1.02]">
+                        <div>
+                            <h4 className="flex justify-center items-center text-sm font-medium text-purple-900 dark:text-purple-200">
+                                New Shop Subcategory
+                            </h4>
+                        </div>
+                        <span className="w-12 h-12 flex items-center justify-center rounded-fullbg-purple-200 text-purple-700dark:bg-purple-800/50 dark:text-purple-200">
+                            <Banknote size={20} />
                         </span>
                     </div>
                 </Link>

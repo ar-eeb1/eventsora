@@ -3,7 +3,9 @@ import BreadCrumb from '@/components/application/BreadCrumb'
 import ButtonLoading from '@/components/application/ButtonLoading'
 import Select from '@/components/application/Main/Select'
 import Editor from '@/components/application/Provider/Editor'
-import MediaModal from '@/components/application/Provider/MediaModal'
+import UploadMedia from '@/components/application/Provider/UploadMedia'
+import { X } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -29,12 +31,10 @@ const breadCrumbData = [
 const ReviewListing = ({ params }) => {
   const { id } = use(params)
   const { data: getListing, loading: getListingLoading } = useFetch(`/api/admin/listing/get/${id}`)
+  const queryClient = useQueryClient()
 
   const sortByLabel = (a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
 
-  //MEDIA MODAL STATES
-
-  const [open, setOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState([])
   const [loading, setLoading] = useState(false)
   const [fields, setFields] = useState(false)
@@ -635,13 +635,6 @@ const ReviewListing = ({ params }) => {
                   </div>
 
                   <div className='rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 p-8 text-center bg-linear-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 transition-all duration-200 hover:border-primary/50'>
-                    <MediaModal
-                      open={open}
-                      setOpen={setOpen}
-                      selectedMedia={selectedMedia}
-                      setSelectedMedia={setSelectedMedia}
-                      isMultiple={true}
-                    />
                     {selectedMedia.length > 0 && (
                       <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6'>
                         {selectedMedia.map((media, index) => (
@@ -658,20 +651,32 @@ const ReviewListing = ({ params }) => {
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                               <span className="text-white text-xs font-medium">#{index + 1}</span>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedMedia(prev => prev.filter(m => m._id !== media._id));
+                              }}
+                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
                           </div>
                         ))}
                       </div>
                     )}
-                    <Button
-                      type='button'
-                      onClick={() => setOpen(true)}
-                      className='h-12 px-8 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105'
-                    >
-                      {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
-                    </Button>
+                    <div className="flex justify-center gap-4">
+                      <UploadMedia
+                        isMultiple={true}
+                        queryClient={queryClient}
+                        onUploadSuccess={(newMedia) => {
+                          const formattedMedia = newMedia.map(m => ({ _id: m._id, url: m.secure_url }));
+                          setSelectedMedia(prev => [...prev, ...formattedMedia]);
+                        }}
+                      />
+                    </div>
                     {selectedMedia.length > 0 && (
                       <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                        {selectedMedia.length} {selectedMedia.length === 1 ? 'image' : 'images'} selected
+                        {selectedMedia.length} {selectedMedia.length === 1 ? 'image' : 'images'} added
                       </p>
                     )}
                   </div>

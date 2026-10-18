@@ -14,7 +14,7 @@ import { addIntoBooking } from '@/store/reducer/bookingReducer'
 import { WEBSITE_BOOKINGS } from '@/routes/WebsiteRoute'
 import { useRouter } from 'next/navigation'
 import { IoPricetagOutline, IoClose } from 'react-icons/io5'
-import Pusher from 'pusher-js'
+import { joinSocketRooms, socket } from '@/lib/socket'
 
 
 const ChatPage = () => {
@@ -39,18 +39,14 @@ const ChatPage = () => {
     // 1 FETCH OLD MESSAGES
     const { data: messageData, refetch } = useFetch(`/api/message/get/${id}`)
 
-    // Real-time messages with Pusher
+    // Real-time messages with Socket.IO
     useEffect(() => {
-        if (!id || !process.env.NEXT_PUBLIC_PUSHER_KEY) return
+        if (!id || !user?._id) return
 
-        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-            cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-        })
-
-        const channel = pusher.subscribe(`chat-${id}`)
+        const cleanupRooms = joinSocketRooms({ userId: user._id, conversationId: id })
 
         // Listen for messages in current chat
-        channel.bind('new-message', (data) => {
+        const handleNewMessage = (data) => {
             setMessages((prev) => {
                 if (prev.find((msg) => msg._id === data._id)) return prev
                 return [...prev, data]
@@ -73,11 +69,10 @@ const ChatPage = () => {
                 updatedConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
                 return { ...prev, data: updatedConversations }
             })
-        })
+        }
 
         // Listen for sidebar updates (for all chats)
-        const userChannel = pusher.subscribe(`user-${user?._id}`)
-        userChannel.bind('conversation-update', (data) => {
+        const handleConversationUpdate = (data) => {
             setConversationData((prev) => {
                 if (!prev?.data) return prev
                 const updatedConversations = prev.data.map((conv) => {
@@ -94,13 +89,16 @@ const ChatPage = () => {
                 updatedConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
                 return { ...prev, data: updatedConversations }
             })
-        })
+        }
+
+        socket.on('new-message', handleNewMessage)
+        socket.on('conversation-update', handleConversationUpdate)
 
         return () => {
-            channel.unbind_all()
-            channel.unsubscribe()
-            userChannel.unbind_all()
-            userChannel.unsubscribe()
+            cleanupRooms()
+            socket.off('new-message', handleNewMessage)
+            socket.off('conversation-update', handleConversationUpdate)
+            socket.emit('leave-chat', id)
         }
     }, [id, user?._id])
 
@@ -246,6 +244,11 @@ const ChatPage = () => {
                                 {conversationData?.data?.find(c => c._id === id)?.listingId?.name}
                             </h3>
                         )}
+                        {conversationData?.data?.find(c => c._id === id)?.productId?.name && (
+                            <h3 className="font-semibold text-lg">
+                                {conversationData?.data?.find(c => c._id === id)?.productId?.name}
+                            </h3>
+                        )}
                     </div>
                     {conversationData?.data?.find(c => c._id === id)?.listingId?.slug && (
                         <Link
@@ -254,6 +257,15 @@ const ChatPage = () => {
                             className="text-primary hover:underline text-sm font-medium"
                         >
                             See Listing
+                        </Link>
+                    )}
+                    {conversationData?.data?.find(c => c._id === id)?.productId?.slug && (
+                        <Link
+                            href={`/shop/${conversationData?.data?.find(c => c._id === id)?.productId?.category?.slug}/${conversationData?.data?.find(c => c._id === id)?.productId?.slug}`}
+                            target="_blank"
+                            className="text-primary hover:underline text-sm font-medium"
+                        >
+                            See Product
                         </Link>
                     )}
                 </div>

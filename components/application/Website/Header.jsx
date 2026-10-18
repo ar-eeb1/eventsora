@@ -3,14 +3,14 @@ import { WEBSITE_HOME, WEBSITE_LOGIN } from '@/routes/AdminPanelRoute'
 import Link from 'next/link'
 import React, { useState, useCallback, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import Pusher from 'pusher-js'
+import { joinSocketRooms, socket } from '@/lib/socket'
 import axios from 'axios'
 import logo from '@/public/assets/eventsoraWhite.png'
 import Image from 'next/image'
 import Categories from './Categories'
 import { CircleUserRound, SearchIcon, X } from 'lucide-react'
 import { useSelector } from 'react-redux'
-import { USER_DASHBOARD, WEBSITE_CATEGORY, WEBSITE_MESSAGES } from '@/routes/WebsiteRoute'
+import { SHOP, USER_DASHBOARD, WEBSITE_CATEGORY, WEBSITE_MESSAGES } from '@/routes/WebsiteRoute'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import Booking from './Booking'
 import profileIcon from '@/public/assets/user.png'
@@ -41,24 +41,21 @@ const Header = () => {
         checkUnread()
     }, [auth])
 
-    // Real-time notification with Pusher
+    // Real-time notification with Socket.IO
     useEffect(() => {
-        if (!auth?._id || !process.env.NEXT_PUBLIC_PUSHER_KEY) return
+        if (!auth?._id) return
 
-        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-            cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-        })
-
-        const channel = pusher.subscribe(`user-${auth._id}`)
-        channel.bind('conversation-update', (data) => {
+        const cleanupRooms = joinSocketRooms({ userId: auth._id })
+        const handleConversationUpdate = () => {
             // If we are already on the messages page for this conversation, don't show dot?
             // Actually, always show it if it's a new message event
             setHasUnread(true)
-        })
+        }
+        socket.on('conversation-update', handleConversationUpdate)
 
         return () => {
-            channel.unbind_all()
-            channel.unsubscribe()
+            cleanupRooms()
+            socket.off('conversation-update', handleConversationUpdate)
         }
     }, [auth?._id])
 
@@ -89,7 +86,7 @@ const Header = () => {
                 </Link>
 
                 <div className='flex items-center gap-3 md:gap-8'>
-                    
+
                     {/* DESKTOP & MOBILE NAV */}
                     <nav className={`
                         fixed inset-0 z-[60] bg-pink-100 transition-transform duration-300 ease-in-out lg:relative lg:inset-auto lg:bg-transparent lg:translate-x-0
@@ -117,16 +114,21 @@ const Header = () => {
                             <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
                                 <Link href={WEBSITE_CATEGORY('entertainment')}>Entertainment</Link>
                             </li>
-                            <li className='opacity-50 line-through cursor-not-allowed'>
-                                Shop
+                            <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
+                                <Link
+                                    href={SHOP}
+                                    onNavigate={() => window.dispatchEvent(new Event('eventsora:shop-arrival'))}
+                                >
+                                    Shop
+                                </Link>
                             </li>
                         </ul>
                     </nav>
 
                     {/* BACKDROP FOR MOBILE */}
                     {isMobileMenu && (
-                        <div 
-                            className="fixed inset-0 bg-black/50 z-[55] lg:hidden" 
+                        <div
+                            className="fixed inset-0 bg-black/50 z-[55] lg:hidden"
                             onClick={toggleMobileMenu}
                         />
                     )}
@@ -136,7 +138,7 @@ const Header = () => {
                         <button type='button' onClick={toggleSearch} className="p-1">
                             <SearchIcon className='hover:text-pink-100 cursor-pointer text-white md:size-6 size-5' />
                         </button>
-                        
+
                         <Link href={WEBSITE_MESSAGES} className="p-1 relative">
                             <ChatBubbleOutlineIcon className='text-white' sx={{ fontSize: { xs: 22, md: 24 } }} />
                             {hasUnread && (
@@ -162,9 +164,9 @@ const Header = () => {
                         )}
 
                         {/* MOBILE HAMBURGER */}
-                        <button 
-                            type='button' 
-                            className='lg:hidden p-1 text-white' 
+                        <button
+                            type='button'
+                            className='lg:hidden p-1 text-white'
                             onClick={toggleMobileMenu}
                         >
                             <CiMenuFries size={26} />

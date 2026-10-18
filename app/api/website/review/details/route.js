@@ -7,13 +7,14 @@ export async function GET(request) {
     try {
         await connectDB()
         const searchParams = request.nextUrl.searchParams
-        const listingId = searchParams.get('listingId')
-        if (!listingId) {
-            return response(false, 404, 'listing is missing')
-        }
+        const target = [
+            ['listing', searchParams.get('listingId')],
+            ['product', searchParams.get('productId')],
+        ].filter(([, value]) => value)
+        if (target.length !== 1 || !mongoose.isValidObjectId(target[0][1])) return response(false, 400, 'Exactly one valid review target is required')
 
         const reviews = await reviewModel.aggregate([
-            { $match: { listing: new mongoose.Types.ObjectId(listingId), deletedAt: null } },
+            { $match: { [target[0][0]]: new mongoose.Types.ObjectId(target[0][1]), deletedAt: null } },
             { $group: { _id: "$rating", count: { $sum: 1 } } },
             { $sort: { _id: -1 } }
         ])

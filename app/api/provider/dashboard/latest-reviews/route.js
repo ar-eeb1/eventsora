@@ -29,10 +29,32 @@ export async function GET() {
                 }
             },
             {
-                $unwind: "$listingDetails"
+                $unwind: {
+                    path: "$listingDetails",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
-                $match: { "listingDetails.userId": providerId }
+                $lookup: {
+                    from: "products",
+                    localField: "product",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$productDetails",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $match: {
+                    $or: [
+                        { "listingDetails.userId": providerId },
+                        { "productDetails.userId": providerId },
+                    ]
+                }
             },
             {
                 $lookup: {
@@ -61,8 +83,8 @@ export async function GET() {
                     review: 1,
                     title: 1,
                     createdAt: 1,
-                    listing: "$listingDetails.name",
-                    slug: "$listingDetails.slug",
+                    listing: { $ifNull: ["$listingDetails.name", "$productDetails.name"] },
+                    slug: { $ifNull: ["$listingDetails.slug", "$productDetails.slug"] },
                     reviewer: "$userDetails.name"
                 }
             }

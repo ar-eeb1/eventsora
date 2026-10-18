@@ -4,6 +4,8 @@ import { catchError, response } from "@/lib/helperFunction";
 import ConversationModel from "@/models/Conversation.model";
 import UserModel from "@/models/User.model";
 import ListingModel from "@/models/Listing.model";
+import ProductModel from "@/models/Product.Model";
+import ShopCategoryModel from "@/models/ShopCategory.model";
 
 export async function GET(request) {
     try {
@@ -20,6 +22,14 @@ export async function GET(request) {
             }
         }).populate('participants', 'name email profileImage')
             .populate('listingId', 'name slug media')
+            .populate({
+                path: 'productId',
+                select: 'name slug category userId',
+                populate: [
+                    { path: 'category', select: 'slug' },
+                    { path: 'userId', select: 'name' },
+                ],
+            })
             .sort({ updatedAt: -1 })
             .lean()
 

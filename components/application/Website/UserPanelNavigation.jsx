@@ -2,9 +2,9 @@
 import { Button } from '@/components/ui/button'
 import { showToast } from '@/lib/showToast'
 import { WEBSITE_LOGIN } from '@/routes/AdminPanelRoute'
-import { USER_BOOKINGS, USER_DASHBOARD, USER_PROFILE } from '@/routes/WebsiteRoute'
+import { USER_BOOKINGS, USER_DASHBOARD, USER_ORDERS, USER_PROFILE } from '@/routes/WebsiteRoute'
 import { logout } from '@/store/reducer/authReducer'
-import { Dashboard, Person } from '@mui/icons-material'
+import { Dashboard, Person, ShoppingBag } from '@mui/icons-material'
 import { CalendarIcon } from '@mui/x-date-pickers'
 import axios from 'axios'
 import Link from 'next/link'
@@ -54,6 +54,12 @@ const UserPanelNavigation = () => {
                     <Link href={USER_BOOKINGS} className={`block p-3 text-sm rounded hover:bg-primary hover:text-white ${pathname.startsWith(USER_BOOKINGS) ? 'bg-primary text-white' : ''}`}>
                         <CalendarIcon />
                         Bookings
+                    </Link>
+                </li>
+                <li className='mb-2'>
+                    <Link href={USER_ORDERS} className={`block p-3 text-sm rounded hover:bg-primary hover:text-white ${pathname.startsWith(USER_ORDERS) ? 'bg-primary text-white' : ''}`}>
+                        <ShoppingBag />
+                        My Orders
                     </Link>
                 </li>
                 <li className='mb-2'>

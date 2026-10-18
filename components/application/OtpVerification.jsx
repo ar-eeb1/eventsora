@@ -44,7 +44,7 @@ const OtpVerification = ({ email, onSubmit, loading }) => {
             showToast("success", resendOTPresponse.message)
             setResendCooldown(60)
         } catch (error) {
-            showToast("error", error.message)
+            showToast("error", error.response?.data?.message || error.message)
         } finally {
             setIsResendingOtp(false)
         }

@@ -3,6 +3,9 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
 import reviewModel from "@/models/Review.model";
+import ProductModel from "@/models/Product.Model";
+import mongoose from "mongoose";
+import z from "zod";
 
 export async function POST(request) {
     try {
@@ -15,11 +18,16 @@ export async function POST(request) {
         const payload = await request.json()
 
         const schema = zSchema.pick({
-            listing: true,
-            userId: true,
-            rating: true,
             title: true,
             review: true,
+        }).extend({
+            rating: z.coerce.number().min(1).max(5),
+            listing: z.string().min(1).optional(),
+            product: z.string().min(1).optional(),
+        }).superRefine((data, ctx) => {
+            if ([data.listing, data.product].filter(Boolean).length !== 1) {
+                ctx.addIssue({ code: 'custom', message: 'Provide exactly one review target.' })
+            }
         })
 
         const validate = schema.safeParse(payload)
@@ -27,7 +35,16 @@ export async function POST(request) {
             return response(false, 400, 'Invalid or missing field', validate.error)
         }
 
-        const { listing, userId, rating, title, review } = validate.data
+        const { listing, product, rating, title, review } = validate.data
+        const targetId = listing || product
+        if (!mongoose.isValidObjectId(targetId)) return response(false, 400, 'Invalid review target.')
+
+        if (listing) {
+            const ListingModel = (await import('@/models/Listing.model')).default
+            if (!await ListingModel.exists({ _id: listing, deletedAt: null, status: 'approved' })) return response(false, 404, 'Listing not found.')
+        } else if (product) {
+            if (!await ProductModel.exists({ _id: product, deletedAt: null, status: 'approved' })) return response(false, 404, 'Product not found.')
+        }
 
 
         // const existingReview = await reviewModel.findOne({ listing, user: userId })
@@ -36,8 +53,9 @@ export async function POST(request) {
         // }
 
         const newReview = new reviewModel({
-            listing: listing,
-            user: userId,
+            listing,
+            product,
+            user: auth.userId,
             rating: rating,
             title: title,
             review: review

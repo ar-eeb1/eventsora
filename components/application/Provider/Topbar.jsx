@@ -11,7 +11,7 @@ import ProviderMobileSearch from './ProviderMobileSearch'
 import ProviderDropDown from './ProviderDropdown'
 import { Mail } from 'lucide-react'
 import Link from 'next/link'
-import Pusher from 'pusher-js'
+import { joinSocketRooms, socket } from '@/lib/socket'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { usePathname } from 'next/navigation'
@@ -39,22 +39,19 @@ const Topbar = () => {
     checkUnread()
   }, [user])
 
-  // Real-time notification with Pusher
+  // Real-time notification with Socket.IO
   useEffect(() => {
-    if (!user?._id || !process.env.NEXT_PUBLIC_PUSHER_KEY) return
+    if (!user?._id) return
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-    })
-
-    const channel = pusher.subscribe(`user-${user._id}`)
-    channel.bind('conversation-update', (data) => {
+    const cleanupRooms = joinSocketRooms({ userId: user._id })
+    const handleConversationUpdate = () => {
       setHasUnread(true)
-    })
+    }
+    socket.on('conversation-update', handleConversationUpdate)
 
     return () => {
-      channel.unbind_all()
-      channel.unsubscribe()
+      cleanupRooms()
+      socket.off('conversation-update', handleConversationUpdate)
     }
   }, [user?._id])
 

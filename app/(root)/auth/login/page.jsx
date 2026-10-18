@@ -69,8 +69,9 @@ const LoginPage = () => {
             setOtpEmail(values.email)
             form.reset()
             showToast("success", loginResponse.message)
+
         } catch (error) {
-            showToast("error", error.message)
+            showToast("error", error.response?.data?.message || error.message)
         } finally {
             setLoading(false)
         }
@@ -103,7 +104,7 @@ const LoginPage = () => {
             }
 
         } catch (error) {
-            showToast("error", error.message)
+            showToast("error", error.response?.data?.message || error.message)
         } finally {
             setOtpVerificationLoading(false)
         }

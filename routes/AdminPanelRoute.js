@@ -25,5 +25,7 @@ export const ADMIN_BOOKINGS_REFUNDED = '/admin/bookings?paymentStatus=refunded'
 export const ADMIN_BOOKINGS_DETAILS = (booking_id) => booking_id ? `/admin/bookings/details/${booking_id}` : ''
 
 export const ADMIN_SEARCHES = '/admin/searches'
-
-
+export const ADMIN_PRODUCT_ORDERS = '/admin/product-orders'
+export const ADMIN_PRODUCT_ORDERS_PENDING = '/admin/product-orders?reviewStatus=pending'
+export const ADMIN_PRODUCT_ORDERS_ACCEPTED = '/admin/product-orders?reviewStatus=accepted'
+export const ADMIN_PRODUCT_ORDERS_REJECTED = '/admin/product-orders?reviewStatus=rejected'

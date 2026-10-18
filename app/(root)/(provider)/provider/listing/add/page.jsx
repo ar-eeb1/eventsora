@@ -4,13 +4,13 @@ import ButtonLoading from '@/components/application/ButtonLoading'
 import { numberToIndianWords } from '@/lib/numberToWords'
 import Select from '@/components/application/Main/Select'
 import Editor from '@/components/application/Provider/Editor'
-import MediaModal from '@/components/application/Provider/MediaModal'
 import UploadMedia from '@/components/application/Provider/UploadMedia'
+import MediaModal from '@/components/application/Provider/MediaModal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Calendar as CalendarIcon } from 'lucide-react'
+import { Calendar as CalendarIcon, Images, X } from 'lucide-react'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
@@ -23,7 +23,6 @@ import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import slugify from 'slugify'
-import { X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 
 const breadCrumbData = [
@@ -33,10 +32,8 @@ const breadCrumbData = [
 ]
 
 const AddListing = () => {
-  //MEDIA MODAL STATES
-
-  const [open, setOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState([])
+  const [openMediaModal, setOpenMediaModal] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const queryClient = useQueryClient()
@@ -588,13 +585,6 @@ const AddListing = () => {
                   </div>
 
                   <div className='rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 p-8 text-center bg-linear-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 transition-all duration-200 hover:border-primary/50'>
-                    <MediaModal
-                      open={open}
-                      setOpen={setOpen}
-                      selectedMedia={selectedMedia}
-                      setSelectedMedia={setSelectedMedia}
-                      isMultiple={true}
-                    />
                     {selectedMedia.length > 0 && (
                       <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6'>
                         {selectedMedia.map((media, index) => (
@@ -616,7 +606,7 @@ const AddListing = () => {
                               onClick={() => {
                                 setSelectedMedia(prev => prev.filter(m => m._id !== media._id));
                               }}
-                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -624,14 +614,7 @@ const AddListing = () => {
                         ))}
                       </div>
                     )}
-                    <div className='flex justify-center items-center gap-4'>
-                      <Button
-                        type='button'
-                        onClick={() => setOpen(true)}
-                        className='h-9 px-8 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105'
-                      >
-                        {selectedMedia.length > 0 ? 'Change Media' : 'Select Media'}
-                      </Button>
+                    <div className='flex justify-center items-center gap-4 flex-wrap'>
                       <UploadMedia 
                         isMultiple={true} 
                         queryClient={queryClient} 
@@ -640,10 +623,26 @@ const AddListing = () => {
                           setSelectedMedia(prev => [...prev, ...formattedMedia]);
                         }}
                       />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setOpenMediaModal(true)}
+                        className="h-10 px-4 font-medium rounded-lg border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200 cursor-pointer flex items-center gap-2"
+                      >
+                        <Images className="w-4 h-4" />
+                        Select from Gallery
+                      </Button>
                     </div>
+                    <MediaModal
+                      open={openMediaModal}
+                      setOpen={setOpenMediaModal}
+                      selectedMedia={selectedMedia}
+                      setSelectedMedia={setSelectedMedia}
+                      isMultiple={true}
+                    />
                     {selectedMedia.length > 0 && (
                       <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                        {selectedMedia.length} {selectedMedia.length === 1 ? 'image' : 'images'} selected
+                        {selectedMedia.length} {selectedMedia.length === 1 ? 'image' : 'images'} added
                       </p>
                     )}
                   </div>

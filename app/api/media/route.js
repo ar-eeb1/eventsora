@@ -18,7 +18,7 @@ export async function GET(request) {
         if (userId) {
             filter.userId = userId;
         } else {
-            const auth = await isAuthenticated('provider')
+            const auth = await isAuthenticated(['provider', 'master', 'admin', 'seller'])
             if (!auth.isAuth) {
                 return response(false, 403, 'Unauthorized,')
             }

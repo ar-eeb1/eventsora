@@ -21,7 +21,10 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import ReviewList from './ReviewList'
 import useFetch from '@/hooks/useFetch'
 
-const ListingReview = ({ listingId }) => {
+const ListingReview = ({ listingId, productId }) => {
+    const targetField = productId ? 'product' : 'listing'
+    const targetId = productId || listingId
+    const targetQuery = `${targetField}Id=${targetId}`
     const auth = useSelector((store) => store.authStore.auth)
 
     const queryClient = useQueryClient()
@@ -35,7 +38,7 @@ const ListingReview = ({ listingId }) => {
         rating: {},
         percentage: {}
     })
-    const { data: reviewDetails } = useFetch(`/api/website/review/details?listingId=${listingId}`)
+    const { data: reviewDetails } = useFetch(`/api/website/review/details?${targetQuery}`)
 
     useEffect(() => {
         if (reviewDetails && reviewDetails.success) {
@@ -51,7 +54,7 @@ const ListingReview = ({ listingId }) => {
     }, [])
 
     const formSchema = zSchema.pick({
-        listing: true,
+        [targetField]: true,
         userId: true,
         rating: true,
         title: true,
@@ -61,7 +64,7 @@ const ListingReview = ({ listingId }) => {
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            listing: listingId,
+            [targetField]: targetId,
             userId: auth?._id,
             rating: 0,
             title: '',
@@ -75,7 +78,7 @@ const ListingReview = ({ listingId }) => {
             const payload = {
                 ...values,
                 userId: auth?._id,
-                listing: listingId,
+                [targetField]: targetId,
             }
 
             const { data } = await axios.post('/api/website/review/create', payload)
@@ -86,7 +89,7 @@ const ListingReview = ({ listingId }) => {
 
             showToast('success', data.message)
             form.reset()
-            queryClient.invalidateQueries(['listing-review'])
+            queryClient.invalidateQueries({ queryKey: ['product-review', targetField, targetId] })
         } catch (error) {
             showToast('error', error.response?.data?.message || error.message)
         } finally {
@@ -96,7 +99,7 @@ const ListingReview = ({ listingId }) => {
 
     // GET REVIEWS FOR THIS LISTING AND PAGINATION
     const fetchReview = async (pageParam) => {
-        const { data: getReviewData } = await axios.get(`/api/website/review/get?listingId=${listingId}&page=${pageParam}`)
+        const { data: getReviewData } = await axios.get(`/api/website/review/get?${targetQuery}&page=${pageParam}`)
         if (!getReviewData?.success) {
             return
         }
@@ -106,7 +109,7 @@ const ListingReview = ({ listingId }) => {
 
     // TANSTACK
     const { error, data, isFetching, fetchNextPage, hasNextPage } = useInfiniteQuery({
-        queryKey: ['listing-review'],
+        queryKey: ['product-review', targetField, targetId],
         queryFn: async ({ pageParam }) => fetchReview(pageParam),
         initialPageParam: 0,
         getNextPageParam: (lastPage) => {

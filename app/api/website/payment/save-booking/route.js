@@ -58,7 +58,7 @@ export async function POST(request) {
         }, {});
 
         const createdBookings = [];
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://eventsora.com';
+        const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://eventsora.com';
 
         // For each provider group, create a separate booking
         for (const [providerId, providerListings] of Object.entries(groupedByProvider)) {

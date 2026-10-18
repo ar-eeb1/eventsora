@@ -17,8 +17,6 @@ const playfair = Playfair_Display({
     subsets: ['latin'],
 })
 
-
-
 const AddHomeListing = async () => {
     await connectDB()
 

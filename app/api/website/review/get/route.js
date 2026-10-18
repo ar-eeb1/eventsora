@@ -8,18 +8,21 @@ export async function GET(request) {
         await connectDB()
         const searchParams = request.nextUrl.searchParams
 
-        const listingId = searchParams.get('listingId')
-        if (!listingId) {
-            return response(false, 400, 'Listing ID is required')
-        }
+        const target = [
+            ['listing', searchParams.get('listingId')],
+            ['product', searchParams.get('productId')],
+        ].filter(([, value]) => value)
+        if (target.length !== 1 || !mongoose.isValidObjectId(target[0][1])) return response(false, 400, 'Exactly one valid review target is required')
 
-        const page = parseInt(searchParams.get('page')) || 0
+        const rawPage = searchParams.get('page') || '0'
+        const page = Number(rawPage)
+        if (!Number.isSafeInteger(page) || page < 0) return response(false, 400, 'Page must be a non-negative integer')
         const limit = 2
         const skip = page * limit
 
-        let matchQuery = {
+        const matchQuery = {
             deletedAt: null,
-            listing: new mongoose.Types.ObjectId(listingId)
+            [target[0][0]]: new mongoose.Types.ObjectId(target[0][1])
         }
 
         // aggregation pipeline to fetch reviews with user details and pagination

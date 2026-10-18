@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     count: 0,
-    listings: []
+    listings: [],
+    productCart: []
 }
 export const bookingReducer = createSlice({
     name: 'bookingStore',
@@ -73,6 +74,48 @@ export const bookingReducer = createSlice({
             state.count = 0
         },
 
+        addToProductCart: (state, action) => {
+            state.productCart ||= []
+            const item = action.payload
+            const existing = state.productCart.find((entry) => (
+                String(entry.productId) === String(item.productId) &&
+                String(entry.variantId || '') === String(item.variantId || '')
+            ))
+            if (!existing) {
+                state.productCart.push(item)
+                return
+            }
+            existing.stockType = item.stockType
+            existing.processingTime = item.processingTime
+            const nextQuantity = existing.quantity + item.quantity
+            existing.quantity = item.maxQuantity == null
+                ? nextQuantity
+                : Math.min(nextQuantity, item.maxQuantity)
+        },
+
+        updateProductCartQuantity: (state, action) => {
+            const { productId, variantId, quantity } = action.payload
+            const item = state.productCart.find((entry) => (
+                String(entry.productId) === String(productId) &&
+                String(entry.variantId || '') === String(variantId || '')
+            ))
+            if (!item || quantity < item.minimumQuantity) return
+            if (item.maxQuantity != null && quantity > item.maxQuantity) return
+            item.quantity = quantity
+        },
+
+        removeFromProductCart: (state, action) => {
+            const { productId, variantId } = action.payload
+            state.productCart = state.productCart.filter((entry) => (
+                String(entry.productId) !== String(productId) ||
+                String(entry.variantId || '') !== String(variantId || '')
+            ))
+        },
+
+        clearProductCart: (state) => {
+            state.productCart = []
+        },
+
         syncVerifiedBookings: (state, action) => {
             const verifiedData = action.payload; // This is the array from server
 
@@ -122,6 +165,10 @@ export const {
     updateQuantity,
     removeFromBooking,
     clearBooking,
+    addToProductCart,
+    updateProductCartQuantity,
+    removeFromProductCart,
+    clearProductCart,
     syncVerifiedBookings
 } = bookingReducer.actions
 export default bookingReducer.reducer

@@ -45,7 +45,8 @@ const UpcomingEvents = () => {
                         const remaining = (evt.totalAmount || 0) - (evt.receivedAmount || 0)
 
                         return (
-                            <Link key={evt._id} href={PROVIDER_BOOKINGS_DETAILS(evt.booking_id)} className='group'>
+                            evt.booking_id ? (
+                                <Link key={evt._id} href={PROVIDER_BOOKINGS_DETAILS(evt.booking_id)} className='group'>
                                 <div className='flex items-center gap-4 p-3 rounded-lg border bg-white dark:bg-card dark:border-gray-800 hover:border-pink-300 hover:shadow-md transition-all'>
                                     {/* Image Thumbnail */}
                                     <div className='relative w-16 h-16 rounded overflow-hidden border shrink-0 bg-gray-50'>
@@ -82,7 +83,15 @@ const UpcomingEvents = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </Link>
+                                </Link>
+                            ) : (
+                                <div key={evt._id} className='flex items-center gap-4 p-3 rounded-lg border bg-white dark:bg-card dark:border-gray-800'>
+                                    <div className='flex-1 min-w-0'>
+                                        <span className='font-semibold text-gray-900 dark:text-white truncate text-sm'>{evt.name}</span>
+                                        <p className='text-xs text-gray-400'>Booking details unavailable</p>
+                                    </div>
+                                </div>
+                            )
                         )
                     })}
                 </div>

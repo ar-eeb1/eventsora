@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 export async function PUT(request) {
     try {
-        const auth = await isAuthenticated('provider')
+        const auth = await isAuthenticated(['provider', 'master', 'admin', 'seller'])
         if (!auth.isAuth) {
             return response(false, 403, 'Unauthorized.')
         }
@@ -52,7 +52,7 @@ export async function DELETE(request) {
     session.startTransaction()
 
     try {
-        const auth = await isAuthenticated('provider')
+        const auth = await isAuthenticated(['provider', 'master', 'admin', 'seller'])
         if (!auth.isAuth) {
             return response(false, 403, 'Unauthorized.')
         }
