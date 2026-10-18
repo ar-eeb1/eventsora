@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import img from '@/public/assets/img-placeholder.png'
 import React from 'react'
-import { BsFillPeopleFill } from "react-icons/bs"
 import { MapPin, Users } from 'lucide-react'
 import Link from 'next/link'
 import { WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
