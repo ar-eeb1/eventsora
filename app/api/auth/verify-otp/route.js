@@ -53,6 +53,7 @@ export async function POST(request) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             maxAge: 3 * 60 * 60, // 3 hours in seconds
+            ...(process.env.NODE_ENV === 'production' ? { domain: '.eventsora.com' } : {}),
         })
 
         await getOtpData.deleteOne()

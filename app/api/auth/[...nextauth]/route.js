@@ -54,6 +54,7 @@ const handler = NextAuth({
                         maxAge: 3 * 24 * 60 * 60, // 3 days
                         path: '/',
                         sameSite: 'strict',
+                        ...(process.env.NODE_ENV === 'production' ? { domain: '.eventsora.com' } : {}),
                     })
 
                     // Attach role to user object so it's available in session/jwt callback if needed

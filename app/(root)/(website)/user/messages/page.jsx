@@ -6,10 +6,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef } from 'react'
 import { joinSocketRooms, socket } from '@/lib/socket'
+import { messageApiUrl } from '@/lib/messageApi'
 
 const MessagesPage = () => {
     const { auth: user } = useSelector(state => state.authStore)
-    const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
+    const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(
+        messageApiUrl('/conversation/get'),
+        'GET',
+        { withCredentials: true }
+    )
     const conversationsRef = useRef([])
 
     useEffect(() => {

@@ -1,7 +1,6 @@
 'use client'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
-import axios from 'axios'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -15,6 +14,7 @@ import { WEBSITE_BOOKINGS } from '@/routes/WebsiteRoute'
 import { useRouter } from 'next/navigation'
 import { IoPricetagOutline, IoClose } from 'react-icons/io5'
 import { joinSocketRooms, socket } from '@/lib/socket'
+import { messageApi, messageApiUrl } from '@/lib/messageApi'
 
 
 const ChatPage = () => {
@@ -42,7 +42,7 @@ const ChatPage = () => {
         loading: messagesLoading,
         error: messagesError,
         refetch: refetchMessages
-    } = useFetch(`/api/message/get/${id}`)
+    } = useFetch(messageApiUrl(`/get/${id}`), 'GET', { withCredentials: true })
 
     // Real-time messages with Socket.IO
     useEffect(() => {
@@ -116,7 +116,7 @@ const ChatPage = () => {
     // Mark as read
     useEffect(() => {
         if (id && messages.length > 0) {
-            axios.post('/api/message/read', { conversationId: id })
+            messageApi.post('/read', { conversationId: id })
         }
     }, [id, messages.length])
 
@@ -129,7 +129,7 @@ const ChatPage = () => {
         const currentConv = conversationData?.data?.find(c => c._id === id)
 
         try {
-            const { data } = await axios.post(`/api/message/send`, {
+            const { data } = await messageApi.post('/send', {
                 conversationId: id,
                 text: isQuoteMode ? `Price Quotation: Rs. ${quotePrice} for ${quoteDate} - ${newMessage}` : newMessage,
                 isQuote: isQuoteMode,
@@ -139,7 +139,11 @@ const ChatPage = () => {
             })
 
             if (data.success) {
-                setMessages([...messages, data.data])
+                setMessages((prev) => (
+                    prev.some((message) => message._id === data.data._id)
+                        ? prev
+                        : [...prev, data.data]
+                ))
                 setNewMessage('')
                 setQuotePrice('')
                 setQuoteDate('')
@@ -182,7 +186,11 @@ const ChatPage = () => {
         router.push(WEBSITE_BOOKINGS)
     }
 
-    const { data: conversationData, setData: setConversationData, loading } = useFetch(`/api/message/conversation/get`)
+    const { data: conversationData, setData: setConversationData, loading } = useFetch(
+        messageApiUrl('/conversation/get'),
+        'GET',
+        { withCredentials: true }
+    )
     const selectedConversation = conversationData?.data?.find((conv) => conv._id === id)
     const fallbackMessage = !messages.length
         && !messagesError

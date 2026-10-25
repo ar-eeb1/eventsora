@@ -17,6 +17,7 @@ import { WEBSITE_LOGIN } from '@/routes/AdminPanelRoute'
 import { addToProductCart } from '@/store/reducer/bookingReducer'
 import { SHOP, SHOP_CART, SHOP_CATEGORY, SHOP_CHECKOUT, SHOP_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import { showToast } from '@/lib/showToast'
+import { messageApi } from '@/lib/messageApi'
 
 const formatPrice = (price) => new Intl.NumberFormat('en-PK', {
   style: 'currency',
@@ -56,7 +57,7 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
   const handleMessageSeller = async () => {
     setMessaging(true)
     try {
-      const { data } = await axios.post('/api/message/conversation/create', { productId: product._id })
+      const { data } = await messageApi.post('/conversation/create', { productId: product._id })
       if (!data.success) throw new Error(data.message || 'Could not start a conversation.')
       router.push(`/user/messages/${data.data._id}`)
     } catch (error) {

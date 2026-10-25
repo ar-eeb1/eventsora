@@ -1,7 +1,6 @@
 'use client'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
-import axios from 'axios'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -11,6 +10,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { IoPricetagOutline, IoClose } from 'react-icons/io5'
 import { joinSocketRooms, socket } from '@/lib/socket'
+import { messageApi, messageApiUrl } from '@/lib/messageApi'
 
 
 
@@ -33,7 +33,11 @@ const ProviderChatPage = () => {
     }, [messages.length])
 
     // 1 FETCH OLD MESSAGES
-    const { data: messageData, refetch } = useFetch(`/api/message/get/${id}`)
+    const { data: messageData, refetch } = useFetch(
+        messageApiUrl(`/get/${id}`),
+        'GET',
+        { withCredentials: true }
+    )
 
     // Real-time messages with Socket.IO
     useEffect(() => {
@@ -97,7 +101,7 @@ const ProviderChatPage = () => {
             socket.off('conversation-update', handleConversationUpdate)
             socket.emit('leave-chat', id)
         }
-    }, [id, user?._id])
+    }, [id, user?._id, setConversationData])
 
     useEffect(() => {
         if (messageData?.success) {
@@ -108,7 +112,7 @@ const ProviderChatPage = () => {
     // Mark as read
     useEffect(() => {
         if (id && messages.length > 0) {
-            axios.post('/api/message/read', { conversationId: id })
+            messageApi.post('/read', { conversationId: id })
         }
     }, [id, messages.length])
 
@@ -121,7 +125,7 @@ const ProviderChatPage = () => {
         const currentConv = conversationData?.data?.find(c => c._id === id)
         
         try {
-            const { data } = await axios.post(`/api/message/send`, {
+            const { data } = await messageApi.post('/send', {
                 conversationId: id,
                 text: isQuoteMode ? `Price Quotation: Rs. ${quotePrice} for ${quoteDate} - ${newMessage}` : newMessage,
                 isQuote: isQuoteMode,
@@ -131,7 +135,11 @@ const ProviderChatPage = () => {
             })
 
             if (data.success) {
-                setMessages([...messages, data.data])
+                setMessages((prev) => (
+                    prev.some((message) => message._id === data.data._id)
+                        ? prev
+                        : [...prev, data.data]
+                ))
                 setNewMessage('')
                 setQuotePrice('')
                 setQuoteDate('')
@@ -145,16 +153,11 @@ const ProviderChatPage = () => {
         }
     }
 
-    const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
-
-    // Polling for conversation list
-    useEffect(() => {
-        const interval = setInterval(() => {
-            refetchConversation()
-        }, 3000)
-
-        return () => clearInterval(interval)
-    }, [refetchConversation])
+    const { data: conversationData, setData: setConversationData, loading } = useFetch(
+        messageApiUrl('/conversation/get'),
+        'GET',
+        { withCredentials: true }
+    )
 
     if (loading && !conversationData) return <div>Messages Loading...</div>
 

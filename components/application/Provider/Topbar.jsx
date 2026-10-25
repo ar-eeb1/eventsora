@@ -16,6 +16,7 @@ import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { messageApi } from '@/lib/messageApi'
 
 const Topbar = () => {
   const { toggleSidebar } = useSidebar()
@@ -28,7 +29,7 @@ const Topbar = () => {
     if (!user) return
     const checkUnread = async () => {
       try {
-        const { data } = await axios.get('/api/message/conversation/get')
+        const { data } = await messageApi.get('/conversation/get')
         if (data.success) {
           setHasUnread(data.data.some(c => !c.isRead))
         }
@@ -55,12 +56,7 @@ const Topbar = () => {
     }
   }, [user?._id])
 
-  // Clear dot if we are on messages page
-  useEffect(() => {
-    if (pathname.includes('/provider/messages')) {
-      setHasUnread(false)
-    }
-  }, [pathname])
+  const showUnread = hasUnread && !pathname.includes('/provider/messages')
 
   return (
     <div className='fixed border h-14 w-full top-0 left-0 z-30 md:pl-72 pe-8 px-5 flex items-center justify-between bg-white dark:bg-card  '>
@@ -75,7 +71,7 @@ const Topbar = () => {
         <ProviderMobileSearch />
         <Link href="/provider/messages" className="relative p-2 text-gray-500 hover:text-primary transition-colors">
           <Mail size={22} />
-          {hasUnread && (
+          {showUnread && (
             <span className="absolute top-2 right-2 w-3.5 h-3.5 bg-primary rounded-full border-2 border-white dark:border-gray-800 animate-pulse" />
           )}
         </Link>

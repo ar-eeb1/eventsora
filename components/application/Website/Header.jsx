@@ -17,6 +17,7 @@ import profileIcon from '@/public/assets/user.png'
 import { CiMenuFries } from "react-icons/ci";
 import Search from './Search'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import { messageApi } from '@/lib/messageApi'
 
 const Header = () => {
     const auth = useSelector(store => store.authStore.auth)
@@ -30,7 +31,7 @@ const Header = () => {
         if (!auth) return
         const checkUnread = async () => {
             try {
-                const { data } = await axios.get('/api/message/conversation/get')
+                const { data } = await messageApi.get('/conversation/get')
                 if (data.success) {
                     setHasUnread(data.data.some(c => !c.isRead))
                 }
@@ -58,13 +59,6 @@ const Header = () => {
             socket.off('conversation-update', handleConversationUpdate)
         }
     }, [auth?._id])
-
-    // Clear dot if we navigate to messages
-    useEffect(() => {
-        if (pathname.includes('/messages')) {
-            setHasUnread(false)
-        }
-    }, [pathname])
 
     const toggleMobileMenu = useCallback(() => {
         setIsMobileMenu(prev => !prev)
@@ -141,7 +135,7 @@ const Header = () => {
 
                         <Link href={WEBSITE_MESSAGES} className="p-1 relative">
                             <ChatBubbleOutlineIcon className='text-white' sx={{ fontSize: { xs: 22, md: 24 } }} />
-                            {hasUnread && (
+                            {hasUnread && !pathname.includes('/messages') && (
                                 <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-pink-900 animate-pulse" />
                             )}
                         </Link>

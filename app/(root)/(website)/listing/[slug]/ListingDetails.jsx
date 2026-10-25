@@ -28,6 +28,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { url } from 'zod'
 import PortfolioMedia from '@/components/application/Website/PortfolioMedia'
 import { marked } from 'marked'
+import { messageApi } from '@/lib/messageApi'
 
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
@@ -202,7 +203,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 return
             }
 
-            const { data } = await axios.post('/api/message/conversation/create', {
+            const { data } = await messageApi.post('/conversation/create', {
                 receiverId: receiverId,
                 listingId: listing._id
             })

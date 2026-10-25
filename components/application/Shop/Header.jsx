@@ -17,6 +17,7 @@ import profileIcon from '@/public/assets/user.png'
 import { CiMenuFries } from "react-icons/ci";
 
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import { messageApi } from '@/lib/messageApi'
 
 const Header = () => {
   const auth = useSelector(store => store.authStore.auth)
@@ -30,7 +31,7 @@ const Header = () => {
     if (!auth) return
     const checkUnread = async () => {
       try {
-        const { data } = await axios.get('/api/message/conversation/get')
+        const { data } = await messageApi.get('/conversation/get')
         if (data.success) {
           setHasUnread(data.data.some(c => !c.isRead))
         }

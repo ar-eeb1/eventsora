@@ -6,7 +6,16 @@ export async function POST(params) {
     try {
         await connectDB()
         const cookieStore = await cookies()
-        cookieStore.delete('access_token')
+        cookieStore.set({
+            name: 'access_token',
+            value: '',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 0,
+            ...(process.env.NODE_ENV === 'production' ? { domain: '.eventsora.com' } : {}),
+        })
         return response(true, 200, 'Logout Successfully')
     } catch (error) {
         return catchError(error)
