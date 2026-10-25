@@ -37,7 +37,12 @@ const ChatPage = () => {
     }, [messages.length])
 
     // 1 FETCH OLD MESSAGES
-    const { data: messageData, refetch } = useFetch(`/api/message/get/${id}`)
+    const {
+        data: messageData,
+        loading: messagesLoading,
+        error: messagesError,
+        refetch: refetchMessages
+    } = useFetch(`/api/message/get/${id}`)
 
     // Real-time messages with Socket.IO
     useEffect(() => {
@@ -178,6 +183,27 @@ const ChatPage = () => {
     }
 
     const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
+    const selectedConversation = conversationData?.data?.find((conv) => conv._id === id)
+    const fallbackMessage = !messages.length
+        && !messagesError
+        && selectedConversation?.lastMessage
+        && selectedConversation.lastMessage !== 'Started conversation'
+        && selectedConversation.lastMessageBy
+        ? [{
+            _id: `conversation-${selectedConversation._id}-last-message`,
+            sender: selectedConversation.lastMessageBy._id,
+            text: selectedConversation.lastMessage,
+            createdAt: selectedConversation.updatedAt,
+            readBy: [],
+        }]
+        : []
+    const displayedMessages = messages.length ? messages : fallbackMessage
+    const otherParticipant = selectedConversation?.participants?.find(
+        (participant) => participant._id !== user?._id
+    )
+    const conversationTitle = selectedConversation?.listingId?.name
+        || selectedConversation?.productId?.name
+        || otherParticipant?.name
 
     // Polling for conversation list
     useEffect(() => {
@@ -239,29 +265,24 @@ const ChatPage = () => {
                 {/* Chat Header */}
                 <div className="p-4 bg-white dark:bg-gray-800 border-b dark:border-gray-700 flex justify-between items-center">
                     <div>
-                        {conversationData?.data?.find(c => c._id === id)?.listingId?.name && (
+                        {conversationTitle && (
                             <h3 className="font-semibold text-lg">
-                                {conversationData?.data?.find(c => c._id === id)?.listingId?.name}
-                            </h3>
-                        )}
-                        {conversationData?.data?.find(c => c._id === id)?.productId?.name && (
-                            <h3 className="font-semibold text-lg">
-                                {conversationData?.data?.find(c => c._id === id)?.productId?.name}
+                                {conversationTitle}
                             </h3>
                         )}
                     </div>
-                    {conversationData?.data?.find(c => c._id === id)?.listingId?.slug && (
+                    {selectedConversation?.listingId?.slug && (
                         <Link
-                            href={`/listing/${conversationData?.data?.find(c => c._id === id)?.listingId?.slug}`}
+                            href={`/listing/${selectedConversation.listingId.slug}`}
                             target="_blank"
                             className="text-primary hover:underline text-sm font-medium"
                         >
                             See Listing
                         </Link>
                     )}
-                    {conversationData?.data?.find(c => c._id === id)?.productId?.slug && (
+                    {selectedConversation?.productId?.slug && (
                         <Link
-                            href={`/shop/${conversationData?.data?.find(c => c._id === id)?.productId?.category?.slug}/${conversationData?.data?.find(c => c._id === id)?.productId?.slug}`}
+                            href={`/shop/${selectedConversation.productId.category?.slug}/${selectedConversation.productId.slug}`}
                             target="_blank"
                             className="text-primary hover:underline text-sm font-medium"
                         >
@@ -270,7 +291,25 @@ const ChatPage = () => {
                     )}
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#ffe7ef] dark:bg-gray-900">
-                    {messages.map((msg) => {
+                    {(messagesLoading || (!messageData && !messagesError)) && !displayedMessages.length && (
+                        <p className="text-center text-gray-500">Loading messages...</p>
+                    )}
+                    {messagesError && (
+                        <div role="alert" className="mx-auto max-w-md rounded-lg border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+                            <p>Could not load this conversation&apos;s messages: {messagesError}</p>
+                            <button
+                                type="button"
+                                onClick={refetchMessages}
+                                className="mt-2 font-semibold underline"
+                            >
+                                Try again
+                            </button>
+                        </div>
+                    )}
+                    {!messagesLoading && !messagesError && !displayedMessages.length && (
+                        <p className="text-center text-gray-500">No messages in this conversation yet.</p>
+                    )}
+                    {displayedMessages.map((msg) => {
                         const isMyMessage = msg.sender === user?._id || msg.sender?._id === user?._id
                         return (
                             <div key={msg._id} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}>

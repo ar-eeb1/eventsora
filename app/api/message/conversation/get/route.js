@@ -21,6 +21,7 @@ export async function GET(request) {
                 $in: [auth.userId]
             }
         }).populate('participants', 'name email profileImage')
+            .populate('lastMessageBy', 'name')
             .populate('listingId', 'name slug media')
             .populate({
                 path: 'productId',
