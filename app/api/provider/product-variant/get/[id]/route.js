@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
         await connectDB()
         const variant = await ProductVariantModel.findOne({ _id: id, deletedAt: null })
             .populate({ path: 'product', match: { userId: auth.userId, deletedAt: null }, select: '_id name' })
-            .populate('media', '_id secure_url url')
+            .populate('media', '_id secure_url thumbnail_url alt url')
             .lean()
         if (!variant?.product) return response(false, 404, 'Product variant not found.')
         return response(true, 200, 'Product variant found.', { ...variant, productId: variant.product._id })

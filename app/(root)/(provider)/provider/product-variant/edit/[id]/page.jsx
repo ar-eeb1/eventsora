@@ -2,6 +2,8 @@
 
 import BreadCrumb from '@/components/application/BreadCrumb'
 import ButtonLoading from '@/components/application/ButtonLoading'
+import MediaModal from '@/components/application/Provider/MediaModal'
+import UploadMedia from '@/components/application/Provider/UploadMedia'
 import Select from '@/components/application/Main/Select'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -13,10 +15,13 @@ import { showToast } from '@/lib/showToast'
 import { productVariantFormSchema } from '@/lib/zodSchema'
 import { PROVIDER_DASHBOARD, PROVIDER_PRODUCT_VARIANT_SHOW } from '@/routes/ProviderPanelRoute'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { X } from 'lucide-react'
 
 const breadCrumbData = [
     { href: PROVIDER_DASHBOARD, label: 'Dashboard' },
@@ -26,16 +31,19 @@ const breadCrumbData = [
 
 const EditProductVariant = () => {
     const { id } = useParams()
+    const queryClient = useQueryClient()
     const { data: productsData } = useFetch('/api/provider/products-for-variant')
     const { data: variantData, loading: variantLoading } = useFetch(id ? `/api/provider/product-variant/get/${id}` : null)
     const products = productsData?.success ? productsData.data : []
     const [loading, setLoading] = React.useState(false)
+    const [selectedMedia, setSelectedMedia] = React.useState([])
+    const [openMediaModal, setOpenMediaModal] = React.useState(false)
     const form = useForm({
         resolver: zodResolver(productVariantFormSchema),
         defaultValues: {
             productId: '', name: '', price: 0, sku: '', discountPercentage: 0,
             stockType: 'in_stock', stockQuantity: 0, processingValue: 0,
-            processingUnit: 'days', inquirePrice: false,
+            processingUnit: 'days', inquirePrice: false, media: [],
         },
     })
     const stockType = form.watch('stockType')
@@ -50,7 +58,13 @@ const EditProductVariant = () => {
                 stockType: variant.stockType || 'in_stock', stockQuantity: variant.stockQuantity || 0,
                 processingValue: variant.processingTime?.value || 0,
                 processingUnit: variant.processingTime?.unit || 'days', inquirePrice: !!variant.inquirePrice,
+                media: (variant.media || []).map((media) => media._id),
             })
+            setSelectedMedia((variant.media || []).map((media) => ({
+                _id: media._id,
+                url: media.secure_url || media.url,
+                alt: media.alt,
+            })))
         }
     }, [variantData, form])
 
@@ -63,6 +77,7 @@ const EditProductVariant = () => {
         try {
             const payload = {
                 _id: id, ...values,
+                media: selectedMedia.map((media) => media._id),
                 stockQuantity: values.stockType === 'in_stock' ? values.stockQuantity : 0,
                 processingTime: { value: values.processingValue, unit: values.processingUnit },
             }
@@ -98,9 +113,32 @@ const EditProductVariant = () => {
                     <FormField control={form.control} name='processingUnit' render={({ field }) => <FormItem><FormLabel>Processing Unit</FormLabel><FormControl><Select options={[{ label: 'Hours', value: 'hours' }, { label: 'Days', value: 'days' }]} selected={field.value} setSelected={field.onChange} isMulti={false} placeholder='Select unit' /></FormControl><FormMessage /></FormItem>} />
                     <FormField control={form.control} name='inquirePrice' render={({ field }) => <FormItem className='flex items-start gap-3 rounded-md border p-4'><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel>Inquire Price</FormLabel></FormItem>} />
                 </div>
+                <section className='space-y-4'>
+                    <div>
+                        <h5 className='text-lg font-semibold'>Variant Images <span className='text-sm font-normal text-muted-foreground'>(optional)</span></h5>
+                        <p className='text-sm text-muted-foreground'>These images appear when a customer selects this variant.</p>
+                    </div>
+                    {selectedMedia.length > 0 && (
+                        <div className='flex flex-wrap gap-3'>
+                            {selectedMedia.map((media) => (
+                                <div key={media._id} className='relative size-24 overflow-hidden rounded-md border'>
+                                    <Image src={media.url || media.secure_url} alt={media.alt || 'Variant image'} fill sizes='96px' className='object-cover' unoptimized />
+                                    <button type='button' onClick={() => setSelectedMedia((current) => current.filter((item) => item._id !== media._id))} aria-label='Remove variant image' className='absolute right-1 top-1 rounded-full bg-white p-1 text-gray-700 shadow'>
+                                        <X className='size-4' />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <div className='flex flex-wrap gap-3'>
+                        <UploadMedia isMultiple queryClient={queryClient} onUploadSuccess={(media) => setSelectedMedia((current) => [...current, ...media.filter((item) => !current.some((selected) => selected._id === item._id))])} />
+                        <Button type='button' variant='outline' onClick={() => setOpenMediaModal(true)}>Choose from Media Library</Button>
+                    </div>
+                </section>
                 <div className='flex justify-end border-t pt-6'><ButtonLoading loading={loading} type='submit' text='Update Product Variant' className='h-12 px-8' /></div>
             </form></Form></CardContent>
         </Card>
+        <MediaModal open={openMediaModal} setOpen={setOpenMediaModal} selectedMedia={selectedMedia} setSelectedMedia={setSelectedMedia} isMultiple />
     </div>
 }
 
