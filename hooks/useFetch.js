@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 
 const useFetch = (url, method = "GET", options = {}) => {
     const [data, setData] = useState(null)
@@ -69,9 +69,9 @@ const useFetch = (url, method = "GET", options = {}) => {
 
     }, [requestOption, url, refreshIndex])
 
-    const refetch = () => {
+    const refetch = useCallback(() => {
         setRefreshIndex(prev => prev + 1)
-    }
+    }, [])
 
     return { data, setData, loading, error, refetch }
 }

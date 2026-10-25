@@ -105,7 +105,7 @@ const ChatPage = () => {
             socket.off('conversation-update', handleConversationUpdate)
             socket.emit('leave-chat', id)
         }
-    }, [id, user?._id])
+    }, [id, user?._id, setConversationData])
 
     useEffect(() => {
         if (messageData?.success) {
@@ -182,7 +182,7 @@ const ChatPage = () => {
         router.push(WEBSITE_BOOKINGS)
     }
 
-    const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
+    const { data: conversationData, setData: setConversationData, loading } = useFetch(`/api/message/conversation/get`)
     const selectedConversation = conversationData?.data?.find((conv) => conv._id === id)
     const fallbackMessage = !messages.length
         && !messagesError
@@ -204,15 +204,6 @@ const ChatPage = () => {
     const conversationTitle = selectedConversation?.listingId?.name
         || selectedConversation?.productId?.name
         || otherParticipant?.name
-
-    // Polling for conversation list
-    useEffect(() => {
-        const interval = setInterval(() => {
-            refetchConversation()
-        }, 3000)
-
-        return () => clearInterval(interval)
-    }, [refetchConversation])
 
     if (loading && !conversationData) return <div>Messages Loading...</div>
 

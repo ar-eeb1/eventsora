@@ -4,20 +4,55 @@ import { useSelector } from 'react-redux'
 import img from '@/public/assets/profile.png' // Default image
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
+import { joinSocketRooms, socket } from '@/lib/socket'
 
 const MessagesPage = () => {
     const { auth: user } = useSelector(state => state.authStore)
-    const { data: conversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
+    const { data: conversationData, setData: setConversationData, loading, refetch: refetchConversation } = useFetch(`/api/message/conversation/get`)
+    const conversationsRef = useRef([])
 
-    // Polling for conversation list
     useEffect(() => {
-        const interval = setInterval(() => {
-            refetchConversation()
-        }, 3000)
+        conversationsRef.current = conversationData?.data || []
+    }, [conversationData])
 
-        return () => clearInterval(interval)
-    }, [refetchConversation])
+    useEffect(() => {
+        if (!user?._id) return
+
+        const cleanupRooms = joinSocketRooms({ userId: user._id })
+        const handleConversationUpdate = (update) => {
+            const existingConversation = conversationsRef.current.some(
+                (conversation) => conversation._id === update.conversationId
+            )
+
+            if (!existingConversation) {
+                refetchConversation()
+                return
+            }
+
+            setConversationData((prev) => {
+                if (!prev?.data) return prev
+                const updatedConversations = prev.data.map((conversation) =>
+                    conversation._id === update.conversationId
+                        ? {
+                            ...conversation,
+                            lastMessage: update.lastMessage,
+                            updatedAt: update.updatedAt,
+                            isRead: false,
+                        }
+                        : conversation
+                )
+                updatedConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                return { ...prev, data: updatedConversations }
+            })
+        }
+
+        socket.on('conversation-update', handleConversationUpdate)
+        return () => {
+            cleanupRooms()
+            socket.off('conversation-update', handleConversationUpdate)
+        }
+    }, [user?._id, refetchConversation, setConversationData])
 
     if (loading && !conversationData) return <div className="p-5">Messages Loading...</div>
 
