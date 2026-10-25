@@ -19,9 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import slugify from 'slugify'
-import CategoryModel from "@/models/Category.model";
-import ShopSubcategoryModel from "@/models/ShopSubcategory.model";
-import ShopCategoryModel from "@/models/ShopCategory.model";
 
 const breadCrumbData = [
   { href: MASTER_DASHBOARD, label: 'Dashboard' },
