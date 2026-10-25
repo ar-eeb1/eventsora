@@ -43,6 +43,11 @@ const ChatPage = () => {
         error: messagesError,
         refetch: refetchMessages
     } = useFetch(messageApiUrl(`/get/${id}`), 'GET', { withCredentials: true })
+    const { data: conversationData, setData: setConversationData, loading } = useFetch(
+        messageApiUrl('/conversation/get'),
+        'GET',
+        { withCredentials: true }
+    )
 
     // Real-time messages with Socket.IO
     useEffect(() => {
@@ -186,11 +191,6 @@ const ChatPage = () => {
         router.push(WEBSITE_BOOKINGS)
     }
 
-    const { data: conversationData, setData: setConversationData, loading } = useFetch(
-        messageApiUrl('/conversation/get'),
-        'GET',
-        { withCredentials: true }
-    )
     const selectedConversation = conversationData?.data?.find((conv) => conv._id === id)
     const fallbackMessage = !messages.length
         && !messagesError

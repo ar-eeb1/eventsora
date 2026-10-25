@@ -38,6 +38,11 @@ const ProviderChatPage = () => {
         'GET',
         { withCredentials: true }
     )
+    const { data: conversationData, setData: setConversationData, loading } = useFetch(
+        messageApiUrl('/conversation/get'),
+        'GET',
+        { withCredentials: true }
+    )
 
     // Real-time messages with Socket.IO
     useEffect(() => {
@@ -152,12 +157,6 @@ const ProviderChatPage = () => {
             setSending(false)
         }
     }
-
-    const { data: conversationData, setData: setConversationData, loading } = useFetch(
-        messageApiUrl('/conversation/get'),
-        'GET',
-        { withCredentials: true }
-    )
 
     if (loading && !conversationData) return <div>Messages Loading...</div>
 
