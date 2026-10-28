@@ -3,7 +3,9 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import ListingModel from "@/models/Listing.model";
+import ListingVariantModel from "@/models/ListingVariant.model";
 import { NextResponse } from "next/server";
+
 
 export async function GET(request) {
     try {

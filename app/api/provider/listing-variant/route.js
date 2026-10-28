@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { NextResponse } from "next/server";
 import ListingVariantModel from "@/models/ListingVariant.model";
+import ListingModel from "@/models/Listing.model";
+
 
 export async function GET(request) {
     try {

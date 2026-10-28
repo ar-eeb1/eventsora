@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/databaseConnection'
 import { catchError } from '@/lib/helperFunction'
 import ProductVariantModel from '@/models/ProductVariant.Model'
 import { NextResponse } from 'next/server'
+import ProductModel from '@/models/Product.Model'
 
 export async function GET(request) {
     try {
