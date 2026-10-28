@@ -144,7 +144,7 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
                       setActiveImage(0)
                       setQuantity(minimumQuantity)
                     }}
-                    className={`rounded-sm border px-3 py-2 text-sm ${activeVariantId === variant._id ? 'border-pink-900 bg-pink-900 text-white' : 'border-gray-300 text-gray-800 hover:border-pink-900'}`}
+                    className={`cursor-pointer rounded-sm border px-3 py-2 text-sm ${activeVariantId === variant._id ? 'border-pink-900 bg-pink-900 text-white' : 'border-gray-300 text-gray-800 hover:border-pink-900'}`}
                   >
                     {variant.name}
                   </button>
@@ -167,7 +167,12 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
             )}
           </div>
 
-          <p className='mt-5 whitespace-pre-line leading-7 text-gray-700'>{product.description}</p>
+          <div
+            className='mt-5 leading-7 text-gray-700 line-clamp-3'
+            dangerouslySetInnerHTML={{ __html: product.description || '' }}
+          />
+          <a rel="stylesheet" href="#desc" >See More</a>
+
 
           <div className='mt-6 grid gap-3 border-y border-gray-200 py-5 text-sm sm:grid-cols-2'>
             <div>
@@ -189,6 +194,7 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
                   {processingTime.value} {processingTime.unit}
                   {processingTime.value !== 1 ? 's' : ''}
                 </p>
+
               </div>
             )}
             {product.userId?.name && (
@@ -244,9 +250,9 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
         </div>
       </section>
 
-      <section className='py-8'>
-        <h2 className='mb-4 text-2xl font-semibold text-gray-900'>Product details</h2>
-        <p className='whitespace-pre-line leading-7 text-gray-700'>{product.description}</p>
+      <section className='py-8' id='desc'>
+        <h2 className='mb-4 text-2xl font-semibold text-gray-900 '>Product details</h2>
+        <div dangerouslySetInnerHTML={{ __html: product.description || '' }} />
       </section>
 
       <ListingReview productId={product._id} />

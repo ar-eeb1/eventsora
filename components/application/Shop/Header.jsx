@@ -1,10 +1,9 @@
 'use client'
-import { WEBSITE_HOME, WEBSITE_LOGIN } from '@/routes/AdminPanelRoute'
+import { SHOP_HOME, WEBSITE_HOME, WEBSITE_LOGIN } from '@/routes/AdminPanelRoute'
 import Link from 'next/link'
 import React, { useState, useCallback, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { joinSocketRooms, socket } from '@/lib/socket'
-import axios from 'axios'
 import logo from '@/public/assets/eventsora.png'
 import Image from 'next/image'
 import { CircleUserRound, ShoppingCart, X } from 'lucide-react'
@@ -71,7 +70,7 @@ const Header = () => {
       <div className='flex justify-between items-center  max-w-screen-2xl mx-auto'>
 
         {/* LOGO */}
-        <Link href={WEBSITE_HOME}>
+        <Link href={SHOP_HOME}>
           <Image src={logo.src} width={logo.width} height={logo.height} alt='Logo' className='w-34 md:w-52' />
         </Link>
 

@@ -63,7 +63,7 @@ const AddProductVariant = () => {
             const { data } = await axios.post('/api/provider/product-variant/create', payload)
             if (!data.success) throw new Error(data.message)
             showToast('success', data.message)
-            form.reset()
+            // form.reset()
             setSelectedMedia([])
         } catch (error) {
             showToast('error', error.response?.data?.message || error.message)

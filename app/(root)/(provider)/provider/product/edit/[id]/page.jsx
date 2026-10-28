@@ -289,7 +289,10 @@ const EditProduct = () => {
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <div className="overflow-hidden rounded-lg border">
-                        <Editor onChange={(event, editor) => form.setValue('description', editor.getData(), { shouldValidate: true })} /></div>
+                        <Editor
+                          initialData={form.getValues('description')}
+                          onChange={(event, editor) => form.setValue('description', editor.getData(), { shouldValidate: true })}
+                        /></div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
