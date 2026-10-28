@@ -43,7 +43,7 @@ export async function GET(request) {
             { $facet: {
                 data: [
                     { $skip: start }, { $limit: size },
-                    { $project: { _id: 1, product: '$productData.name', productId: '$productData._id', name: 1, sku: 1, price: 1, stockType: 1, stockQuantity: 1, status: 1, deletedAt: 1 } }
+                    { $project: { _id: 1, product: '$productData.name', productId: '$productData._id', name: 1, attributes: 1, sku: 1, price: 1, stockType: 1, stockQuantity: 1, status: 1, deletedAt: 1 } }
                 ],
                 meta: [{ $count: 'totalRowCount' }]
             } }

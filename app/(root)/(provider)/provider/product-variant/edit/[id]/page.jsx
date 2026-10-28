@@ -44,6 +44,7 @@ const EditProductVariant = () => {
             productId: '', name: '', price: 0, sku: '', discountPercentage: 0,
             stockType: 'in_stock', stockQuantity: 0, processingValue: 0,
             processingUnit: 'days', inquirePrice: false, media: [],
+            attributes: { size: '', color: '' },
         },
     })
     const stockType = form.watch('stockType')
@@ -54,6 +55,7 @@ const EditProductVariant = () => {
             form.reset({
                 productId: variant.productId || variant.product?._id || '',
                 name: variant.name || '', price: variant.price || 0, sku: variant.sku || '',
+                attributes: { size: variant.attributes?.size || '', color: variant.attributes?.color || '' },
                 discountPercentage: variant.discountPercentage || 0,
                 stockType: variant.stockType || 'in_stock', stockQuantity: variant.stockQuantity || 0,
                 processingValue: variant.processingTime?.value || 0,
@@ -103,7 +105,9 @@ const EditProductVariant = () => {
             <CardContent><Form {...form}><form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
                 <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
                     <FormField control={form.control} name='productId' render={({ field }) => <FormItem><FormLabel>Product</FormLabel><FormControl><Select options={products.map((item) => ({ label: item.name, value: item._id }))} selected={field.value} setSelected={field.onChange} isMulti={false} placeholder='Select product' /></FormControl><FormMessage /></FormItem>} />
-                    {field('name', 'Variant Name', { placeholder: 'e.g. Premium' })}
+                    {field('name', 'Variant (e.g. number)', { placeholder: 'e.g. 1' })}
+                    {field('attributes.size', 'Size option (optional)', { placeholder: 'e.g. 40 inches' })}
+                    {field('attributes.color', 'Color option (optional)', { placeholder: 'e.g. Gold' })}
                     {field('sku', 'SKU', { placeholder: 'e.g. PROD-PREM-001' })}
                     {field('price', 'Price', { type: 'number', min: 0, step: '0.01' })}
                     {field('discountPercentage', 'Discount Percentage', { type: 'number', min: 0, max: 100, step: '0.01' })}

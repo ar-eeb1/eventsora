@@ -25,6 +25,46 @@ const formatPrice = (price) => new Intl.NumberFormat('en-PK', {
   maximumFractionDigits: 0,
 }).format(price || 0)
 
+const getVariantOptionInfo = (variant) => {
+  const attributes = Object.fromEntries(
+    Object.entries(variant?.attributes || {}).filter(([, value]) => typeof value === 'string' && value.trim())
+  )
+  const sizeMatch = variant?.sku?.match(/(?:^|[-_])(\d+(?:\.\d+)?)[-_ ]*(?:INCH(?:ES)?|IN)\b/i)
+  if (!sizeMatch) return { attributes, inferred: false }
+  const skuColor = variant.sku?.match(/(?:INCH(?:ES)?|IN)[-_ ]+(.+)$/i)?.[1]
+    ?.replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+  const isVariantName = /^\d+(?:\.\d+)?$/.test(variant.name || '')
+  const inferredAttributes = {
+    ...(!attributes.size ? { size: `${sizeMatch[1]} Inches` } : {}),
+    ...(!attributes.color && (skuColor || (!isVariantName && variant.name))
+      ? { color: skuColor || variant.name }
+      : {}),
+  }
+
+  return {
+    attributes: { ...attributes, ...inferredAttributes },
+    inferred: Object.keys(inferredAttributes).length > 0,
+  }
+}
+
+const getVariantAttributes = (variant) => getVariantOptionInfo(variant).attributes
+const isVariantGroupName = (variant) => (
+  Object.keys(variant?.attributes || {}).length > 0 ||
+  /^\d+(?:\.\d+)?$/.test(variant?.name || '')
+)
+
+const formatVariantName = (variant) => {
+  if (!variant) return null
+  const { attributes, inferred } = getVariantOptionInfo(variant)
+  const formattedAttributes = Object.entries(attributes)
+    .map(([name, value]) => `${name[0].toUpperCase()}${name.slice(1)}: ${value}`)
+  const variantLabel = isVariantGroupName(variant) ? `Variant: ${variant.name}` : null
+  return [...(variantLabel ? [variantLabel] : inferred ? [] : [variant.name]), ...formattedAttributes]
+    .filter(Boolean)
+    .join(' · ')
+}
+
 const ProductDetails = ({ product, category, subcategory, reviewStats, variants = [] }) => {
   const router = useRouter()
   const dispatch = useDispatch()
@@ -32,7 +72,15 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
   const cartItems = useSelector((store) => store.bookingStore.productCart || [])
   const minimumQuantity = product.minimumOrderQuantity || 1
   const [activeVariantId, setActiveVariantId] = useState(variants[0]?._id || '')
-  const activeVariant = variants.find((variant) => variant._id === activeVariantId)
+  const activeVariant = variants.find((variant) => variant._id === activeVariantId) || variants[0]
+  const hasAttributeOptions = variants.some((variant) => Object.keys(getVariantAttributes(variant)).length > 0)
+  const hasVariantGroups = variants.some(isVariantGroupName)
+  const attributeNames = [...new Set(variants.flatMap((variant) => Object.keys(getVariantAttributes(variant))))]
+  const variantNames = [...new Set(variants.map((variant) => variant.name).filter(Boolean))]
+  const activeAttributes = getVariantAttributes(activeVariant)
+  const variantsForName = !hasVariantGroups
+    ? variants
+    : variants.filter((variant) => variant.name === activeVariant?.name)
   const variantMedia = activeVariant?.media?.length ? activeVariant.media : product.media
   const images = variantMedia?.length ? variantMedia : [{ secure_url: placeholder.src, alt: product.name }]
   const [activeImage, setActiveImage] = useState(0)
@@ -53,6 +101,24 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
   const productUrl = SHOP_PRODUCT_DETAILS(category.slug, product.slug)
   const [messaging, setMessaging] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
+  const variantDisplayName = formatVariantName(activeVariant)
+
+  const selectVariant = (variant) => {
+    if (!variant) return
+    setActiveVariantId(variant._id)
+    setActiveImage(0)
+    setQuantity(minimumQuantity)
+  }
+
+  const selectAttribute = (name, value) => {
+    const candidates = variantsForName.filter((variant) => getVariantAttributes(variant)[name] === value)
+    const matchingVariant = candidates.find((variant) => attributeNames.every((attributeName) => (
+      attributeName === name ||
+      !activeAttributes[attributeName] ||
+      getVariantAttributes(variant)[attributeName] === activeAttributes[attributeName]
+    ))) || candidates[0]
+    selectVariant(matchingVariant)
+  }
 
   const handleMessageSeller = async () => {
     setMessaging(true)
@@ -72,7 +138,7 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
       productId: product._id,
       variantId: activeVariant?._id || null,
       productName: product.name,
-      variantName: activeVariant?.name || null,
+      variantName: variantDisplayName,
       productSlug: product.slug,
       categorySlug: category.slug,
       sku,
@@ -131,25 +197,73 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
           </div>
 
           {variants.length > 0 && (
-            <div className='mt-5'>
-              <p className='mb-2 text-sm font-semibold text-gray-900'>Options</p>
-              <div className='flex flex-wrap gap-2'>
-                {variants.map((variant) => (
-                  <button
-                    key={variant._id}
-                    type='button'
-                    aria-pressed={activeVariantId === variant._id}
-                    onClick={() => {
-                      setActiveVariantId(variant._id)
-                      setActiveImage(0)
-                      setQuantity(minimumQuantity)
-                    }}
-                    className={`cursor-pointer rounded-sm border px-3 py-2 text-sm ${activeVariantId === variant._id ? 'border-pink-900 bg-pink-900 text-white' : 'border-gray-300 text-gray-800 hover:border-pink-900'}`}
-                  >
-                    {variant.name}
-                  </button>
-                ))}
-              </div>
+            <div className='mt-5 space-y-4'>
+              {hasAttributeOptions ? (
+                <>
+                  {hasVariantGroups && (
+                    <div>
+                      <p className='mb-2 text-sm font-semibold text-gray-900'>Variant: {activeVariant?.name}</p>
+                      {variantNames.length > 1 && (
+                        <div className='flex flex-wrap gap-2'>
+                          {variantNames.map((name) => {
+                            const optionVariant = variants.find((variant) => variant.name === name)
+                            return (
+                              <button
+                                key={name}
+                                type='button'
+                                aria-pressed={activeVariant?.name === name}
+                                onClick={() => selectVariant(optionVariant)}
+                                className={`cursor-pointer rounded-sm border px-3 py-2 text-sm ${activeVariant?.name === name ? 'border-pink-900 bg-pink-900 text-white' : 'border-gray-300 text-gray-800 hover:border-pink-900'}`}
+                              >
+                                {name}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {attributeNames.map((name) => {
+                    const values = [...new Set(variantsForName.map((variant) => getVariantAttributes(variant)[name]).filter(Boolean))]
+                    if (!values.length) return null
+                    return (
+                      <div key={name}>
+                        <p className='mb-2 text-sm font-semibold capitalize text-gray-900'>{name}: {activeAttributes[name]}</p>
+                        <div className='flex flex-wrap gap-2'>
+                          {values.map((value) => (
+                            <button
+                              key={value}
+                              type='button'
+                              aria-pressed={activeAttributes[name] === value}
+                              onClick={() => selectAttribute(name, value)}
+                              className={`cursor-pointer rounded-sm border px-3 py-2 text-sm ${activeAttributes[name] === value ? 'border-pink-900 bg-pink-900 text-white' : 'border-gray-300 text-gray-800 hover:border-pink-900'}`}
+                            >
+                              {value}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </>
+              ) : (
+                <div>
+                  <p className='mb-2 text-sm font-semibold text-gray-900'>Options</p>
+                  <div className='flex flex-wrap gap-2'>
+                    {variants.map((variant) => (
+                      <button
+                        key={variant._id}
+                        type='button'
+                        aria-pressed={activeVariant?._id === variant._id}
+                        onClick={() => selectVariant(variant)}
+                        className={`cursor-pointer rounded-sm border px-3 py-2 text-sm ${activeVariant?._id === variant._id ? 'border-pink-900 bg-pink-900 text-white' : 'border-gray-300 text-gray-800 hover:border-pink-900'}`}
+                      >
+                        {variant.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
