@@ -3,7 +3,7 @@ import { isAuthenticated } from '@/lib/authentication'
 import { connectDB } from '@/lib/databaseConnection'
 import { catchError, response } from '@/lib/helperFunction'
 import ProductModel from '@/models/Product.Model'
-
+import ProductVariantModel from '@/models/ProductVariant.Model'
 export async function GET(request, { params }) {
     try {
         const auth = await isAuthenticated('provider')
