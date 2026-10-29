@@ -66,7 +66,7 @@ const productVariantSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ["pending", "approved", "rejected", "draft"],
-        default: "pending"
+        default: "approved"
     },
     deletedAt: {
         type: Date,
