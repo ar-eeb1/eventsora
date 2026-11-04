@@ -26,7 +26,7 @@ import ListingDetailsSkeleton from '@/components/application/Website/ListingDeta
 import ListingReview from '@/components/application/Website/ListingReview'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { url } from 'zod'
-import PortfolioMedia from '@/components/application/Website/PortfolioMedia'
+// import PortfolioMedia from '@/components/application/Website/PortfolioMedia'
 import { marked } from 'marked'
 import { messageApi } from '@/lib/messageApi'
 
@@ -555,14 +555,14 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                 <div dangerouslySetInnerHTML={{ __html: marked.parse(decode(listing?.description || ''), { breaks: true }) }}></div>
             </Card>
             {/* PORTFOLIO */}
-            <Card className={'mb-10 p-4'}>
+            {/* <Card className={'mb-10 p-4'}>
                 <CardHeader className={'font-semibold text-2xl border-b border-pink-400 p-0 m-0 [.border-b]:pb-0'}>
                     <h2>Portfolio</h2>
                 </CardHeader>
                 <CardContent>
                     <PortfolioMedia userId={listing?.userId?._id || listing?.userId} />
                 </CardContent>
-            </Card>
+            </Card> */}
             {/* <Card className={'mb-10 p-4'}>
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.569993409171!2d67.050618!3d24.946714699999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb340813dc70c37%3A0xe503df5734802d4a!2sNorth%20Marriage%20Garden!5e0!3m2!1sen!2s!4v1772465330808!5m2!1sen!2s"
