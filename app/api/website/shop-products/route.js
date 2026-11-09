@@ -1,6 +1,7 @@
 import { connectDB } from '@/lib/databaseConnection'
 import { catchError, response } from '@/lib/helperFunction'
 import ProductModel from '@/models/Product.Model'
+import ProductVariantModel from '@/models/ProductVariant.Model'
 import ShopCategoryModel from '@/models/ShopCategory.model'
 import ShopSubcategoryModel from '@/models/ShopSubcategory.model'
 import '@/models/Media.model'
@@ -35,9 +36,23 @@ export async function GET(request) {
             filter.subcategory = { $in: subcategories.map((subcategory) => subcategory._id) }
         }
         if (minPrice !== null || maxPrice !== null) {
-            filter.price = {}
-            if (minPrice !== null) filter.price.$gte = minPrice
-            if (maxPrice !== null) filter.price.$lte = maxPrice
+            const priceRange = {}
+            if (minPrice !== null) priceRange.$gte = minPrice
+            if (maxPrice !== null) priceRange.$lte = maxPrice
+
+            const candidateProductIds = await ProductModel.distinct('_id', filter)
+            const variantProductIds = candidateProductIds.length
+                ? await ProductVariantModel.distinct('product', {
+                    product: { $in: candidateProductIds },
+                    status: 'approved',
+                    deletedAt: null,
+                    price: priceRange,
+                })
+                : []
+            filter.$or = [
+                { price: priceRange },
+                { _id: { $in: variantProductIds } },
+            ]
         }
 
         const products = await ProductModel.find(filter)
@@ -46,7 +61,42 @@ export async function GET(request) {
             .limit(100)
             .lean()
 
-        return response(true, 200, 'Shop products fetched', products)
+        const variants = products.length
+            ? await ProductVariantModel.find({
+                product: { $in: products.map((product) => product._id) },
+                status: 'approved',
+                deletedAt: null,
+            })
+                .populate('media', '_id secure_url thumbnail_url alt')
+                .sort({ createdAt: 1 })
+                .lean()
+            : []
+        const variantsByProduct = new Map()
+        for (const variant of variants) {
+            const productId = variant.product.toString()
+            const productVariants = variantsByProduct.get(productId) || []
+            productVariants.push(variant)
+            variantsByProduct.set(productId, productVariants)
+        }
+
+        const isWithinPriceRange = (price) => (
+            (minPrice === null || price >= minPrice) &&
+            (maxPrice === null || price <= maxPrice)
+        )
+        const filteredProducts = []
+        for (const product of products) {
+            const productVariants = variantsByProduct.get(product._id.toString()) || []
+            if (productVariants.length) {
+                const matchingVariants = productVariants.filter((variant) => isWithinPriceRange(variant.price))
+                if (matchingVariants.length) {
+                    filteredProducts.push({ ...product, variants: matchingVariants })
+                }
+            } else if (isWithinPriceRange(product.price)) {
+                filteredProducts.push({ ...product, variants: [] })
+            }
+        }
+
+        return response(true, 200, 'Shop products fetched', filteredProducts)
     } catch (error) {
         return catchError(error)
     }

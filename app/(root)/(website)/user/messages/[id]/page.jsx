@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { IoPricetagOutline, IoClose } from 'react-icons/io5'
 import { joinSocketRooms, socket } from '@/lib/socket'
 import { messageApi, messageApiUrl } from '@/lib/messageApi'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 
 const ChatPage = () => {
@@ -230,13 +231,15 @@ const ChatPage = () => {
                             className="block p-4 bg-white dark:bg-gray-800 rounded-lg border hover:shadow-md transition-shadow"
                         >
                             <div className="flex items-center gap-4">
-                                <Image
-                                    src={listing.media?.[0]?.secure_url || img.src}
-                                    width={50}
-                                    height={50}
-                                    alt="Listing"
-                                    className="rounded-full object-cover w-[50px] h-[50px]"
-                                />
+                                <div className='relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-full'>
+                                    <Image
+                                        src={listing.media?.[0]?.secure_url || img.src}
+                                        fill
+                                        alt="Listing"
+                                        className="object-cover"
+                                    />
+                                    <ImageWatermark size='small' />
+                                </div>
                                 <div className="flex-1">
                                     <h3 className="font-semibold text-lg line-clamp-1">{listing.name || otherParticipant.name}</h3>
                                     <div className="flex justify-between items-center mt-1">

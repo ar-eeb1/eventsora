@@ -15,6 +15,28 @@ const ShopCategoryProducts = ({ categorySlug, categoryName }) => {
   if (maxPrice) query.set('maxPrice', maxPrice)
   const { data, loading, error } = useFetch(`/api/website/shop-products?${query.toString()}`)
   const products = data?.data || []
+  const getVariantGroups = (variants = []) => {
+    const groups = new Map()
+    for (const variant of variants) {
+      const key = variant.name || variant._id
+      const group = groups.get(key) || []
+      group.push(variant)
+      groups.set(key, group)
+    }
+
+    return [...groups.values()].map((group) => {
+      const availableVariants = group.filter((variant) => (
+        variant.stockType === 'made_to_order' || variant.stockQuantity > 0
+      ))
+      const candidates = availableVariants.length ? availableVariants : group
+      return [...candidates].sort((a, b) => a.price - b.price)[0]
+    })
+  }
+  const productCards = products.flatMap((product) => (
+    product.variants?.length
+      ? getVariantGroups(product.variants).map((variant) => ({ product, variant }))
+      : [{ product, variant: null }]
+  ))
 
   if (loading || !data) {
     return <p className='py-16 text-center text-gray-500'>Loading products...</p>
@@ -28,10 +50,11 @@ const ShopCategoryProducts = ({ categorySlug, categoryName }) => {
 
   return (
     <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-      {products.map((product) => (
+      {productCards.map(({ product, variant }) => (
         <ProductBox
-          key={product._id}
+          key={`${product._id}-${variant?._id || 'product'}`}
           product={product}
+          variant={variant}
           categoryName={categoryName}
           categorySlug={categorySlug}
         />

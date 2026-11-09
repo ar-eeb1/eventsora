@@ -13,6 +13,7 @@ import { SHOP, SHOP_CART, SHOP_CHECKOUT } from '@/routes/WebsiteRoute'
 import { WEBSITE_LOGIN } from '@/routes/AdminPanelRoute'
 import { showToast } from '@/lib/showToast'
 import { getMinimumDeliverySlot, SHOP_DELIVERY_TIME_ZONE } from '@/lib/shopDelivery'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 const formatPrice = (amount) => new Intl.NumberFormat('en-PK', {
   style: 'currency',
@@ -222,6 +223,7 @@ const CheckoutPage = () => {
               <div key={`${item.productId}-${item.variantId || 'standard'}`} className='flex gap-3 py-3'>
                 <div className='relative h-16 w-16 shrink-0 overflow-hidden bg-gray-100'>
                   <Image src={item.image || placeholder} fill alt={item.productName} sizes='64px' className='object-cover' unoptimized={Boolean(item.image)} />
+                  <ImageWatermark size='small' />
                 </div>
                 <div className='min-w-0 flex-1'>
                   <p className='line-clamp-2 text-sm font-medium text-gray-900'>{item.productName}</p>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import placeholder from '@/public/assets/img-placeholder.png'
 import { removeFromProductCart, updateProductCartQuantity } from '@/store/reducer/bookingReducer'
 import { SHOP, SHOP_CHECKOUT, SHOP_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 const formatPrice = (amount) => new Intl.NumberFormat('en-PK', {
   style: 'currency',
@@ -52,6 +53,7 @@ const ProductCartPage = () => {
               <article key={`${item.productId}-${item.variantId || 'standard'}`} className='flex flex-wrap gap-4 py-5 sm:flex-nowrap'>
                 <Link href={SHOP_PRODUCT_DETAILS(item.categorySlug, item.productSlug)} className='relative h-24 w-24 shrink-0 overflow-hidden bg-gray-100'>
                   <Image src={item.image || placeholder} fill alt={item.productName} sizes='96px' className='object-cover' unoptimized={Boolean(item.image)} />
+                  <ImageWatermark size='small' />
                 </Link>
                 <div className='min-w-0 flex-1'>
                   <Link href={SHOP_PRODUCT_DETAILS(item.categorySlug, item.productSlug)} className='font-semibold text-gray-900 hover:text-pink-900'>{item.productName}</Link>

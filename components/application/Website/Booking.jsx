@@ -28,6 +28,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { WEBSITE_BOOKINGS, WEBSITE_CHECKOUT, WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
 import { removeFromBooking } from '@/store/reducer/bookingReducer'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 // Constants
 const IMAGE_SIZE = 100
@@ -151,6 +152,7 @@ const Booking = () => {
                                                         className='object-cover hover:scale-105 transition-transform'
                                                         alt={listing?.listingName || 'Listing image'}
                                                     />
+                                                    <ImageWatermark size='small' />
                                                 </div>
                                             </Link>
 

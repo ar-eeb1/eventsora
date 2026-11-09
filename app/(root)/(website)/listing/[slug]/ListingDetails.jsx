@@ -29,6 +29,7 @@ import { url } from 'zod'
 // import PortfolioMedia from '@/components/application/Website/PortfolioMedia'
 import { marked } from 'marked'
 import { messageApi } from '@/lib/messageApi'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 
 const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCount }) => {
@@ -320,6 +321,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                                 alt='listing full view'
                                 className='object-contain max-h-[90vh] max-w-[90vw] rounded-md shadow-2xl'
                             />
+                            <ImageWatermark size='large' />
                         </div>
                     </div>
                 </div>
@@ -338,6 +340,7 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                                 alt='listing'
                                 className='border rounded-md max-w-full transition-opacity group-hover:opacity-95'
                             />
+                            <ImageWatermark size='large' />
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-md">
                                 <span className="text-white text-sm bg-black/50 px-3 py-1 rounded-full">Click to Zoom</span>
                             </div>
@@ -345,15 +348,22 @@ const ListingDetails = ({ listing, variants, startingPrice, capacity, reviewCoun
                     </div>
                     <div className='flex xl:flex-col items-center xl:gap-5 gap-3 xl:w-36 overflow-auto xl:pb-0 pb-2 max-h-150'>
                         {listing?.media?.map((thumb) => (
-                            <Image
+                            <button
                                 key={thumb._id}
-                                src={thumb?.secure_url || img.src}
-                                width={100}
-                                height={100}
-                                alt="listing thumbnail"
-                                className={`md:max-w-full max-w-16 rounded-md cursor-pointer ${thumb.secure_url === activeThumb ? 'border-2 border-primary' : 'border'}`}
+                                type='button'
+                                className='relative shrink-0'
                                 onClick={() => setActiveThumb(thumb.secure_url)}
-                            />
+                                aria-label='View listing image'
+                            >
+                                <Image
+                                    src={thumb?.secure_url || img.src}
+                                    width={100}
+                                    height={100}
+                                    alt="listing thumbnail"
+                                    className={`md:max-w-full max-w-16 rounded-md cursor-pointer ${thumb.secure_url === activeThumb ? 'border-2 border-primary' : 'border'}`}
+                                />
+                                <ImageWatermark size='small' />
+                            </button>
                         ))}
                     </div>
                 </div>

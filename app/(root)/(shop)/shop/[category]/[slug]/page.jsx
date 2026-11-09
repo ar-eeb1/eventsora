@@ -26,9 +26,16 @@ export async function generateMetadata({ params }) {
   }
 }
 
-const page = async ({ params }) => {
+const page = async ({ params, searchParams }) => {
   const { category, slug } = await params
-  return <ShopProductLoader categorySlug={category} productSlug={slug} />
+  const query = await searchParams
+  return (
+    <ShopProductLoader
+      categorySlug={category}
+      productSlug={slug}
+      selectedVariantId={typeof query?.variant === 'string' ? query.variant : ''}
+    />
+  )
 }
 
 export default page

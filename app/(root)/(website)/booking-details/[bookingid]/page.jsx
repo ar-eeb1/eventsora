@@ -12,6 +12,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
 import StatusBadge from '@/components/application/StatusBadge'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 
 const breadCrumbData = [
@@ -138,6 +139,7 @@ const BookingDetails = () => {
                           alt={item.name}
                           className="object-cover"
                         />
+                        <ImageWatermark size='small' />
                       </Link>
                       <div className="flex-1">
                         <Link href={`/listing/${item.listingId?.slug || item.slug}`} className="hover:text-pink-600 transition-colors">

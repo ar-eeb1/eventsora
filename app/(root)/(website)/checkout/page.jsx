@@ -15,6 +15,7 @@ import { WEBSITE_BOOKING_DETAILS, WEBSITE_BOOKINGS, WEBSITE_LISTING_DETAILS } fr
 import { zSchema } from '@/lib/zodSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { z } from 'zod'
@@ -375,6 +376,7 @@ const CheckoutPage = () => {
                                   alt={listing.listingName}
                                   className='object-cover'
                                 />
+                                <ImageWatermark size='small' />
                               </div>
                               <div className='flex flex-col'>
                                 <Link href={WEBSITE_LISTING_DETAILS(listing?.slug)} className='font-semibold line-clamp-2 hover:text-pink-600 transition-colors mb-1'>{listing.listingName}</Link>

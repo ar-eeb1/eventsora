@@ -4,6 +4,7 @@ import React from 'react'
 import { MapPin, Users } from 'lucide-react'
 import Link from 'next/link'
 import { WEBSITE_LISTING_DETAILS } from '@/routes/WebsiteRoute'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 const ListingBox = ({ listing }) => {
     const imageUrl = listing?.media?.[0]?.secure_url || img.src
@@ -25,6 +26,7 @@ const ListingBox = ({ listing }) => {
                     className='object-cover hover:scale-105 transition-transform duration-300'
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
+                <ImageWatermark />
                 {capacity &&
                     <div className='flex items-center gap-2 text-gray-600 absolute right-2 top-2 bg-white/90 backdrop-blur-sm px-2 rounded-full py-1 shadow-sm border border-pink-100'>
                         <Users size={15} className='text-pink-700' aria-hidden="true" />

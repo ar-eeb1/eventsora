@@ -13,6 +13,7 @@ import { Package, Trash2, Calendar, ShoppingBag } from 'lucide-react'
 import { BiMinus, BiPlus } from 'react-icons/bi'
 import { decreaseQuantity, increaseQuantity, removeFromBooking, updateQuantity } from '@/store/reducer/bookingReducer'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 const breadCrumbData = [
   { href: WEBSITE_HOME, label: 'Home' },
@@ -135,6 +136,7 @@ const BookingItem = ({ item, onIncrease, onDecrease, onRemove, onUpdateQuantity 
               fill
               className='object-cover'
             />
+            <ImageWatermark size='small' />
           </div>
           <div className='flex-1 min-w-0'>
             <h4 className='font-semibold line-clamp-2 hover:text-pink-600 transition-colors mb-1'>

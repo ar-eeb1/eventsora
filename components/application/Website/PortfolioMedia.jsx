@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { CardContent } from '@/components/ui/card'
 import ButtonLoading from '@/components/application/ButtonLoading'
 import img from '@/public/assets/img-placeholder.png'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 const PortfolioMedia = ({ userId }) => {
     const [media, setMedia] = useState([])
@@ -68,6 +69,7 @@ const PortfolioMedia = ({ userId }) => {
                             className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
                             priority={index === 0}
                         />
+                        <ImageWatermark />
 
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300" />
                     </div>

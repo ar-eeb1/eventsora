@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
@@ -18,6 +18,7 @@ import { addToProductCart } from '@/store/reducer/bookingReducer'
 import { SHOP, SHOP_CART, SHOP_CATEGORY, SHOP_CHECKOUT, SHOP_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import { showToast } from '@/lib/showToast'
 import { messageApi } from '@/lib/messageApi'
+import ImageWatermark from '@/components/application/Website/ImageWatermark'
 
 const formatPrice = (price) => new Intl.NumberFormat('en-PK', {
   style: 'currency',
@@ -65,13 +66,15 @@ const formatVariantName = (variant) => {
     .join(' · ')
 }
 
-const ProductDetails = ({ product, category, subcategory, reviewStats, variants = [] }) => {
+const ProductDetails = ({ product, category, subcategory, reviewStats, variants = [], selectedVariantId }) => {
   const router = useRouter()
   const dispatch = useDispatch()
   const auth = useSelector((store) => store.authStore.auth)
   const cartItems = useSelector((store) => store.bookingStore.productCart || [])
   const minimumQuantity = product.minimumOrderQuantity || 1
-  const [activeVariantId, setActiveVariantId] = useState(variants[0]?._id || '')
+  const [activeVariantId, setActiveVariantId] = useState(
+    variants.find((variant) => variant._id === selectedVariantId)?._id || variants[0]?._id || ''
+  )
   const activeVariant = variants.find((variant) => variant._id === activeVariantId) || variants[0]
   const hasAttributeOptions = variants.some((variant) => Object.keys(getVariantAttributes(variant)).length > 0)
   const hasVariantGroups = variants.some(isVariantGroupName)
@@ -102,6 +105,11 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
   const [messaging, setMessaging] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
   const variantDisplayName = formatVariantName(activeVariant)
+
+  useEffect(() => {
+    const selectedVariant = variants.find((variant) => variant._id === selectedVariantId)
+    if (selectedVariant) setActiveVariantId(selectedVariant._id)
+  }, [selectedVariantId, variants])
 
   const selectVariant = (variant) => {
     if (!variant) return
@@ -180,11 +188,13 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
                 className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-19 sm:w-19 ${imageIndex === index ? 'border-pink-900' : 'border-gray-200'}`}
               >
                 <Image src={image.secure_url || placeholder} fill alt={image.alt || product.name} sizes='76px' className='object-cover' unoptimized={Boolean(image.secure_url)} />
+                <ImageWatermark size='small' />
               </button>
             ))}
           </div>
           <button type='button' onClick={() => setImageOpen(true)} className='relative order-1 aspect-square w-full overflow-hidden rounded-sm bg-gray-100 sm:order-2' aria-label='View product image larger'>
             <Image src={imageUrl} fill alt={images[imageIndex]?.alt || product.name} sizes='(max-width: 768px) 100vw, 50vw' className='object-cover transition-transform duration-300 hover:scale-[1.02]' unoptimized={Boolean(images[imageIndex]?.secure_url)} priority />
+            <ImageWatermark size='large' />
           </button>
         </div>
 
@@ -382,6 +392,7 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
               <div key={`${item.productId}-${item.variantId || 'standard'}`} className='flex gap-3 border-b border-gray-100 py-4'>
                 <div className='relative h-16 w-16 shrink-0 overflow-hidden bg-gray-100'>
                   <Image src={item.image || placeholder} fill alt={item.productName} sizes='64px' className='object-cover' unoptimized={Boolean(item.image)} />
+                  <ImageWatermark size='small' />
                 </div>
                 <div className='min-w-0 flex-1'>
                   <p className='line-clamp-2 text-sm font-medium text-gray-900'>{item.productName}</p>
@@ -410,6 +421,7 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
           <button type='button' aria-label='Close image viewer' onClick={() => setImageOpen(false)} className='absolute right-5 top-5 rounded-full p-2 text-white hover:bg-white/10'><X size={28} /></button>
           <div className='relative h-[85vh] w-full max-w-5xl' onClick={(event) => event.stopPropagation()}>
             <Image src={imageUrl} fill alt={images[imageIndex]?.alt || product.name} sizes='90vw' className='object-contain' unoptimized={Boolean(images[imageIndex]?.secure_url)} />
+            <ImageWatermark size='large' />
           </div>
         </div>
       )}
