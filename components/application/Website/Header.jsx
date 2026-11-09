@@ -108,14 +108,14 @@ const Header = () => {
                             <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
                                 <Link href={WEBSITE_CATEGORY('entertainment')}>Entertainment</Link>
                             </li>
-                            <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
+                            {/* <li className='hover:text-pink-500 lg:hover:text-pink-200 transition-colors' onClick={closeMobileMenu}>
                                 <Link
                                     href={SHOP}
                                     onNavigate={() => window.dispatchEvent(new Event('eventsora:shop-arrival'))}
                                 >
                                     Shop
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </nav>
 

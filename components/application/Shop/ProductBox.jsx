@@ -14,7 +14,8 @@ const formatPrice = (price) => new Intl.NumberFormat('en-PK', {
 const ProductBox = ({ product, variant, categoryName, categorySlug, className = '' }) => {
   const image = variant?.media?.[0] || product.media?.[0]
   const imageUrl = image?.secure_url
-  const name = variant?.name || product.name
+  const productName = product.name
+  const variantName = variant?.name
   const price = variant?.price ?? product.price
   const discountPercentage = variant?.discountPercentage ?? product.discountPercentage ?? 0
   const discountedPrice = price * (1 - discountPercentage / 100)
@@ -39,7 +40,7 @@ const ProductBox = ({ product, variant, categoryName, categorySlug, className = 
         <Image
           src={imageUrl || placeholder}
           fill
-          alt={image?.alt || name}
+          alt={image?.alt || productName}
           sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw'
           className='object-cover transition-transform duration-300 group-hover:scale-105'
           unoptimized={Boolean(imageUrl)}
@@ -53,7 +54,10 @@ const ProductBox = ({ product, variant, categoryName, categorySlug, className = 
       </div>
       <div className='space-y-3 p-4'>
         <p className='text-xs font-semibold uppercase text-pink-800'>{categoryName || 'Eventsora Shop'}</p>
-        <h2 className='line-clamp-1 text-lg font-semibold text-gray-900'>{name}</h2>
+        <h2 className='line-clamp-1 text-lg font-semibold text-gray-900'>{productName}</h2>
+        {variantName && (
+          <p className='-mt-2 line-clamp-1 text-sm text-gray-600'>{variantName}</p>
+        )}
         <div className='flex flex-wrap items-baseline gap-2'>
           {inquirePrice ? (
             <p className='text-lg font-bold text-pink-900'>Price on request</p>
