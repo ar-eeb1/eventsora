@@ -295,7 +295,16 @@ const ProductDetails = ({ product, category, subcategory, reviewStats, variants 
             className='mt-5 leading-7 text-gray-700 line-clamp-3'
             dangerouslySetInnerHTML={{ __html: product.description || '' }}
           />
-          <a rel="stylesheet" href="#desc" >See More</a>
+          <a
+            href='#desc'
+            onClick={(event) => {
+              event.preventDefault()
+              document.getElementById('desc')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }}
+            className='inline-block font-bold text-pink-900 underline underline-offset-4 transition duration-200 hover:text-pink-700 active:scale-95'
+          >
+            See More
+          </a>
 
 
           <div className='mt-6 grid gap-3 border-y border-gray-200 py-5 text-sm sm:grid-cols-2'>
